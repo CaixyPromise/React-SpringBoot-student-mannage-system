@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caixy.adminSystem.mapper.MajorInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.caixy.adminSystem.model.entity.MajorInfo">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="departId" column="departId" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="createUserId" column="createUserId" jdbcType="BIGINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,departId,name,
+        createUserId,createTime,updateTime,
+        isDelete
+    </sql>
+
+    <sql id="Base_Major_query">
+        SELECT m.id   AS majorId,
+               m.departId,
+               m.name AS majorName,
+               m.createUserId,
+               m.createTime,
+               m.updateTime,
+               d.id   AS departmentId,
+               d.name AS departmentName
+        FROM major_info m
+                 LEFT JOIN
+             department_info d ON m.departId = d.id
+        WHERE m.isDelete = 0
+    </sql>
+    <select id="listMajorWithDepartmentByPage" resultType="com.caixy.adminSystem.model.vo.major.MajorInfoWithDepartmentQueryVO">
+        SELECT
+            d.id AS departmentId,
+            d.name AS departmentName,
+            m.id AS majorId,
+            m.name AS majorName
+        FROM
+            department_info d
+                LEFT JOIN
+            major_info m ON d.id = m.departId AND m.isDelete = 0
+
+    </select>
+    <select id="getMajorWithDepartment" resultType="com.caixy.adminSystem.model.vo.major.MajorInfoWithDepartmentQueryVO">
+        <include refid="Base_Major_query" />
+    </select>
+
+
+
+    <select id="getMajorWithDepartmentById" resultType="com.caixy.adminSystem.model.vo.major.MajorWithDepartmentVO">
+        SELECT
+            m.id,
+            m.departId,
+            m.name,
+            m.createTime,
+            m.updateTime,
+            d.id AS departmentId,
+            d.name AS departmentName
+        FROM
+            major_info m
+                LEFT JOIN
+            department_info d ON m.departId = d.id
+        WHERE
+            m.isDelete = 0 AND m.id = #{id}
+    </select>
+
+
+    <select id="findDepartmentIdsByNames" resultType="com.caixy.adminSystem.model.entity.DepartmentInfo">
+        SELECT
+        id AS id,
+        name AS name
+        FROM
+        department_info
+        WHERE
+        name IN
+        <foreach item="name" collection="list" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+        AND isDelete = 0
+    </select>
+
+    <select id="checkMajorNamesExistUnderDepartments" resultType="com.caixy.adminSystem.model.entity.MajorInfo">
+        SELECT
+        m.name AS name,
+        d.id AS departId
+        FROM
+        major_info m
+        JOIN
+        department_info d ON m.departId = d.id
+        WHERE
+        m.name IN
+        <foreach item="name" collection="majorNames" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+        AND d.id IN
+        <foreach item="id" collection="departmentIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND m.isDelete = 0
+        AND d.isDelete = 0
+    </select>
+
+
+</mapper>

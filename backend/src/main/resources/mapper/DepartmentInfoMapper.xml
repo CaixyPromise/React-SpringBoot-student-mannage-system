@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caixy.adminSystem.mapper.DepartmentInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.caixy.adminSystem.model.entity.DepartmentInfo">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="createUserId" column="createUserId" jdbcType="BIGINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,createUserId,
+        createTime,updateTime,isDelete
+    </sql>
+
+    <select id="selectMajorByDepartmentId" resultType="com.caixy.adminSystem.model.dto.department.DepartmentWithMajorsDTO">
+        SELECT
+            d.id   AS departmentId,
+            d.name as departmentName,
+            m.name AS majorName,
+            m.id   AS majorId
+        FROM
+            department_info d
+        LEFT JOIN
+        major_info m on d.id = m.departId
+        <where>
+            <if test="departmentId != null">
+                AND d.id = #{departmentId}
+            </if>
+            AND d.isDelete = 0
+            AND m.isDelete = 0
+        </where>
+    </select>
+
+    <select id="validateDepartmentsAndMajors" resultType="java.util.Map">
+        SELECT
+        d.id AS departmentId,
+        m.id AS majorId
+        FROM
+        department_info d
+        LEFT JOIN
+        major_info m ON d.id = m.departId
+        WHERE
+        d.id IN
+        <foreach item="departmentId" collection="departmentIds" open="(" separator="," close=")">
+            #{departmentId}
+        </foreach>
+        AND
+        m.id
+        IN
+        <foreach item="majorId" collection="majorIds" open="(" separator="," close=")">
+            #{majorId}
+        </foreach>
+        AND
+        d.isDelete = 0
+        AND
+        m.isDelete = 0
+    </select>
+</mapper>

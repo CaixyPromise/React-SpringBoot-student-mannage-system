@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caixy.adminSystem.mapper.ClassesInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.caixy.adminSystem.model.entity.ClassesInfo">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="departId" column="departId" jdbcType="BIGINT"/>
+            <result property="majorId" column="majorId" jdbcType="BIGINT"/>
+            <result property="creatorId" column="creatorId" jdbcType="BIGINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,departId,
+        majorId,creatorId,createTime,
+        updateTime,isDelete
+    </sql>
+</mapper>

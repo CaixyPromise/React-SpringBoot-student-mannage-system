@@ -9,21 +9,25 @@ import com.caixy.adminSystem.common.ResultUtils;
 import com.caixy.adminSystem.constant.UserConstant;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.exception.ThrowUtils;
-
-import com.caixy.adminSystem.model.dto.classesInfo.ClassesInfoAddRequest;
-import com.caixy.adminSystem.model.dto.classesInfo.ClassesInfoEditRequest;
-import com.caixy.adminSystem.model.dto.classesInfo.ClassesInfoQueryRequest;
-import com.caixy.adminSystem.model.dto.classesInfo.ClassesInfoUpdateRequest;
+import com.caixy.adminSystem.model.dto.classesInfo.*;
 import com.caixy.adminSystem.model.entity.ClassesInfo;
 import com.caixy.adminSystem.model.entity.User;
+import com.caixy.adminSystem.model.vo.ClassesInfo.AllClassesOptionDataVO;
 import com.caixy.adminSystem.model.vo.ClassesInfo.ClassesInfoVO;
 import com.caixy.adminSystem.service.ClassesInfoService;
 import com.caixy.adminSystem.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 班级操作接口
@@ -181,6 +185,20 @@ public class ClassesController
         return ResultUtils.success(classesInfoService.getClassesInfoVOPage(postPage, request));
     }
 
+    @PostMapping("get/classes/under-major")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<List<ClassesInfoVO>> listClassesInfoVOByPageUnderMajor(@RequestBody @Valid ClassesInfoQueryUnderMajorRequest postQueryRequest)
+    {
+        if (postQueryRequest == null
+                || postQueryRequest.getMajorId() == null
+                || postQueryRequest.getDepartmentId() == null)
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数不能为空");
+        }
+        return ResultUtils.success(classesInfoService.getClassesInfoVOPageUnderMajor(postQueryRequest));
+    }
+
+
     /**
      * 分页获取当前用户创建的资源列表
      *
@@ -190,7 +208,7 @@ public class ClassesController
      */
     @PostMapping("/my/list/page/vo")
     public BaseResponse<Page<ClassesInfoVO>> listMyClassesInfoVOByPage(@RequestBody ClassesInfoQueryRequest postQueryRequest,
-                                                         HttpServletRequest request)
+                                                                       HttpServletRequest request)
     {
         if (postQueryRequest == null)
         {
@@ -218,7 +236,7 @@ public class ClassesController
      */
     @PostMapping("/search/page/vo")
     public BaseResponse<Page<ClassesInfoVO>> searchClassesInfoVOByPage(@RequestBody ClassesInfoQueryRequest postQueryRequest,
-                                                         HttpServletRequest request)
+                                                                       HttpServletRequest request)
     {
         long size = postQueryRequest.getPageSize();
         // 限制爬虫
@@ -260,4 +278,42 @@ public class ClassesController
         return ResultUtils.success(result);
     }
 
+    /**
+     * 获取学院->专业->班级树形结构
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @since 2024/4/30 下午2:50
+     */
+    @PostMapping("/get/classes")
+    public BaseResponse<List<AllClassesOptionDataVO>> getClassesOptionDataVOByPage(@RequestBody ClassesInfoQueryRequest postQueryRequest) {
+        List<DepartmentMajorClassDTO> rawData = classesInfoService.fetchAllClassesData();
+        Map<Long, List<DepartmentMajorClassDTO>> groupedByDepartment =
+                rawData.stream()
+                        .collect(Collectors.groupingBy(dto -> dto.getDepartmentId() != null ? dto.getDepartmentId() : -1));
+
+        List<AllClassesOptionDataVO> result = groupedByDepartment.entrySet().stream().map(deptEntry -> {
+            DepartmentMajorClassDTO firstDept = deptEntry.getValue().get(0);
+            AllClassesOptionDataVO deptOption = new AllClassesOptionDataVO(String.valueOf(deptEntry.getKey()), firstDept.getDepartmentName());
+            Map<Long, List<DepartmentMajorClassDTO>> groupedByMajor =
+                    deptEntry.getValue().stream()
+                            .collect(Collectors.groupingBy(dto -> dto.getMajorId() != null ? dto.getMajorId() : -1));
+
+            List<AllClassesOptionDataVO> majorOptions = groupedByMajor.entrySet().stream().map(majorEntry -> {
+                if (majorEntry.getKey() == -1) return null; // Skip if majorId is -1 (null in database)
+                DepartmentMajorClassDTO firstMajor = majorEntry.getValue().get(0);
+                AllClassesOptionDataVO majorOption =
+                        new AllClassesOptionDataVO(String.valueOf(majorEntry.getKey()), firstMajor.getMajorName());
+                List<AllClassesOptionDataVO> classOptions = majorEntry.getValue().stream()
+                        .filter(classDto -> classDto.getClassId() != null) // Ensure class ID is not null
+                        .map(classEntry -> new AllClassesOptionDataVO(String.valueOf(classEntry.getClassId()), classEntry.getClassName(), new ArrayList<>()))
+                        .collect(Collectors.toList());
+                majorOption.setChildren(classOptions.isEmpty() ? new ArrayList<>() : classOptions);
+                return majorOption;
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+            deptOption.setChildren(majorOptions.isEmpty() ? new ArrayList<>() : majorOptions);
+            return deptOption;
+        }).collect(Collectors.toList());
+        return ResultUtils.success(result);
+    }
 }

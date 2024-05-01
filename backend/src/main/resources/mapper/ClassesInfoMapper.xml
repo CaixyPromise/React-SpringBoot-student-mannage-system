@@ -20,4 +20,44 @@
         majorId,creatorId,createTime,
         updateTime,isDelete
     </sql>
+
+    <select id="selectClassByMajorAndDepartId" resultType="com.caixy.adminSystem.model.vo.ClassesInfo.ClassesInfoVO">
+        SELECT
+            cls.id as id,
+            cls.name as name,
+            depart.name as departName,
+            major.name as majorName,
+            cls.creatorId as creatorId,
+            cls.createTime as createTime,
+            cls.updateTime as updateTime
+        FROM
+            department_info depart,
+            classes_info cls,
+            major_info major
+        WHERE
+            depart.id = #{departId} AND
+            major.id = #{majorId} AND
+            cls.departId = depart.id AND
+            cls.majorId = major.id
+    </select>
+
+    <select id="fetchAllClassesData" resultType="com.caixy.adminSystem.model.dto.classesInfo.DepartmentMajorClassDTO">
+        SELECT
+            d.id AS departmentId,
+            d.name AS departmentName,
+            m.id AS majorId,
+            m.name AS majorName,
+            c.id AS classId,
+            c.name AS className
+        FROM
+            department_info d
+                LEFT JOIN
+            major_info m ON d.id = m.departId AND m.isDelete = 0
+                LEFT JOIN
+            classes_info c ON m.id = c.majorId AND c.isDelete = 0
+        WHERE
+            d.isDelete = 0
+        ORDER BY
+            d.name, m.name, c.name;
+    </select>
 </mapper>

@@ -14,24 +14,26 @@ import java.util.List;
 public class ClassesInfoUpdateRequest implements Serializable {
 
     /**
-     * id
+     * 名字
      */
-    private Long id;
+    String name;
+
 
     /**
-     * 标题
+     * 学院id
      */
-    private String title;
+    Long departId;
 
     /**
-     * 内容
+     * 专业id
      */
-    private String content;
-
+    Long majorId;
+    
     /**
-     * 标签列表
+     * 班级id
      */
-    private List<String> tags;
-
+    Long id;
+    
+    
     private static final long serialVersionUID = 1L;
 }

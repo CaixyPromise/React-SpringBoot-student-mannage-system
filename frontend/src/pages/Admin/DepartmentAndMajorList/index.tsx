@@ -1,20 +1,20 @@
 import CreateModal from "@/components/CreateAndUpdateModal/components/CreateModal";
 import UpdateModal from '@/components/CreateAndUpdateModal/components/UpdateModal';
 import {PlusOutlined} from '@ant-design/icons';
-import type {ActionType} from '@ant-design/pro-components';
-import {PageContainer, ProTable} from '@ant-design/pro-components';
+import {ActionType, PageContainer, ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
-import {Button, Empty, MenuProps, message} from 'antd';
+import {Button, Cascader, Empty, Form, Input, MenuProps, message, Modal} from 'antd';
 import React, {useRef, useState} from 'react';
 import {
     createDepartmentColumns,
     DepartmentColumns,
+    subClassesColumns,
     subMajorColumns,
     updateMajorColumns
 } from "@/pages/Admin/DepartmentAndMajorList/columns/DepartmentAndMajorColumns";
 import {
     addMajorInfoUsingPOST,
-    deleteMajorInfoUsingPOST, downloadTemplateUsingGET,
+    deleteMajorInfoUsingPOST,
     listMajorInfoByPageUsingPOST,
     updateMajorInfoUsingPOST
 } from "@/services/backend/majorInfoController";
@@ -24,6 +24,11 @@ import {
     updateDepartmentInfoUsingPOST
 } from "@/services/backend/departmentController";
 import Dropdown from "antd/es/dropdown/dropdown";
+import {
+    addClassesInfoUsingPOST,
+    listClassesInfoVoByPageUnderMajorUsingPOST,
+    updateClassesInfoUsingPOST
+} from "@/services/backend/classesController";
 
 interface DataSourceMajor
 {
@@ -55,6 +60,9 @@ const DepartmentAndMajorListPage: React.FC = () =>
     const [ createMajorModalVisible, setCreateMajorModalVisible ] = useState<boolean>(false);
     const [ updateMajorModalVisible, setUpdateMajorModalVisible ] = useState<boolean>(false);
 
+    // 班级模态框状态
+    const [ createClassesModalVisible, setCreateClassesModalVisible ] = useState<boolean>(false);
+    const [ updateClassesModalVisible, setUpdateClassesModalVisible ] = useState<boolean>(false);
     // 当前选中的专业
     const [ majorCurrentRow, setMajorCurrentRow ] = useState<{
         majorId: string;
@@ -62,10 +70,23 @@ const DepartmentAndMajorListPage: React.FC = () =>
         departmentId: string;
     }>({ majorId: "", majorName: "", departmentId: "" });
 
+    const [ classesCurrentRow, setClassesCurrentRow ] = useState<{
+        classesId: string;
+        classesName: string;
+        departmentId: string;
+        majorId: string;
+    }>({ classesId: "", classesName: "", departmentId: "", majorId: "" });
+
+    const [ classForm ] = Form.useForm<{
+        departmentMajor: string[];
+        classesName: string;
+    }>();
     const actionRef = useRef<ActionType>();
     // 当前用户点击的数据
     const [ currentRow, setCurrentRow ] = useState<API.User>();
     const majorRef = useRef<ActionType>();
+    const classesRef = useRef<ActionType>();
+
     const [ dataSource, setDataSource ] = useState<DataSourceDepartment[]>([])
     const [ currentUpdateDepartment, setCurrentUpdateDepartment ] = useState()
     const processData = (data) =>
@@ -87,6 +108,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
                 groupedByDepartment[record.departmentId].majors.push({
                     majorId: record.majorId,
                     majorName: record.majorName,
+                    departmentId: record.departmentId,
                     operations: '操作', // 根据需要定义操作
                 });
             }
@@ -95,8 +117,8 @@ const DepartmentAndMajorListPage: React.FC = () =>
             ...dept,
             key: dept.departmentId
         }));
-        console.log("result is: ", result)
         setDataSource(result);
+        console.log("dataSource: ", dataSource)
         return result;
     };
     const majorExpandedRowRender = (record: any) =>
@@ -142,6 +164,9 @@ const DepartmentAndMajorListPage: React.FC = () =>
             dataSource={record.majors}
             pagination={false}
             rowKey={"majorId"}
+            expandable={{
+                expandedRowRender: classesExpandedRowRender,
+            }}
             tableRender={(_, dom) => (
                 isEmpty ? <Empty
                     description={<p>此学院尚未设立专业 <a
@@ -153,8 +178,10 @@ const DepartmentAndMajorListPage: React.FC = () =>
     }
 
 
-    const classeseExpandedRowRender = (record: any) =>
+    const classesExpandedRowRender = (record: any) =>
     {
+        console.log("record is: ", record)
+        console.log("majorCurrentRef is: ", majorCurrentRow)
         const handleDeleteMajor = async (record: { majorId: API.DeleteRequest; }) =>
         {
             const { data, code } = await deleteMajorInfoUsingPOST({ id: record.majorId })
@@ -164,45 +191,100 @@ const DepartmentAndMajorListPage: React.FC = () =>
                 actionRef.current?.reloadAndRest?.()
             }
         }
-        const handleUpdateClick = (record: DataSourceMajor) =>
+        const handleUpdateClick = (record) =>
         {
-            // 找到当前专业所属的学院ID
-            const departmentId = dataSource.find(
-                department => department.majors.some(major => major.majorId === record.majorId))?.departmentId || '';
+            const findIdsByNames = (majorName: string, departName: string) =>
+            {
+                for (let department of dataSource)
+                {
+                    if (department.departmentName === departName)
+                    {
+                        for (let major of department.majors)
+                        {
+                            if (major.majorName === majorName)
+                            {
+                                return {
+                                    departmentId: department.departmentId,
+                                    majorId: major.majorId
+                                };
+                            }
+                        }
+                    }
+                }
+                return { departmentId: '', majorId: '' };
+            }
 
-            // 设置当前操作的专业行及其学院ID
-            setMajorCurrentRow({
-                majorId: record.majorId,
-                majorName: record.majorName,
-                departmentId: departmentId
-            });
+            // 找到当前专业所属的学院ID
+            const { departmentId, majorId } = findIdsByNames(record.majorName, record.departName)
+            // // 设置当前操作的专业行及其学院ID
+            setClassesCurrentRow({
+                classesId: record.id,
+                classesName: record.name,
+                departmentId: departmentId,
+                majorId: majorId
+            })
+            // setClassesCurrentRow({
+            //     majorId: record,
+            //     classesId: record.id,
+            //     classesName: record.majorName,
+            //     departmentId: departmentId
+            // });
 
             // 显示更新专业的模态框
-            setUpdateMajorModalVisible(true);
+            setUpdateClassesModalVisible(true);
         };
 
-        const isEmpty = record.majors.length === 0;
+        const fetchDataSource: {
+            data: API.ClassesInfoVO[] | undefined,
+            total: number,
+            success: boolean
+        } = async () =>
+        {
+            const { code, data } = await listClassesInfoVoByPageUnderMajorUsingPOST({
+                majorId: record.majorId,
+                departmentId: record.departmentId
+            })
+            if (code === 0 && data)
+            {
+                return {
+                    data: data,
+                    size: data.length,
+                    success: true
+                };
+            }
+            else
+            {
+                return {
+                    data: [],
+                    size: 0,
+                    success: false
+                };
+            }
+
+        }
+
 
         return <ProTable
-            columns={subMajorColumns({
-                setCurrentRow: setMajorCurrentRow,
+            columns={subClassesColumns({
+                setCurrentRow: setClassesCurrentRow,
                 handleDeleteFunction: handleDeleteMajor,
                 setUpdateModalVisible: handleUpdateClick,
             })}
             headerTitle={false}
             search={false}
-            actionRef={majorRef}
+            actionRef={classesRef}
             options={false}
-            dataSource={record.majors}
+            // dataSource={[]}
             pagination={false}
-            rowKey={"majorId"}
-            tableRender={(_, dom) => (
-                isEmpty ? <Empty
-                    description={<p>此学院尚未设立专业 <a
-                        onClick={() => setCreateMajorModalVisible(true)}>现在去创建</a></p>}
-
-                /> : dom
-            )}
+            rowKey={"id"}
+            request={fetchDataSource}
+            // tableRender={(_, dom) => (
+            //     isEmpty ? <Empty
+            //         description={<p>此学院尚未设立班级 <a
+            //             onClick={() => setCreateMajorModalVisible(true)}>现在去创建</a></p>}
+            //
+            //     /> : dom
+            // )}
         />
     }
     /**
@@ -304,7 +386,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
         }
     }
 
-    const handleUpdateMajor = async (record) =>
+    const handleUpdateMajor = async (record: { majorName: any; majorId: any; departmentId: any; }) =>
     {
         try
         {
@@ -339,7 +421,8 @@ const DepartmentAndMajorListPage: React.FC = () =>
             onClick: async () =>
             {
                 const response = await fetch('/api/major/download/template/major');
-                if (!response.ok) {
+                if (!response.ok)
+                {
                     message.error('下载失败')
                 }
                 const blob = await response.blob();
@@ -385,6 +468,11 @@ const DepartmentAndMajorListPage: React.FC = () =>
                     >
                         <PlusOutlined/> 新建学院
                     </Button>,
+                    <Button type={"primary"}
+                            onClick={() => setCreateClassesModalVisible(true)}
+                    >
+                        <PlusOutlined/>新建班级
+                    </Button>,
                     <Dropdown.Button
                         icon={<PlusOutlined/>}
                         type="primary"
@@ -399,9 +487,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
                     >
                         新建专业
                     </Dropdown.Button>,
-                    <Button
-                        新建班级
-                    ></Button>
+
                 ]}
                 request={async (params, sort, filter) =>
                 {
@@ -515,6 +601,142 @@ const DepartmentAndMajorListPage: React.FC = () =>
                     setUpdateMajorModalVisible(false);
                 }}
             />
+
+            {/* 班级更新/创建操作*/}
+            <Modal
+                title={"新建班级"}
+                open={createClassesModalVisible}
+                onCancel={() =>
+                {
+                    setCreateClassesModalVisible(false)
+                    classForm.resetFields()
+                }}
+                onOk={async () =>
+                {
+                    const { departmentMajor, className } = classForm.getFieldsValue();
+                    if (departmentMajor && className)
+                    {
+                        const majorId = departmentMajor[1];
+                        const departId = departmentMajor[0];
+                        const response = await addClassesInfoUsingPOST({
+                            majorId,
+                            departId,
+                            name: className
+                        })
+                        message.success("班级创建成功！")
+
+                        setCreateClassesModalVisible(false)
+                        classForm.resetFields()
+                        actionRef.current?.reload();
+                        return response;
+                    }
+                    else
+                    {
+                        message.error("请输入完整信息！")
+                    }
+                }}
+            >
+                <Form form={classForm}>
+                    <Form.Item
+                        name="departmentMajor"
+                        label="所属学院和专业"
+                        rules={[ { required: true, message: '请选择学院和专业!' } ]}
+                    >
+                        <Cascader
+                            options={dataSource.map(dept => ({
+                                value: dept.departmentId,
+                                label: dept.departmentName,
+                                children: dept.majors.map(major => ({
+                                    value: major.majorId,
+                                    label: major.majorName,
+                                }))
+                            }))}
+                            placeholder="请先选择学院，然后选择专业"
+                        />
+                    </Form.Item>
+                    <Form.Item name={"className"} label={"班级名称"}
+                               rules={[ { required: true, message: '请输入班级名称!' } ]}>
+                        <Input placeholder={"班级名称"}></Input>
+
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+
+            <Modal
+                title="更新班级信息"
+                open={updateClassesModalVisible}
+                onCancel={() =>
+                {
+                    setUpdateClassesModalVisible(false);
+                    classForm.resetFields();
+                }}
+                onOk={async () =>
+                {
+                    const { departmentMajor, className } = classForm.getFieldsValue();
+                    if (departmentMajor && className)
+                    {
+                        const majorId = departmentMajor[1];
+                        const departId = departmentMajor[0];
+                        const response = await updateClassesInfoUsingPOST({
+                            id: classesCurrentRow.classesId,
+                            majorId,
+                            departId,
+                            name: className
+                        });
+                        if (response.code === 0)
+                        {
+                            message.success("班级更新成功！");
+                            setUpdateClassesModalVisible(false);
+                            classForm.resetFields();
+                            actionRef.current?.reload();
+                        }
+                        else
+                        {
+                            message.error(`班级更新失败！失败原因：${response.message}`);
+                        }
+                        return response;
+                    }
+                    else
+                    {
+                        message.error("请输入完整信息！");
+                    }
+                }}
+            >
+                <Form
+                    form={classForm}
+                    initialValues={{
+                        departmentMajor: [ classesCurrentRow.departmentId, classesCurrentRow.majorId ],
+                        className: classesCurrentRow.classesName
+                    }}
+                >
+                    <Form.Item
+                        name="departmentMajor"
+                        label="所属学院和专业"
+                        rules={[ { required: true, message: '请选择学院和专业!' } ]}
+                    >
+                        <Cascader
+                            options={dataSource.map(dept => ({
+                                value: dept.departmentId,
+                                label: dept.departmentName,
+                                children: dept.majors.map(major => ({
+                                    value: major.majorId,
+                                    label: major.majorName,
+                                }))
+                            }))}
+                            placeholder="请先选择学院，然后选择专业"
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        name="className"
+                        label="班级名称"
+                        rules={[ { required: true, message: '请输入班级名称!' } ]}
+                    >
+                        <Input placeholder="班级名称"/>
+                    </Form.Item>
+                </Form>
+            </Modal>
+
         </PageContainer>
     );
 };

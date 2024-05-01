@@ -7,8 +7,6 @@ import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoQueryRequest;
 import com.caixy.adminSystem.model.entity.StudentInfo;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * @author CAIXYPROMISE
  * @description 针对表【student_score】的数据库操作Service
@@ -44,10 +42,9 @@ public interface StudentInfoService extends IService<StudentInfo>
      * 获取帖子封装
      *
      * @param post
-     * @param request
      * @return
      */
-    StudentInfoVO getStudentInfoVO(StudentInfo post, HttpServletRequest request);
+    StudentInfoVO getStudentInfoVO(StudentInfo post);
 
     /**
      * 分页获取帖子封装
@@ -56,5 +53,5 @@ public interface StudentInfoService extends IService<StudentInfo>
      * @param request
      * @return
      */
-    Page<StudentInfoVO> getStudentInfoVOPage(Page<StudentInfo> postPage, HttpServletRequest request);
+    Page<StudentInfoVO> getStudentInfoVOPage(Page<StudentInfo> postPage);
 }

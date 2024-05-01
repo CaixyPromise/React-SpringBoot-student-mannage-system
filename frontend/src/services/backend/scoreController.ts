@@ -2,9 +2,9 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** addPost POST /api/score/add */
-export async function addPostUsingPOST3(
-  body: API.PostAddRequest,
+/** addStudentGrades POST /api/score/add */
+export async function addStudentGradesUsingPOST(
+  body: API.StudentGradesAddRequest,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseLong_>('/api/score/add', {
@@ -17,8 +17,8 @@ export async function addPostUsingPOST3(
   });
 }
 
-/** deletePost POST /api/score/delete */
-export async function deletePostUsingPOST3(
+/** deleteStudentGrades POST /api/score/delete */
+export async function deleteStudentGradesUsingPOST(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
 ) {
@@ -32,9 +32,9 @@ export async function deletePostUsingPOST3(
   });
 }
 
-/** editPost POST /api/score/edit */
-export async function editPostUsingPOST3(
-  body: API.PostEditRequest,
+/** editStudentGrades POST /api/score/edit */
+export async function editStudentGradesUsingPOST(
+  body: API.StudentGradesEditRequest,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseBoolean_>('/api/score/edit', {
@@ -47,13 +47,13 @@ export async function editPostUsingPOST3(
   });
 }
 
-/** getPostVOById GET /api/score/get/vo */
-export async function getPostVoByIdUsingGET3(
+/** getStudentGradesVOById GET /api/score/get/vo */
+export async function getStudentGradesVoByIdUsingGET(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getPostVOByIdUsingGET3Params,
+  params: API.getStudentGradesVOByIdUsingGET1Params,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponsePostVO_>('/api/score/get/vo', {
+  return request<API.BaseResponseStudentGradesVO_>('/api/score/get/vo', {
     method: 'GET',
     params: {
       ...params,
@@ -62,12 +62,12 @@ export async function getPostVoByIdUsingGET3(
   });
 }
 
-/** listPostByPage POST /api/score/list/page */
-export async function listPostByPageUsingPOST3(
-  body: API.PostQueryRequest,
+/** listStudentGradesByPage POST /api/score/list/page */
+export async function listStudentGradesByPageUsingPOST(
+  body: API.StudentGradesQueryRequest,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponsePagePost_>('/api/score/list/page', {
+  return request<API.BaseResponsePageStudentGrades_>('/api/score/list/page', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -77,12 +77,12 @@ export async function listPostByPageUsingPOST3(
   });
 }
 
-/** listPostVOByPage POST /api/score/list/page/vo */
-export async function listPostVoByPageUsingPOST3(
-  body: API.PostQueryRequest,
+/** listStudentGradesVOByPage POST /api/score/list/page/vo */
+export async function listStudentGradesVoByPageUsingPOST(
+  body: API.StudentGradesQueryRequest,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponsePagePostVO_>('/api/score/list/page/vo', {
+  return request<API.BaseResponsePageStudentGradesVO_>('/api/score/list/page/vo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -92,12 +92,12 @@ export async function listPostVoByPageUsingPOST3(
   });
 }
 
-/** listMyPostVOByPage POST /api/score/my/list/page/vo */
-export async function listMyPostVoByPageUsingPOST3(
-  body: API.PostQueryRequest,
+/** listMyStudentGradesVOByPage POST /api/score/my/list/page/vo */
+export async function listMyStudentGradesVoByPageUsingPOST(
+  body: API.StudentGradesQueryRequest,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponsePagePostVO_>('/api/score/my/list/page/vo', {
+  return request<API.BaseResponsePageStudentGradesVO_>('/api/score/my/list/page/vo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -107,12 +107,12 @@ export async function listMyPostVoByPageUsingPOST3(
   });
 }
 
-/** searchPostVOByPage POST /api/score/search/page/vo */
-export async function searchPostVoByPageUsingPOST3(
-  body: API.PostQueryRequest,
+/** searchStudentGradesVOByPage POST /api/score/search/page/vo */
+export async function searchStudentGradesVoByPageUsingPOST(
+  body: API.StudentGradesQueryRequest,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponsePagePostVO_>('/api/score/search/page/vo', {
+  return request<API.BaseResponsePageStudentGradesVO_>('/api/score/search/page/vo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -122,9 +122,9 @@ export async function searchPostVoByPageUsingPOST3(
   });
 }
 
-/** updatePost POST /api/score/update */
-export async function updatePostUsingPOST3(
-  body: API.PostUpdateRequest,
+/** updateStudentGrades POST /api/score/update */
+export async function updateStudentGradesUsingPOST(
+  body: API.StudentGradesUpdateRequest,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseBoolean_>('/api/score/update', {

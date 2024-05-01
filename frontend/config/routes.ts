@@ -10,6 +10,8 @@ export default [
       { path: '/admin', redirect: '/admin/user' },
       { icon: 'user', path: '/admin/user', component: './Admin/User', name: "用户管理" },
       { path: '/admin/department-data', name: '学院与专业管理', component: './Admin/DepartmentAndMajorList' },
+      { path: '/admin/subject', name: '科目管理', component: './Admin/Subject' },
+      { path: '/admin/student', name: '学生管理', component: './Admin/Student' },
 
     ],
   },

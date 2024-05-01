@@ -69,3 +69,9 @@ interface ColumnsFunctionProps
   setUpdateModalVisible:  React.Dispatch<React.SetStateAction<any>>
   handleDeleteFunction: (record: any) => void
 }
+
+interface OptionProps {
+  value: string;
+  label: string;
+  children?: OptionProps[]
+}

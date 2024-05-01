@@ -55,7 +55,7 @@ public class MajorInfoServiceImpl extends ServiceImpl<MajorInfoMapper, MajorInfo
     {
         return this.count(new LambdaQueryWrapper<MajorInfo>()
                 .eq(MajorInfo::getId, majorId)
-                .eq(MajorInfo::getDepartId, departId)) == 0;
+                .eq(MajorInfo::getDepartId, departId)) != 0;
     }
 
 

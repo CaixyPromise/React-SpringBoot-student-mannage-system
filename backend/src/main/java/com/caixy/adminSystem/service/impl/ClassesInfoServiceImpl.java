@@ -7,7 +7,10 @@ import com.caixy.adminSystem.common.ErrorCode;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.mapper.ClassesInfoMapper;
 import com.caixy.adminSystem.model.dto.classesInfo.ClassesInfoQueryRequest;
+import com.caixy.adminSystem.model.dto.classesInfo.ClassesInfoQueryUnderMajorRequest;
+import com.caixy.adminSystem.model.dto.classesInfo.DepartmentMajorClassDTO;
 import com.caixy.adminSystem.model.entity.ClassesInfo;
+import com.caixy.adminSystem.model.entity.MajorInfo;
 import com.caixy.adminSystem.model.vo.ClassesInfo.ClassesInfoVO;
 import com.caixy.adminSystem.service.ClassesInfoService;
 import com.caixy.adminSystem.service.DepartmentInfoService;
@@ -16,6 +19,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author CAIXYPROMISE
@@ -33,11 +39,18 @@ public class ClassesInfoServiceImpl extends ServiceImpl<ClassesInfoMapper, Class
     @Resource
     private MajorInfoService majorInfoService;
 
+
+    @Override
+    public List<DepartmentMajorClassDTO>  fetchAllClassesData()
+    {
+        return this.baseMapper.fetchAllClassesData();
+    }
+
     @Override
     public void validClassesInfo(ClassesInfo post, boolean add)
     {
         boolean majorExistById = majorInfoService.majorExistById(post.getMajorId(), post.getDepartId());
-        if (majorExistById)
+        if (!majorExistById)
         {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "专业不存在");
         }
@@ -72,6 +85,19 @@ public class ClassesInfoServiceImpl extends ServiceImpl<ClassesInfoMapper, Class
     public Page<ClassesInfoVO> getClassesInfoVOPage(Page<ClassesInfo> postPage, HttpServletRequest request)
     {
         return null;
+    }
+
+    @Override
+    public List<ClassesInfoVO> getClassesInfoVOPageUnderMajor(ClassesInfoQueryUnderMajorRequest classesInfoQueryRequest)
+    {
+        List<ClassesInfoVO> classesInfoVOS =
+                baseMapper.selectClassByMajorAndDepartId(classesInfoQueryRequest.getDepartmentId(),
+                        classesInfoQueryRequest.getMajorId());
+        if (classesInfoVOS.isEmpty())
+        {
+            return Collections.emptyList();
+        }
+        return classesInfoVOS;
     }
 
 

@@ -35,7 +35,7 @@ export async function deleteDepartmentInfoUsingPOST(
 /** getDepartmentInfoVOById GET /api/department/get/vo */
 export async function getDepartmentInfoVoByIdUsingGET(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getDepartmentInfoVOByIdUsingGETParams,
+  params: API.getDepartmentInfoVOByIdUsingGET1Params,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseDepartmentInfoVO_>('/api/department/get/vo', {
@@ -50,7 +50,7 @@ export async function getDepartmentInfoVoByIdUsingGET(
 /** getMajorUnderDepartment GET /api/department/get/vo/department-major */
 export async function getMajorUnderDepartmentUsingGET(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getMajorUnderDepartmentUsingGETParams,
+  params: API.getMajorUnderDepartmentUsingGET1Params,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseDepartmentWithMajorsVO_>(

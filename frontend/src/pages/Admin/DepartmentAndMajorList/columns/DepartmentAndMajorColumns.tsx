@@ -83,6 +83,56 @@ export const subMajorColumns = ({
     },
 ]
 
+export const subClassesColumns = ({
+    setCurrentRow,
+    setUpdateModalVisible,
+    handleDeleteFunction
+}: ColumnsFunctionProps): ProColumns[] => [
+    {
+        title: "班级id",
+        dataIndex: "id",
+        width: 120,
+    },
+    {
+        title: "班级名称",
+        dataIndex: "name",
+        width: 120,
+    },
+    {
+        title: "专业名称",
+        dataIndex: "majorName",
+        width: 120,
+    },
+    {
+        title: "学院名称",
+        dataIndex: "departName",
+        width: 120,
+    },
+    {
+        title: '操作',
+        dataIndex: 'option',
+        valueType: 'option',
+        width: 200,
+        render: (_, record) => (
+            <Space size="middle">
+                <Typography.Link
+                    onClick={() =>
+                    {
+                        setCurrentRow(record);
+                        setUpdateModalVisible(record);
+                    }}
+                >
+                    修改
+                </Typography.Link>
+                <Typography.Link type="danger" onClick={() => handleDeleteFunction(record)}>
+                    删除
+                </Typography.Link>
+            </Space>
+        ),
+    },
+]
+
+
 export const createDepartmentColumns: ProColumns[] = [
     {
         title: "学院名称",

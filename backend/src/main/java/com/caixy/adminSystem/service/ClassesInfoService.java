@@ -3,11 +3,14 @@ package com.caixy.adminSystem.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.caixy.adminSystem.model.dto.classesInfo.ClassesInfoQueryRequest;
+import com.caixy.adminSystem.model.dto.classesInfo.ClassesInfoQueryUnderMajorRequest;
+import com.caixy.adminSystem.model.dto.classesInfo.DepartmentMajorClassDTO;
 import com.caixy.adminSystem.model.entity.ClassesInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.caixy.adminSystem.model.vo.ClassesInfo.ClassesInfoVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
 * @author CAIXYPROMISE
@@ -15,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 * @createDate 2024-04-28 22:48:38
 */
 public interface ClassesInfoService extends IService<ClassesInfo> {
+    List<DepartmentMajorClassDTO>  fetchAllClassesData();
+
     /**
      * 校验
      *
@@ -56,4 +61,7 @@ public interface ClassesInfoService extends IService<ClassesInfo> {
      * @return
      */
     Page<ClassesInfoVO> getClassesInfoVOPage(Page<ClassesInfo> postPage, HttpServletRequest request);
+
+    List<ClassesInfoVO> getClassesInfoVOPageUnderMajor(ClassesInfoQueryUnderMajorRequest classesInfoQueryRequest);
+
 }

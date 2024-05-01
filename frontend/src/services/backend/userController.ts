@@ -35,7 +35,7 @@ export async function deleteUserUsingPOST(
 /** getUserById GET /api/user/get */
 export async function getUserByIdUsingGET(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getUserByIdUsingGETParams,
+  params: API.getUserByIdUsingGET1Params,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseUser_>('/api/user/get', {
@@ -58,7 +58,7 @@ export async function getLoginUserUsingGET(options?: { [key: string]: any }) {
 /** getUserVOById GET /api/user/get/vo */
 export async function getUserVoByIdUsingGET(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getUserVOByIdUsingGETParams,
+  params: API.getUserVOByIdUsingGET1Params,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseUserVO_>('/api/user/get/vo', {

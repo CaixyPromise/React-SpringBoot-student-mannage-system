@@ -3,15 +3,13 @@ package com.caixy.adminSystem.model.dto.studentInfo;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 更新请求
- *
- 
  */
 @Data
-public class StudentInfoUpdateRequest implements Serializable {
+public class StudentInfoUpdateRequest implements Serializable
+{
 
     /**
      * id
@@ -19,19 +17,29 @@ public class StudentInfoUpdateRequest implements Serializable {
     private Long id;
 
     /**
-     * 标题
+     * 学生姓名
      */
-    private String title;
+    private String stuName;
 
     /**
-     * 内容
+     * 学生性别
      */
-    private String content;
+    private Integer stuSex;
 
     /**
-     * 标签列表
+     * 学生学院id
      */
-    private List<String> tags;
+    private Long stuDeptId;
+
+    /**
+     * 学生专业id
+     */
+    private Long stuMajorId;
+
+    /**
+     * 学生班级Id
+     */
+    private Long stuClassId;
 
     private static final long serialVersionUID = 1L;
 }

@@ -1,9 +1,6 @@
 package com.caixy.adminSystem.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -28,6 +25,11 @@ public class Subjects implements Serializable
     private String name;
 
     /**
+     * 创建人id
+     */
+    private Long creatorId;
+
+    /**
      * 创建时间
      */
     private Date createTime;
@@ -40,6 +42,7 @@ public class Subjects implements Serializable
     /**
      * 是否删除
      */
+    @TableLogic
     private Integer isDelete;
 
     @TableField(exist = false)

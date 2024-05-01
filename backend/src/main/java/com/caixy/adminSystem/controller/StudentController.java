@@ -1,6 +1,5 @@
 package com.caixy.adminSystem.controller;
 
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.caixy.adminSystem.annotation.AuthCheck;
 import com.caixy.adminSystem.common.BaseResponse;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * 学生操作控制器
@@ -38,7 +36,7 @@ public class StudentController
 {
 
     @Resource
-    private StudentInfoService studentScoreService;
+    private StudentInfoService studentInfoService;
 
     @Resource
     private UserService userService;
@@ -59,11 +57,13 @@ public class StudentController
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        User loginUser = userService.getLoginUser(request);
         StudentInfo post = new StudentInfo();
         BeanUtils.copyProperties(postAddRequest, post);
-        List<String> tags = postAddRequest.getTags();
-
-        boolean result = studentScoreService.save(post);
+        // 参数校验
+        studentInfoService.validStudentInfo(post, true);
+        post.setCreatorId(loginUser.getId());
+        boolean result = studentInfoService.save(post);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newStudentInfoId = post.getId();
         return ResultUtils.success(newStudentInfoId);
@@ -86,10 +86,10 @@ public class StudentController
         User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
         // 判断是否存在
-        StudentInfo oldStudentInfo = studentScoreService.getById(id);
+        StudentInfo oldStudentInfo = studentInfoService.getById(id);
         ThrowUtils.throwIf(oldStudentInfo == null, ErrorCode.NOT_FOUND_ERROR);
 
-        boolean b = studentScoreService.removeById(id);
+        boolean b = studentInfoService.removeById(id);
         return ResultUtils.success(b);
     }
 
@@ -111,12 +111,12 @@ public class StudentController
         BeanUtils.copyProperties(postUpdateRequest, post);
 
         // 参数校验
-        studentScoreService.validStudentInfo(post, false);
+        studentInfoService.validStudentInfo(post, false);
         long id = postUpdateRequest.getId();
         // 判断是否存在
-        StudentInfo oldStudentInfo = studentScoreService.getById(id);
+        StudentInfo oldStudentInfo = studentInfoService.getById(id);
         ThrowUtils.throwIf(oldStudentInfo == null, ErrorCode.NOT_FOUND_ERROR);
-        boolean result = studentScoreService.updateById(post);
+        boolean result = studentInfoService.updateById(post);
         return ResultUtils.success(result);
     }
 
@@ -127,18 +127,19 @@ public class StudentController
      * @return
      */
     @GetMapping("/get/vo")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<StudentInfoVO> getStudentInfoVOById(long id, HttpServletRequest request)
     {
         if (id <= 0)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        StudentInfo post = studentScoreService.getById(id);
+        StudentInfo post = studentInfoService.getById(id);
         if (post == null)
         {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        return ResultUtils.success(studentScoreService.getStudentInfoVO(post, request));
+        return ResultUtils.success(studentInfoService.getStudentInfoVO(post));
     }
 
     /**
@@ -149,34 +150,17 @@ public class StudentController
      */
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Page<StudentInfo>> listStudentInfoByPage(@RequestBody StudentInfoQueryRequest postQueryRequest)
+    public BaseResponse<Page<StudentInfoVO>> listStudentInfoByPage(@RequestBody StudentInfoQueryRequest postQueryRequest)
     {
         long current = postQueryRequest.getCurrent();
         long size = postQueryRequest.getPageSize();
-        Page<StudentInfo> postPage = studentScoreService.page(new Page<>(current, size),
-                studentScoreService.getQueryWrapper(postQueryRequest));
-        return ResultUtils.success(postPage);
+        Page<StudentInfo> postPage = studentInfoService.page(new Page<>(current, size),
+                studentInfoService.getQueryWrapper(postQueryRequest));
+        return ResultUtils.success(studentInfoService.getStudentInfoVOPage(postPage));
+//        return ResultUtils.success(postPage);
     }
 
-    /**
-     * 分页获取列表（封装类）
-     *
-     * @param postQueryRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/list/page/vo")
-    public BaseResponse<Page<StudentInfoVO>> listStudentInfoVOByPage(@RequestBody StudentInfoQueryRequest postQueryRequest,
-                                                       HttpServletRequest request)
-    {
-        long current = postQueryRequest.getCurrent();
-        long size = postQueryRequest.getPageSize();
-        // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<StudentInfo> postPage = studentScoreService.page(new Page<>(current, size),
-                studentScoreService.getQueryWrapper(postQueryRequest));
-        return ResultUtils.success(studentScoreService.getStudentInfoVOPage(postPage, request));
-    }
+
 
     /**
      * 分页获取当前用户创建的资源列表
@@ -199,9 +183,9 @@ public class StudentController
         long size = postQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<StudentInfo> postPage = studentScoreService.page(new Page<>(current, size),
-                studentScoreService.getQueryWrapper(postQueryRequest));
-        return ResultUtils.success(studentScoreService.getStudentInfoVOPage(postPage, request));
+        Page<StudentInfo> postPage = studentInfoService.page(new Page<>(current, size),
+                studentInfoService.getQueryWrapper(postQueryRequest));
+        return ResultUtils.success(studentInfoService.getStudentInfoVOPage(postPage));
     }
 
     // endregion
@@ -220,8 +204,8 @@ public class StudentController
         long size = postQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<StudentInfo> postPage = studentScoreService.searchFromEs(postQueryRequest);
-        return ResultUtils.success(studentScoreService.getStudentInfoVOPage(postPage, request));
+        Page<StudentInfo> postPage = studentInfoService.searchFromEs(postQueryRequest);
+        return ResultUtils.success(studentInfoService.getStudentInfoVOPage(postPage));
     }
 
     /**
@@ -242,14 +226,14 @@ public class StudentController
         BeanUtils.copyProperties(postEditRequest, post);
 
         // 参数校验
-        studentScoreService.validStudentInfo(post, false);
+        studentInfoService.validStudentInfo(post, false);
         User loginUser = userService.getLoginUser(request);
         long id = postEditRequest.getId();
         // 判断是否存在
-        StudentInfo oldStudentInfo = studentScoreService.getById(id);
+        StudentInfo oldStudentInfo = studentInfoService.getById(id);
         ThrowUtils.throwIf(oldStudentInfo == null, ErrorCode.NOT_FOUND_ERROR);
 
-        boolean result = studentScoreService.updateById(post);
+        boolean result = studentInfoService.updateById(post);
         return ResultUtils.success(result);
     }
 

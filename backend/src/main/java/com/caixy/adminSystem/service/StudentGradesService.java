@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 */
 public interface StudentGradesService extends IService<StudentGrades> {
 
+    StudentGradesVO getStudentGradesVOByStuId(long stuId);
+
     /**
      * 校验
      *

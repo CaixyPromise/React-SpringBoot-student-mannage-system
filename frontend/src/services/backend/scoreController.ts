@@ -47,6 +47,21 @@ export async function editStudentGradesUsingPOST(
   });
 }
 
+/** getStudentGradesVOByStuId GET /api/score/get/stu/grade */
+export async function getStudentGradesVoByStuIdUsingGET(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getStudentGradesVOByStuIdUsingGET1Params,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseStudentGradesVO_>('/api/score/get/stu/grade', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** getStudentGradesVOById GET /api/score/get/vo */
 export async function getStudentGradesVoByIdUsingGET(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

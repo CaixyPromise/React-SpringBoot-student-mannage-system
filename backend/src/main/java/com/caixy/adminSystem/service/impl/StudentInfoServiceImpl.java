@@ -7,10 +7,7 @@ import com.caixy.adminSystem.common.ErrorCode;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.mapper.StudentInfoMapper;
 import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoQueryRequest;
-import com.caixy.adminSystem.model.entity.ClassesInfo;
-import com.caixy.adminSystem.model.entity.DepartmentInfo;
-import com.caixy.adminSystem.model.entity.MajorInfo;
-import com.caixy.adminSystem.model.entity.StudentInfo;
+import com.caixy.adminSystem.model.entity.*;
 import com.caixy.adminSystem.model.enums.UserSexEnum;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
 import com.caixy.adminSystem.service.ClassesInfoService;
@@ -86,6 +83,7 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         studentInfoVO.setStuDepart(departmentInfoById.getName());
         studentInfoVO.setStuMajor(majorInfoById.getName());
         studentInfoVO.setStuClass(classesInfoById.getName());
+
         return studentInfoVO;
     }
 

@@ -19,10 +19,11 @@ interface UpdateProps
         stuName?: string | undefined;
         stuSex?: number | undefined;
     },
+    packageRequestBody: PayloadBody | null
 }
 
 
-const Index: React.FC<UpdateProps> = ({ payload }: UpdateProps) =>
+const Index: React.FC<UpdateProps> = ( payload : UpdateProps) =>
 {
     const [ form ] = Form.useForm();
     const {

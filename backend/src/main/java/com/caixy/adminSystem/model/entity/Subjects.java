@@ -16,13 +16,23 @@ public class Subjects implements Serializable
     /**
      * id
      */
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
      * 科目名称
      */
     private String name;
+
+    /**
+     * 最高分
+     */
+    private Long gradeMax;
+
+    /**
+     * 最低分
+     */
+    private Long gradeMin;
 
     /**
      * 创建人id

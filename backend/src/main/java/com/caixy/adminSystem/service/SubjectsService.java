@@ -61,4 +61,6 @@ public interface SubjectsService extends IService<Subjects> {
     Page<SubjectsVO> getSubjectsVOPage(Page<Subjects> SubjectsPage, HttpServletRequest request);
 
     List<SubjectsVO> getAllSubjectsVO();
+
+    boolean checkGradeIsValid(Long grade, Subjects subjects);
 }

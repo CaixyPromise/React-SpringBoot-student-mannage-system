@@ -1,28 +1,55 @@
 import {ProColumns} from "@ant-design/pro-components";
-import {Space, Typography} from "antd";
+import {Badge, Space, Typography} from "antd";
 import React from "react";
+import {UserOutline} from "antd-mobile-icons";
+import StudentSex from "@/pages/Admin/Student/utils";
 
-export const SubjectColumns = ({
+export const StudentColumns = ({
     setCurrentRow,
     setUpdateModalVisible,
-    handleDeleteFunction
-}: ColumnsFunctionProps): ProColumns[] => [
+    handleDeleteFunction,
+    setScoreModalVisible,
+}: {
+    setCurrentRow: (currentRow: any) => void
+    setUpdateModalVisible:  React.Dispatch<React.SetStateAction<any>>
+    handleDeleteFunction: (record: any) => void,
+    setScoreModalVisible: (record: any) => void
+}): ProColumns[] => [
     {
-        title: '科目id',
+        title: 'id',
         width: 120,
         dataIndex: 'id',
         render: (_) => <a>{_}</a>,
     },
     {
-        title: '科目名称',
+        title: '学生姓名',
         width: 120,
-        dataIndex: 'name',
+        dataIndex: 'stuName',
     },
     {
-        title: '创建人id',
+        title: '学生性别',
         width: 120,
-        dataIndex: 'creatorId',
+        dataIndex: 'stuSex',
+        render: (_, record) => (
+            <StudentSex useSex={record.stuSex} />
+        )
     },
+    {
+        title: '所属学院',
+        width: 120,
+        dataIndex: 'stuDepart',
+    },
+    {
+        title: '学生专业',
+        width: 120,
+        dataIndex: 'stuMajor',
+    },
+    {
+        title: '学生班级',
+        width: 120,
+        dataIndex: 'stuClass',
+    },
+
     {
         title: '操作',
         dataIndex: 'option',
@@ -43,8 +70,7 @@ export const SubjectColumns = ({
                 <Typography.Link
                     onClick={() =>
                     {
-                        setCurrentRow(record);
-                        setUpdateModalVisible(true);
+                        setScoreModalVisible(record);
                     }}
                 >
                     编辑成绩

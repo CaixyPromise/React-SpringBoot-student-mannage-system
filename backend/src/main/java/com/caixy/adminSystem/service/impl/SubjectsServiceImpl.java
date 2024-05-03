@@ -14,7 +14,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,6 +80,19 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
         SubjectsVO subjectsVO = new SubjectsVO();
         BeanUtils.copyProperties(Subjects, subjectsVO);
         return subjectsVO;
+    }
+
+    /**
+     * 检查成绩是否是符合科目要求
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @since 2024/5/3 下午5:53
+     */
+    @Override
+    public boolean checkGradeIsValid(Long grade, Subjects subjects)
+    {
+        return grade > subjects.getGradeMin() && grade < subjects.getGradeMax();
     }
 }
 

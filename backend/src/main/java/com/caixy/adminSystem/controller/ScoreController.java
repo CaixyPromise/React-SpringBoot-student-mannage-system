@@ -1,6 +1,4 @@
 package com.caixy.adminSystem.controller;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.caixy.adminSystem.annotation.AuthCheck;
 import com.caixy.adminSystem.common.BaseResponse;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * 成绩接口
@@ -146,16 +143,24 @@ public class ScoreController
         return ResultUtils.success(studentGradesService.getStudentGradesVO(post, request));
     }
 
+    /**
+     * 获取学生成绩
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @since 2024/5/3 下午4:39
+     */
     @GetMapping("/get/stu/grade")
-    public BaseResponse<List<StudentGradesVO>> getStudentGradesVOByStuId(@RequestParam("stuId") long stuId,
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<StudentGradesVO> getStudentGradesVOByStuId(@RequestParam("stuId") long stuId,
                                                                          HttpServletRequest request)
     {
         if (stuId <= 0)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-//        student
-        return ResultUtils.success(null);
+        StudentGradesVO studentGradesVOByStuId = studentGradesService.getStudentGradesVOByStuId(stuId);
+        return ResultUtils.success(studentGradesVOByStuId);
     }
 
     /**

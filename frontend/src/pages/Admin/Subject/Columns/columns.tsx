@@ -1,7 +1,8 @@
 import {ProColumns} from "@ant-design/pro-components";
-import {Space, Typography} from "antd";
+import {Badge, InputNumber, Space, Typography} from "antd";
 import React from "react";
 import {userSexOption} from "@/pages/Admin/Student/Columns/option";
+import {record} from "@umijs/utils/compiled/zod";
 
 export const SubjectColumns = ({
     setCurrentRow,
@@ -15,40 +16,34 @@ export const SubjectColumns = ({
         render: (item) => <a>{item}</a>,
     },
     {
-        title: '学生姓名',
+        title: "科目名称",
         width: 120,
-        dataIndex: 'stuName',
+        dataIndex: "name",
+        valueType: "text"
     },
     {
-        title: '学生性别',
+        title: "科目最大值",
         width: 120,
-        dataIndex: 'stuSex',
-        valueType: "select",
-        valueEnum: {
-            1: {text: "男"},
-            2: {text: "女"}
-        }
+        dataIndex: "gradeMax",
+        valueType: "digit",
+        render: (_, record) => (
+            <><Badge status="processing" text={`${record.gradeMax} 分`}/> </>
+        )
     },
     {
-        title: '所属学院',
+        title: "科目最小值",
         width: 120,
-        dataIndex: 'stuDepart',
+        dataIndex: "gradeMin",
+        valueType: "digit",
+        render: (_, record) => (
+            <><Badge status="warning" text={`${record.gradeMin} 分`}/> </>
+        )
     },
     {
-        title: '所属专业',
+        title: '创建人id',
         width: 120,
-        dataIndex: 'stuMajor',
+        dataIndex: 'creatorId',
     },
-    {
-        title: '所属班级',
-        width: 120,
-        dataIndex: 'stuClass',
-    },
-    // {
-    //     title: '创建人id',
-    //     width: 120,
-    //     dataIndex: 'creatorId',
-    // },
     {
         title: '操作',
         dataIndex: 'option',
@@ -59,12 +54,7 @@ export const SubjectColumns = ({
                 <Typography.Link
                     onClick={() =>
                     {
-                        setCurrentRow({
-                            id: record.id,
-                            subjectName: [record.stuDeptId, record.stuMajorId, record.stuClassId ],
-                            stuName: record.stuName,
-                            stuSex: record.stuSex,
-                        });
+                        setCurrentRow(record);
                         setUpdateModalVisible(true);
                     }}
                 >

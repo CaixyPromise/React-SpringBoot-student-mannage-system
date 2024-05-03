@@ -1,9 +1,7 @@
 import {type ActionType, PageContainer, ProTable} from "@ant-design/pro-components";
 import {SubjectColumns} from "@/pages/Admin/Subject/Columns/columns";
-import React, {useRef, useState} from "react";
-import {deleteDepartmentInfoUsingPOST} from "@/services/backend/departmentController";
-import {Button, Form, Input, message, Modal} from "antd";
-import {listUserByPageUsingPOST} from "@/services/backend/userController";
+import React, {useEffect, useRef, useState} from "react";
+import {Button, Form, Input, InputNumber, message, Modal} from "antd";
 import {
     addSubjectsUsingPOST, deleteSubjectsUsingPOST,
     listSubjectsByPageUsingPOST,
@@ -20,7 +18,10 @@ const Index = () =>
     const [ updateModalVisible, setUpdateModalVisible ] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
     // 当前用户点击的数据
-    const [ currentRow, setCurrentRow ] = useState<API.Subjects>();
+    const [ currentRow, setCurrentRow ] = useState<Subject.CurrentRow>();
+    const [gradeMax, setGradeMax] = useState<number>(100);
+    const [gradeMin, setGradeMin] = useState<number>(0);
+
 
     const handleDelete = async (record) =>
     {
@@ -35,10 +36,78 @@ const Index = () =>
         }
     }
 
+    const checkScoreIsValid = async (): Promise<boolean> =>
+    {
+        if (gradeMax <= gradeMin)
+        {
+            message.error("分数最大值必须大于分数最小值");
+            return false;
+        }
+        if (gradeMin < 0)
+        {
+            message.error("分数最小值必须大于等于0");
+            return false;
+        }
+        if (gradeMax > Number.MAX_VALUE)
+        {
+            message.error(`分数最大值必须小于等于${Number.MAX_VALUE}`);
+            return false;
+        }
+        return true
+    }
+
+    const setCurrentRowFunction = (record: API.SubjectsVO) =>
+    {
+        console.log("setCurrentRowFunction: ", record)
+        setCurrentRow({
+            id: record.id,
+            name: record.name,
+            gradeMin: record.gradeMin,
+            gradeMax: record.gradeMax,
+        })
+        setGradeMin(record.gradeMin);
+        setGradeMax(record.gradeMax);
+    }
+
+    const ModalFormItemComponent = ({ initialValues }: { initialValues?: Subject.CurrentRow }) => {
+        // const [form] = Form.useForm();
+        useEffect(() => {
+            form.setFieldsValue(initialValues); // 在组件加载后设置初始值
+        }, [initialValues, form]);
+
+        return (
+            <Form form={form}>
+                <Form.Item name={"name"} label={"科目名称"}>
+                    <Input />
+                </Form.Item>
+                <Form.Item name="gradeMin" label="科目分数最小值">
+                    <InputNumber
+                        min={0}
+                        max={initialValues?.gradeMax}
+                        onChange={(value) => setGradeMin(value)}
+                    />
+                </Form.Item>
+                <Form.Item name="gradeMax" label="科目分数最大值">
+                    <InputNumber
+                        min={initialValues?.gradeMin}
+                        max={Number.MAX_VALUE}
+                        defaultValue={initialValues?.gradeMax}
+                        onChange={(value) => setGradeMax(value)}
+                    />
+                </Form.Item>
+            </Form>
+        );
+    }
+
+
     return <>
         <PageContainer title={"科目管理"}>
             <ProTable
-                columns={SubjectColumns({ setCurrentRow, setUpdateModalVisible, handleDeleteFunction: handleDelete })}
+                columns={SubjectColumns({
+                    handleDeleteFunction: handleDelete,
+                    setCurrentRow: setCurrentRowFunction,
+                    setUpdateModalVisible
+                })}
                 actionRef={actionRef}
                 rowKey="id"
                 toolBarRender={() => [
@@ -78,8 +147,16 @@ const Index = () =>
                         const {name} = form.getFieldsValue();
                         if (name)
                         {
+                            if (!await checkScoreIsValid())
+                            {
+                                return;
+                            }
                             try {
-                                const {data, code} = await addSubjectsUsingPOST({name})
+                                const {data, code} = await addSubjectsUsingPOST({
+                                    name,
+                                    gradeMin,
+                                    gradeMax
+                                })
                                 if (code === 0)
                                 {
                                     message.success("添加成功")
@@ -108,11 +185,7 @@ const Index = () =>
                        form.resetFields()
                    }}
             >
-                <Form form={form}>
-                    <Form.Item name={"name"} label={"科目名称"}>
-                        <Input />
-                    </Form.Item>
-                </Form>
+                <ModalFormItemComponent key={"add"}/>
             </Modal>
 
             <Modal title={"更新"}
@@ -123,7 +196,15 @@ const Index = () =>
                        if (name)
                        {
                            try {
-                               const {data, code} = await updateSubjectsUsingPOST({id: currentRow.id, name})
+                               if (!await checkScoreIsValid())
+                               {
+                                   return;
+                               }
+                               const {data, code} = await updateSubjectsUsingPOST({
+                                   id: currentRow.id,
+                                   name,
+                                   gradeMin,
+                                   gradeMax})
                                if (code === 0)
                                {
                                    message.success("添加成功")
@@ -150,15 +231,8 @@ const Index = () =>
                        setUpdateModalVisible(false);
                        form.resetFields();
                    }}
-
             >
-                <Form form={form} initialValues={{
-                    name: currentRow?.name
-                }}>
-                    <Form.Item name={"name"} label={"科目名称"}>
-                        <Input />
-                    </Form.Item>
-                </Form>
+                <ModalFormItemComponent key={"modify"} initialValues={currentRow}/>
             </Modal>
 
         </PageContainer>

@@ -3,30 +3,29 @@ package com.caixy.adminSystem.model.dto.StudentGrades;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 创建请求
- *
- 
  */
 @Data
-public class StudentGradesAddRequest implements Serializable {
+public class StudentGradesAddRequest implements Serializable
+{
 
     /**
-     * 标题
+     * 科目id
      */
-    private String title;
+    private Long subjectId;
 
     /**
-     * 内容
+     * 学生id
      */
-    private String content;
+    private Long studentId;
 
     /**
-     * 标签列表
+     * 成绩
      */
-    private List<String> tags;
+    private Long score;
+
 
     private static final long serialVersionUID = 1L;
 }

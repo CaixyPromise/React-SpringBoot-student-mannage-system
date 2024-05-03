@@ -1,5 +1,4 @@
 import {type ActionType, PageContainer, ProTable} from "@ant-design/pro-components";
-import {SubjectColumns} from "@/pages/Admin/Subject/Columns/columns";
 import React, {useEffect, useRef, useState} from "react";
 import {Button, Card, Descriptions, Form, message, Modal} from "antd";
 import {deleteSubjectsUsingPOST, getAllSubjectsVoUsingGET} from "@/services/backend/subjectController";
@@ -7,8 +6,9 @@ import {PlusOutlined} from "@ant-design/icons";
 import {getClassesOptionDataVoByPageUsingPOST} from "@/services/backend/classesController";
 import UpdateInfoModal from "@/pages/Admin/Student/components/UpdateInfoModal";
 import CreateInfoModal from "@/pages/Admin/Student/components/CreateInfoModal";
-import {CurrentRowProps, PayloadBody} from "@/pages/Admin/Student/typing";
 import {listStudentInfoByPageUsingPOST,} from "@/services/backend/studentController";
+import {StudentColumns} from "@/pages/Admin/Student/Columns/columns";
+import ScoreInfoModal from "@/pages/Admin/Student/components/ScoreInfoModal";
 
 const Index = () =>
 {
@@ -17,23 +17,13 @@ const Index = () =>
     const [ createModalVisible, setCreateModalVisible ] = useState<boolean>(false);
     // 是否显示更新窗口
     const [ updateModalVisible, setUpdateModalVisible ] = useState<boolean>(false);
+    const [ scoreInfoModalVisible, setScoreInfoModalVisible ] = useState<boolean>(false);
+
     const actionRef = useRef<ActionType>();
     // 当前用户点击的数据
-    const [ currentRow, setCurrentRow ] = useState<CurrentRowProps>();
+    const [ currentRow, setCurrentRow ] = useState<Student.CurrentRowProps>();
     const [ cascadeOption, setCascadeOption ] = useState<API.AllClassesOptionDataVO[]>([]);
     const [ subjectOption, setSubjectOption] = useState<OptionProps>();
-
-    /**
-     * 处理选择事件
-     *
-     * @author CAIXYPROMISE
-     * @since 2024/5/1 下午9:39
-     * @version 1.0
-     */
-    const handleChoiceStudentInfo = async (record: CurrentRowProps) =>
-    {
-        const {data, code} = await getStu
-    }
 
     /**
      * 删除
@@ -82,7 +72,9 @@ const Index = () =>
                         // @ts-ignore
                         label: item.name,
                         // @ts-ignore
-                        value: item.id
+                        value: item.id,
+                        max: item.gradeMax,
+                        min: item.gradeMin
                     })
                 })
                 // @ts-ignore
@@ -101,7 +93,7 @@ const Index = () =>
         fetchSubjectOption()
     }, [])
 
-    const packageRequestBody = (): PayloadBody | null =>
+    const packageRequestBody = (): Student.PayloadBody | null =>
     {
         const { stuName, stuSex, subjectName } = form.getFieldsValue();
         if (stuName && stuSex && subjectName && subjectName.length === 3)
@@ -117,10 +109,21 @@ const Index = () =>
         return null
     }
 
+    const setScoreModalVisible = (record: API.StudentInfoVO) =>
+    {
+        setCurrentRow(record)
+        setScoreInfoModalVisible(true)
+    }
+
     return <>
-        <PageContainer title={"科目管理"}>
+        <PageContainer title={"学生管理"}>
             <ProTable
-                columns={SubjectColumns({ setCurrentRow, setUpdateModalVisible, handleDeleteFunction: handleDelete })}
+                columns={StudentColumns({
+                    setCurrentRow,
+                    setUpdateModalVisible,
+                    handleDeleteFunction: handleDelete,
+                    setScoreModalVisible
+                })}
                 actionRef={actionRef}
                 rowKey="id"
                 toolBarRender={() => [
@@ -162,6 +165,14 @@ const Index = () =>
                 setCreateModalVisible={setCreateModalVisible}
                 cascadeOption={cascadeOption}
                 actionRef={actionRef}
+                packageRequestBody={packageRequestBody}
+            />
+
+            <ScoreInfoModal
+                scoreModalVisible={scoreInfoModalVisible}
+                setScoreModalVisible={setScoreInfoModalVisible}
+                currentRow={currentRow}
+                subjectItem={subjectOption}
             />
 
             <UpdateInfoModal
@@ -169,6 +180,7 @@ const Index = () =>
                 setUpdateModalVisible={setUpdateModalVisible}
                 cascadeOption={cascadeOption}
                 actionRef={actionRef}
+                packageRequestBody={packageRequestBody}
                 currentRow={{
                     ...currentRow,
                     packageRequestBody

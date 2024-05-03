@@ -3,6 +3,7 @@ import {Cascader, Form, Input, message, Modal, Select} from "antd";
 import {userSexOption} from "@/pages/Admin/Student/Columns/option";
 import React from "react";
 import {ActionType} from "@ant-design/pro-components";
+import {PayloadBody} from "@/pages/Admin/Student/typing";
 
 interface CreateProps
 {
@@ -10,10 +11,11 @@ interface CreateProps
     setCreateModalVisible: (value: boolean) => void
     cascadeOption: API.AllClassesOptionDataVO[]
     actionRef: React.MutableRefObject<ActionType | undefined>,
+    packageRequestBody: () => PayloadBody | null
 }
 
 
-const Index: React.FC<CreateProps> = ({payload} : CreateProps ) =>
+const Index: React.FC<CreateProps> = (payload : CreateProps ) =>
 {
     const [form] = Form.useForm();
     const {createModalVisible, setCreateModalVisible, cascadeOption, packageRequestBody, actionRef} = payload

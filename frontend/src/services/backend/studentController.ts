@@ -67,22 +67,7 @@ export async function listStudentInfoByPageUsingPOST(
   body: API.StudentInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponsePageStudentInfo_>('/api/student/list/page', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** listStudentInfoVOByPage POST /api/student/list/page/vo */
-export async function listStudentInfoVoByPageUsingPOST(
-  body: API.StudentInfoQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageStudentInfoVO_>('/api/student/list/page/vo', {
+  return request<API.BaseResponsePageStudentInfoVO_>('/api/student/list/page', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

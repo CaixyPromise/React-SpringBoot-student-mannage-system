@@ -125,12 +125,6 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponsePageStudentInfo_ = {
-    code?: number;
-    data?: PageStudentInfo_;
-    message?: string;
-  };
-
   type BaseResponsePageStudentInfoVO_ = {
     code?: number;
     data?: PageStudentInfoVO_;
@@ -351,6 +345,11 @@ declare namespace API {
     id?: number;
   };
 
+  type getStudentGradesVOByStuIdUsingGET1Params = {
+    /** stuId */
+    stuId: number;
+  };
+
   type getStudentInfoVOByIdUsingGET1Params = {
     /** id */
     id?: number;
@@ -369,6 +368,13 @@ declare namespace API {
   type getUserVOByIdUsingGET1Params = {
     /** id */
     id?: number;
+  };
+
+  type GradeItem = {
+    grade?: number;
+    gradeId?: number;
+    subjectId?: number;
+    subjectName?: string;
   };
 
   type LoginUserVO = {
@@ -525,19 +531,6 @@ declare namespace API {
     orders?: OrderItem[];
     pages?: number;
     records?: StudentGradesVO[];
-    searchCount?: boolean;
-    size?: number;
-    total?: number;
-  };
-
-  type PageStudentInfo_ = {
-    countId?: string;
-    current?: number;
-    maxLimit?: number;
-    optimizeCountSql?: boolean;
-    orders?: OrderItem[];
-    pages?: number;
-    records?: StudentInfo[];
     searchCount?: boolean;
     size?: number;
     total?: number;
@@ -701,9 +694,9 @@ declare namespace API {
   };
 
   type StudentGradesAddRequest = {
-    content?: string;
-    tags?: string[];
-    title?: string;
+    score?: number;
+    studentId?: number;
+    subjectId?: number;
   };
 
   type StudentGradesEditRequest = {
@@ -737,27 +730,9 @@ declare namespace API {
   };
 
   type StudentGradesVO = {
-    content?: string;
-    createTime?: string;
-    favourNum?: number;
-    hasFavour?: boolean;
-    hasThumb?: boolean;
-    id?: number;
-    tagList?: string[];
-    thumbNum?: number;
-    title?: string;
-    updateTime?: string;
-    user?: UserVO;
-    userId?: number;
-  };
-
-  type StudentInfo = {
-    id?: number;
-    stuClassId?: number;
-    stuDeptId?: number;
-    stuMajorId?: number;
-    stuName?: string;
-    stuSex?: number;
+    gradeItem?: GradeItem[];
+    stuId?: number;
+    studentInfo?: StudentInfoVO;
   };
 
   type StudentInfoAddRequest = {
@@ -792,17 +767,31 @@ declare namespace API {
   };
 
   type StudentInfoUpdateRequest = {
-    content?: string;
     id?: number;
-    tags?: string[];
-    title?: string;
+    stuClassId?: number;
+    stuDeptId?: number;
+    stuMajorId?: number;
+    stuName?: string;
+    stuSex?: number;
   };
 
-  type StudentInfoVO = true;
+  type StudentInfoVO = {
+    id?: number;
+    stuClass?: string;
+    stuClassId?: number;
+    stuDepart?: string;
+    stuDeptId?: number;
+    stuMajor?: string;
+    stuMajorId?: number;
+    stuName?: string;
+    stuSex?: number;
+  };
 
   type Subjects = {
     createTime?: string;
     creatorId?: number;
+    gradeMax?: number;
+    gradeMin?: number;
     id?: number;
     isDelete?: number;
     name?: string;
@@ -810,6 +799,8 @@ declare namespace API {
   };
 
   type SubjectsAddRequest = {
+    gradeMax?: number;
+    gradeMin?: number;
     name?: string;
   };
 
@@ -842,9 +833,11 @@ declare namespace API {
   };
 
   type SubjectsVO = {
-    id?: string;
+    id?: number;
     name?: string;
-  };
+    gradeMax?: number;
+    gradeMin?: number;
+  }
 
   type uploadFileUsingPOST1Params = {
     biz?: string;

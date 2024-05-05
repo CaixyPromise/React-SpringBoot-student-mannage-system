@@ -17,6 +17,21 @@ export async function addStudentGradesUsingPOST(
   });
 }
 
+/** batchAddStudentGrades POST /api/score/add/batch */
+export async function batchAddStudentGradesUsingPOST(
+  body: API.StudentGradesAddRequest[],
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseBoolean_>('/api/score/add/batch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** deleteStudentGrades POST /api/score/delete */
 export async function deleteStudentGradesUsingPOST(
   body: API.DeleteRequest,

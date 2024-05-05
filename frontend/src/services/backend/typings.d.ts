@@ -723,10 +723,8 @@ declare namespace API {
   };
 
   type StudentGradesUpdateRequest = {
-    content?: string;
     id?: number;
-    tags?: string[];
-    title?: string;
+    grade?: number;
   };
 
   type StudentGradesVO = {
@@ -828,16 +826,18 @@ declare namespace API {
   };
 
   type SubjectsUpdateRequest = {
+    gradeMax?: number;
+    gradeMin?: number;
     id?: number;
     name?: string;
   };
 
   type SubjectsVO = {
-    id?: number;
-    name?: string;
     gradeMax?: number;
     gradeMin?: number;
-  }
+    id?: number;
+    name?: string;
+  };
 
   type uploadFileUsingPOST1Params = {
     biz?: string;

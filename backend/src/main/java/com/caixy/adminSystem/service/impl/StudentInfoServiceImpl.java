@@ -7,7 +7,10 @@ import com.caixy.adminSystem.common.ErrorCode;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.mapper.StudentInfoMapper;
 import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoQueryRequest;
-import com.caixy.adminSystem.model.entity.*;
+import com.caixy.adminSystem.model.entity.ClassesInfo;
+import com.caixy.adminSystem.model.entity.DepartmentInfo;
+import com.caixy.adminSystem.model.entity.MajorInfo;
+import com.caixy.adminSystem.model.entity.StudentInfo;
 import com.caixy.adminSystem.model.enums.UserSexEnum;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
 import com.caixy.adminSystem.service.ClassesInfoService;
@@ -87,6 +90,21 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         return studentInfoVO;
     }
 
+    /**
+     * 根据学生id获取VO
+     */
+    @Override
+    public StudentInfoVO getStudentInfoVOById(Long id)
+    {
+        StudentInfo studentInfo = this.getById(id);
+        if (studentInfo == null)
+        {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "学生信息不存在");
+        }
+        return getStudentInfoVO(studentInfo);
+    }
+
+
     @Override
     public Page<StudentInfoVO> getStudentInfoVOPage(Page<StudentInfo> postPage)
     {
@@ -123,7 +141,18 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         return postVOPage;
     }
 
-
+    /**
+     * 批量根据id获取学生信息
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @since 2024/5/5 下午10:26
+     */
+    @Override
+    public List<StudentInfo> batchListStudentInfoByIds(List<Long> stuIds)
+    {
+        return this.listByIds(stuIds);
+    }
 }
 
 

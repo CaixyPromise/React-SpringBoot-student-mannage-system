@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 成绩接口
@@ -49,6 +50,7 @@ public class ScoreController
      * @return
      */
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addStudentGrades(@RequestBody StudentGradesAddRequest postAddRequest, HttpServletRequest request)
     {
         if (postAddRequest == null)
@@ -60,12 +62,27 @@ public class ScoreController
 
         studentGradesService.validStudentGrades(post, true);
         User loginUser = userService.getLoginUser(request);
-
+        post.setCreatorId(loginUser.getId());
         boolean result = studentGradesService.save(post);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newStudentGradesId = post.getId();
         return ResultUtils.success(newStudentGradesId);
     }
+
+    @PostMapping("/add/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> batchAddStudentGrades(@RequestBody List<StudentGradesAddRequest> postAddRequest, HttpServletRequest request)
+    {
+        if (postAddRequest == null || postAddRequest.isEmpty())
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数不能为空");
+        }
+        User loginUser = userService.getLoginUser(request);
+
+        return ResultUtils.success(studentGradesService.batchAddStudentGrade(postAddRequest, loginUser.getId()));
+    }
+
+
 
     /**
      * 删除

@@ -1,5 +1,5 @@
-import {UserOutline} from "antd-mobile-icons";
 import React from "react";
+import {UserOutlined} from "@ant-design/icons";
 
 
 const StudentSex: React.FC<Student.StudentSexProps> = ({ useSex }) =>
@@ -15,7 +15,7 @@ const StudentSex: React.FC<Student.StudentSexProps> = ({ useSex }) =>
 
     return (
         <span aria-label={label} style={{ color }}>
-            <UserOutline color={color}/> <a>{label}</a>
+            <UserOutlined color={color}/> <a>{label}</a>
         </span>
     );
 };

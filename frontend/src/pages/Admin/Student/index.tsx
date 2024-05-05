@@ -1,6 +1,6 @@
 import {type ActionType, PageContainer, ProTable} from "@ant-design/pro-components";
 import React, {useEffect, useRef, useState} from "react";
-import {Button, Card, Descriptions, Form, message, Modal} from "antd";
+import {Button, Form, message} from "antd";
 import {deleteSubjectsUsingPOST, getAllSubjectsVoUsingGET} from "@/services/backend/subjectController";
 import {PlusOutlined} from "@ant-design/icons";
 import {getClassesOptionDataVoByPageUsingPOST} from "@/services/backend/classesController";
@@ -8,6 +8,7 @@ import UpdateInfoModal from "@/pages/Admin/Student/components/UpdateInfoModal";
 import CreateInfoModal from "@/pages/Admin/Student/components/CreateInfoModal";
 import {listStudentInfoByPageUsingPOST,} from "@/services/backend/studentController";
 import {StudentColumns} from "@/pages/Admin/Student/Columns/columns";
+import AddScoreInfoModal from "@/pages/Admin/Student/components/AddScoreInfoModal";
 import ScoreInfoModal from "@/pages/Admin/Student/components/ScoreInfoModal";
 
 const Index = () =>
@@ -17,13 +18,17 @@ const Index = () =>
     const [ createModalVisible, setCreateModalVisible ] = useState<boolean>(false);
     // 是否显示更新窗口
     const [ updateModalVisible, setUpdateModalVisible ] = useState<boolean>(false);
+    // 添加学生成绩窗口
+    const [ addScoreInfoModalVisible, setAddScoreInfoModalVisible ] = useState<boolean>(false);
+    // 查看学生成绩窗口
     const [ scoreInfoModalVisible, setScoreInfoModalVisible ] = useState<boolean>(false);
+
 
     const actionRef = useRef<ActionType>();
     // 当前用户点击的数据
     const [ currentRow, setCurrentRow ] = useState<Student.CurrentRowProps>();
     const [ cascadeOption, setCascadeOption ] = useState<API.AllClassesOptionDataVO[]>([]);
-    const [ subjectOption, setSubjectOption] = useState<OptionProps>();
+    const [ subjectOption, setSubjectOption ] = useState<OptionProps>();
 
     /**
      * 删除
@@ -61,7 +66,8 @@ const Index = () =>
 
     const fetchSubjectOption = async () =>
     {
-        try {
+        try
+        {
             const { data, code } = await getAllSubjectsVoUsingGET();
             if (data && code === 0)
             {
@@ -73,8 +79,8 @@ const Index = () =>
                         label: item.name,
                         // @ts-ignore
                         value: item.id,
-                        max: item.gradeMax,
-                        min: item.gradeMin
+                        gradeMax: item.gradeMax,
+                        gradeMin: item.gradeMin
                     })
                 })
                 // @ts-ignore
@@ -109,12 +115,6 @@ const Index = () =>
         return null
     }
 
-    const setScoreModalVisible = (record: API.StudentInfoVO) =>
-    {
-        setCurrentRow(record)
-        setScoreInfoModalVisible(true)
-    }
-
     return <>
         <PageContainer title={"学生管理"}>
             <ProTable
@@ -122,7 +122,8 @@ const Index = () =>
                     setCurrentRow,
                     setUpdateModalVisible,
                     handleDeleteFunction: handleDelete,
-                    setScoreModalVisible
+                    setAddScoreModalVisible: setAddScoreInfoModalVisible,
+                    setScoreModalVisible: setScoreInfoModalVisible
                 })}
                 actionRef={actionRef}
                 rowKey="id"
@@ -159,7 +160,6 @@ const Index = () =>
             />
 
 
-
             <CreateInfoModal
                 createModalVisible={createModalVisible}
                 setCreateModalVisible={setCreateModalVisible}
@@ -168,11 +168,17 @@ const Index = () =>
                 packageRequestBody={packageRequestBody}
             />
 
-            <ScoreInfoModal
-                scoreModalVisible={scoreInfoModalVisible}
-                setScoreModalVisible={setScoreInfoModalVisible}
+            <AddScoreInfoModal
+                scoreModalVisible={addScoreInfoModalVisible}
+                setScoreModalVisible={setAddScoreInfoModalVisible}
                 currentRow={currentRow}
                 subjectItem={subjectOption}
+            />
+
+            <ScoreInfoModal scoreInfoModalVisible={scoreInfoModalVisible}
+                            setScoreInfoModalVisible={setScoreInfoModalVisible}
+                            currentRow={currentRow}
+                            subjectItem={subjectOption}
             />
 
             <UpdateInfoModal

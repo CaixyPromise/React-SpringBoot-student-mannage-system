@@ -92,7 +92,7 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
     @Override
     public boolean checkGradeIsValid(Long grade, Subjects subjects)
     {
-        return grade > subjects.getGradeMin() && grade < subjects.getGradeMax();
+        return grade <= subjects.getGradeMin() || grade >= subjects.getGradeMax();
     }
 }
 

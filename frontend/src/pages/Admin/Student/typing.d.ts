@@ -37,15 +37,29 @@ declare namespace Student {
      * @since 2024/5/3 下午9:56
      * @version 1.0
      */
-    interface ScoreModalProps {
+    interface AddScoreModalProps
+    {
         scoreModalVisible: boolean;
         setScoreModalVisible: (visible: boolean) => void;
         currentRow: CurrentRowProps;
         subjectItem: OptionProps[]
     }
 
+    interface ScoreModalProps
+    {
+        scoreInfoModalVisible: boolean;
+        setScoreInfoModalVisible: (visible: boolean) => void;
+        currentRow: CurrentRowProps;
+        subjectItem: OptionProps[]
+    }
+
+
     interface StudentSexProps {
-        useSex: string
+        useSex?: string | number
+    }
+
+    interface SelectSubjectItem {
+        [fieldId: string]: API.SubjectsVO
     }
 
 }

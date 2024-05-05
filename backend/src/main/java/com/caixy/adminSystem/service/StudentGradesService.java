@@ -3,11 +3,13 @@ package com.caixy.adminSystem.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesAddRequest;
 import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesQueryRequest;
 import com.caixy.adminSystem.model.entity.StudentGrades;
 import com.caixy.adminSystem.model.vo.StudentGrades.StudentGradesVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
 * @author CAIXYPROMISE
@@ -60,4 +62,7 @@ public interface StudentGradesService extends IService<StudentGrades> {
      */
     Page<StudentGradesVO> getStudentGradesVOPage(Page<StudentGrades> postPage, HttpServletRequest request);
 
+    Boolean batchAddStudentGrade(List<StudentGradesAddRequest> postAddRequest, Long creatorId);
+
+    List<StudentGrades> listBySubjectId(Long subjectId);
 }

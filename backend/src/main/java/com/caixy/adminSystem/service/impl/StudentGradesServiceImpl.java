@@ -232,7 +232,6 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
         QueryWrapper<StudentGrades> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", subjectId);
         return this.list(queryWrapper);
-
     }
 }
 

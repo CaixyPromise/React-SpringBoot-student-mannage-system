@@ -2,7 +2,7 @@ import React, {useMemo, useRef, useState} from 'react';
 import type {SelectProps} from 'antd';
 import {Select, Spin} from 'antd';
 import debounce from 'lodash/debounce';
-import {DebounceSelectProps, SearchUserInputProps, UserValue} from "@/components/SearchUserInput/typing";
+import {DebounceSelectProps, SearchInputProps, SearchValueResult} from "@/components/SearchUserInput/typing";
 
 
 
@@ -51,11 +51,7 @@ function DebounceSelect<
     );
 }
 
-
-
-
-
-export const SearchUserInput: React.FC<SearchUserInputProps> = ({
+export const SearchUserInput: React.FC<SearchInputProps> = ({
     value,
     setValue,
     placeholder,
@@ -73,7 +69,7 @@ export const SearchUserInput: React.FC<SearchUserInputProps> = ({
             fetchOptions={fetchOptions}
             onChange={(newValue) =>
             {
-                setValue(newValue as UserValue[]);
+                setValue(newValue as SearchValueResult[]);
             }}
             style={style ?? { width: '100%' }}
             maxCount={maxCount}

@@ -22,8 +22,6 @@ const Index = () =>
     const [ addScoreInfoModalVisible, setAddScoreInfoModalVisible ] = useState<boolean>(false);
     // 查看学生成绩窗口
     const [ scoreInfoModalVisible, setScoreInfoModalVisible ] = useState<boolean>(false);
-
-
     const actionRef = useRef<ActionType>();
     // 当前用户点击的数据
     const [ currentRow, setCurrentRow ] = useState<Student.CurrentRowProps>();
@@ -175,10 +173,11 @@ const Index = () =>
                 subjectItem={subjectOption}
             />
 
-            <ScoreInfoModal scoreInfoModalVisible={scoreInfoModalVisible}
-                            setScoreInfoModalVisible={setScoreInfoModalVisible}
-                            currentRow={currentRow}
-                            subjectItem={subjectOption}
+            <ScoreInfoModal
+                scoreInfoModalVisible={scoreInfoModalVisible}
+                setScoreInfoModalVisible={setScoreInfoModalVisible}
+                currentRow={currentRow}
+                subjectItem={subjectOption}
             />
 
             <UpdateInfoModal

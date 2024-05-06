@@ -1,6 +1,56 @@
-import {FormInstance, message} from "antd";
-import {getStudentGradesVoByStuIdUsingGET} from "@/services/backend/scoreController";
+import {message} from "antd";
 import React from "react";
+import {getAllSubjectAnalysesByStudentIdUsingGET} from "@/services/backend/analysisController";
+import {getStudentGradesVoByStuIdUsingGET} from "@/services/backend/scoreController";
+
+const extraId = (currentRow: Student.CurrentRowProps): boolean | string =>
+{
+    if (currentRow === undefined)
+    {
+        return false;
+    }
+    const { id } = currentRow
+    if (id === null || id === undefined || id === "")
+    {
+        return false;
+    }
+    return id;
+}
+
+
+const fetchStudentGradesAnalyses = async (
+    currentRow: Student.CurrentRowProps,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    setData: React.Dispatch<React.SetStateAction<API.StudentAnalysisVO>>,
+): Promise<API.StudentAnalysisVO | undefined | null>=>
+{
+    const id = extraId(currentRow);
+    if (id === false)
+    {
+        message.error("学生id不能为空");
+        return null;
+    }
+    setLoading(true);
+    try {
+        // @ts-ignore
+        const {data, code} = await getAllSubjectAnalysesByStudentIdUsingGET({studentId: id});
+        if (code === 0 && data)
+        {
+            setData(data);
+            return data;
+        }
+    }
+    catch (e: any)
+    {
+        message.error(e.message)
+        return null
+    }
+    finally
+    {
+        setLoading(false);
+    }
+}
+
 
 const fetchStudentInfo = async (
     currentRow: Student.CurrentRowProps,
@@ -8,18 +58,12 @@ const fetchStudentInfo = async (
     setLoading: React.Dispatch<React.SetStateAction<boolean>>,
     setStudentData: React.Dispatch<React.SetStateAction<API.StudentGradesVO>>,
     setGradeItems: React.Dispatch<React.SetStateAction<API.GradeItem[]>>,
-    ) =>
+) =>
 {
-    if (currentRow === undefined)
+    const id = extraId(currentRow);
+    if (id === false)
     {
-        // message.error("学生信息不能为空");
-        setScoreModalVisible(false);
-        return;
-    }
-    const { id } = currentRow
-    if (id === null || id === undefined || id === "")
-    {
-        message.error("学生id不能为空");
+        message.error("学生信息不能为空");
         setScoreModalVisible(false);
         return;
     }
@@ -47,5 +91,6 @@ const fetchStudentInfo = async (
 
 
 export {
-    fetchStudentInfo
+    fetchStudentInfo,
+    fetchStudentGradesAnalyses
 }

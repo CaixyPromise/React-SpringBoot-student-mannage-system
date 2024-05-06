@@ -1,15 +1,15 @@
 import React from "react";
-import {UserValue} from "@/components/SearchUserInput/index";
+import {SearchValueResult} from "@/components/SearchUserInput/index";
 import type {SelectProps} from "antd";
 
-export interface SearchUserInputProps
+export interface SearchInputProps
 {
     mode?: "multiple" | "tags";
     style?: React.CSSProperties; // Use React.CSSProperties for style objects
     placeholder?: string;
-    fetchOptions: (text: string) => Promise<UserValue[]>;
-    value: UserValue[];
-    setValue: React.Dispatch<React.SetStateAction<UserValue[]>>;
+    fetchOptions: (text: string) => Promise<SearchValueResult[]>;
+    value: SearchValueResult[];
+    setValue: React.Dispatch<React.SetStateAction<SearchValueResult[]>>;
     maxCount: number;
 }
 
@@ -20,7 +20,7 @@ export interface DebounceSelectProps<ValueType = any>
     debounceTimeout?: number;
 }
 
-export interface UserValue
+export interface SearchValueResult
 {
     label: string;
     value: string;

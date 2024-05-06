@@ -9,9 +9,9 @@ import java.io.Serializable;
 /**
  * 科目分析实体类
  *
- * @name: com.caixy.adminSystem.model.vo.analysis.SubjectAnalysis
- * @author: CAIXYPROMISE
- * @since: 2024-05-05 22:06
+ * @name com.caixy.adminSystem.model.vo.analysis.SubjectAnalysis
+ * @author CAIXYPROMISE
+ * @since 2024-05-05 22:06
  **/
 @Data
 public class SubjectAnalysis implements Serializable

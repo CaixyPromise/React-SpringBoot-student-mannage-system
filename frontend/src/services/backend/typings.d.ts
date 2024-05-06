@@ -53,6 +53,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListSubjectAnalysis_ = {
+    code?: number;
+    data?: SubjectAnalysis[];
+    message?: string;
+  };
+
   type BaseResponseListSubjectsVO_ = {
     code?: number;
     data?: SubjectsVO[];
@@ -164,6 +170,12 @@ declare namespace API {
   type BaseResponseString_ = {
     code?: number;
     data?: string;
+    message?: string;
+  };
+
+  type BaseResponseStudentAnalysisVO_ = {
+    code?: number;
+    data?: StudentAnalysisVO;
     message?: string;
   };
 
@@ -315,6 +327,11 @@ declare namespace API {
     majors?: MajorInnerInfo[];
   };
 
+  type getAllSubjectAnalysesByStudentIdUsingGET1Params = {
+    /** studentId */
+    studentId: number;
+  };
+
   type getClassesInfoVOByIdUsingGET1Params = {
     /** id */
     id?: number;
@@ -368,6 +385,12 @@ declare namespace API {
   type getUserVOByIdUsingGET1Params = {
     /** id */
     id?: number;
+  };
+
+  type GradeAnalysisFilterDTO = {
+    classIds?: number[];
+    departmentIds?: number[];
+    majorIds?: number[];
   };
 
   type GradeItem = {
@@ -682,6 +705,11 @@ declare namespace API {
     userId?: number;
   };
 
+  type StudentAnalysisVO = {
+    studentGrade?: StudentGradesVO;
+    subjectAnalysis?: SubjectAnalysis[];
+  };
+
   type StudentGrades = {
     createTime?: string;
     creatorId?: number;
@@ -723,8 +751,8 @@ declare namespace API {
   };
 
   type StudentGradesUpdateRequest = {
-    id?: number;
     grade?: number;
+    id?: number;
   };
 
   type StudentGradesVO = {
@@ -783,6 +811,14 @@ declare namespace API {
     stuMajorId?: number;
     stuName?: string;
     stuSex?: number;
+  };
+
+  type SubjectAnalysis = {
+    averageScore?: number;
+    highestScore?: number;
+    highestScoreStudentName?: StudentInfoVO;
+    subjectId?: number;
+    subjectName?: string;
   };
 
   type Subjects = {

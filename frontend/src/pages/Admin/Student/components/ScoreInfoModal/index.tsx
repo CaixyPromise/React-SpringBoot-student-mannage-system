@@ -1,18 +1,25 @@
 import React, {useEffect, useState} from "react";
 import {Card, Descriptions, message, Modal, Spin} from "antd";
-import {fetchStudentInfo} from "@/pages/Admin/Student/server";
+import {fetchStudentGradesAnalyses, fetchStudentInfo} from "@/pages/Admin/Student/server";
 import StudentSex from "@/pages/Admin/Student/components/StudentSex";
 import {ProTable} from "@ant-design/pro-components";
 import {ScoreColumn} from "@/pages/Admin/Student/Columns/columns";
 import {validateScore} from "@/pages/Admin/Student/components/AddScoreInfoModal/utils";
 import {deleteStudentGradesUsingPOST, updateStudentGradesUsingPOST} from "@/services/backend/scoreController";
+import EChartsReact from "echarts-for-react";
+import {StudentAnalysisOption} from "@/pages/Admin/Student/components/ScoreInfoModal/option";
 
-const Index:React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps) =>
+const Index: React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps) =>
 {
     const { scoreInfoModalVisible, setScoreInfoModalVisible, subjectItem, currentRow } = props;
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ studentData, setStudentData ] = useState<API.StudentGradesVO>({});
-    const [gradeItem, setGradeItem] = useState<API.GradeItem[]>([])
+    const [ gradeItem, setGradeItem ] = useState<API.GradeItem[]>([])
+    const [ analysesLoading, setAnalysesLoading ] = useState<boolean>(false);
+    const [ analysesData, setAnalysesData ] = useState<API.StudentAnalysisVO>({})
+    const [ echartOption, setEchartOption] = useState<any>({});
+
+
     // 科目id -> 实体映射
     const optionMapById: {
         [key: string]: OptionProps
@@ -23,23 +30,35 @@ const Index:React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps)
     }, {}) : {};
     useEffect(() =>
     {
-        if (scoreInfoModalVisible && currentRow && currentRow.id)
+        const loadData = async () =>
         {
-            fetchStudentInfo(currentRow, setScoreInfoModalVisible, setLoading, setStudentData, setGradeItem);
+            if (scoreInfoModalVisible && currentRow && currentRow.id)
+            {
+                await fetchStudentGradesAnalyses(currentRow, setAnalysesLoading, setAnalysesData)
+                await fetchStudentInfo(currentRow, setScoreInfoModalVisible, setLoading, setStudentData, setGradeItem);
+            }
         }
+        loadData().then(() => {
+            if (analysesData && !analysesLoading)
+            {
+                setEchartOption(StudentAnalysisOption(analysesData))
+            }
+        });
     }, [ scoreInfoModalVisible, currentRow ]);
 
     const handleUpdateScore = async (rowKey: any, record: API.GradeItem) =>
     {
         // 校验成绩
+        // @ts-ignore
         const isValid = await validateScore(record.grade, rowKey, optionMapById);
         if (!isValid)
         {
             return;
         }
         // 更新成绩
-        try {
-            const {data, code} = await updateStudentGradesUsingPOST({
+        try
+        {
+            const { data, code } = await updateStudentGradesUsingPOST({
                 id: rowKey,
                 grade: record.grade,
             })
@@ -58,12 +77,13 @@ const Index:React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps)
 
     const handleDeleteScore = async (id: any, row?: API.GradeItem) =>
     {
-        try {
+        try
+        {
             if (id == null)
             {
                 return
             }
-            const {code} = await deleteStudentGradesUsingPOST({ id })
+            const { code } = await deleteStudentGradesUsingPOST({ id })
             if (code === 0)
             {
                 message.success("成绩删除成功");
@@ -77,16 +97,19 @@ const Index:React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps)
         }
     }
 
+
+
+
     return <>
         <Modal
             open={scoreInfoModalVisible}
             title={"学生信息"}
             onCancel={() => setScoreInfoModalVisible(false)}
             footer={null}
-            width={1000}
+            width={1300}
         >
-            <Spin spinning={loading} tip={"正在加载学生信息"} delay={300}>
-                <Descriptions title="学生信息" column={2} bordered={true}>
+            <Spin spinning={loading && analysesLoading} tip={"正在加载学生信息"} delay={300}>
+                <Descriptions column={2} bordered={true}>
                     <Descriptions.Item label={"学生ID"}
                                        span={2}><a>{studentData.studentInfo?.id}</a></Descriptions.Item>
                     <Descriptions.Item label={"班级"} span={2}>{studentData.studentInfo?.stuClass}</Descriptions.Item>
@@ -99,8 +122,14 @@ const Index:React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps)
                 </Descriptions>
 
                 <Card
-                    bordered={false}
+                    title={"学生成绩分析"}
+                >
+                    <EChartsReact option={echartOption} />
+                </Card>
+                <Card
+                    // bordered={false}
                     style={{
+                        marginTop: "8px",
                         marginBottom: "8px",
                     }}
                     title="学生成绩"
@@ -118,8 +147,6 @@ const Index:React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps)
                     />
                 </Card>
             </Spin>
-
-
         </Modal>
     </>
 }

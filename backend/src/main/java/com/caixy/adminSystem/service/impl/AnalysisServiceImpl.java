@@ -5,7 +5,9 @@ import com.caixy.adminSystem.model.dto.analysis.GradeAnalysisFilterDTO;
 import com.caixy.adminSystem.model.entity.StudentGrades;
 import com.caixy.adminSystem.model.entity.StudentInfo;
 import com.caixy.adminSystem.model.entity.Subjects;
+import com.caixy.adminSystem.model.vo.StudentGrades.StudentGradesVO;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
+import com.caixy.adminSystem.model.vo.analysis.StudentAnalysisVO;
 import com.caixy.adminSystem.model.vo.analysis.SubjectAnalysis;
 import com.caixy.adminSystem.service.*;
 import lombok.AllArgsConstructor;
@@ -58,6 +60,7 @@ public class AnalysisServiceImpl implements AnalysisService
      * @version 1.0
      * @since 2024/5/5 下午10:16
      */
+    @Override
     public List<SubjectAnalysis> getAllSubjectAnalyses()
     {
         List<Subjects> subjectsList = subjectsService.list();
@@ -66,17 +69,66 @@ public class AnalysisServiceImpl implements AnalysisService
     }
 
     /**
-     * 获取指定科目成绩分析信息
+     * 获取指定学生的成绩分析信息
      *
      * @author CAIXYPROMISE
      * @version 1.0
-     * @since 2024/5/5 下午10:16
+     * @since 2024/5/6 下午3:07
      */
-    public SubjectAnalysis getSubjectAnalysisById(Long subjectId)
+    @Override
+    public StudentAnalysisVO getAllSubjectAnalysesByStudentId(Long studentId)
     {
-        Subjects subject = subjectsService.getById(subjectId);
-        List<StudentGrades> studentGradesList = studentGradesService.listBySubjectId(subjectId);
-        return analyzeGrades(Collections.singletonList(subject), studentGradesList).stream().findFirst().orElse(null);
+        QueryWrapper<StudentGrades> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("stuId", studentId);
+        List<StudentGrades> studentGradesList = studentGradesService.list(queryWrapper);
+        // 查询学生成绩信息
+        StudentGradesVO studentGradesVOByStuId = studentGradesService.getStudentGradesVOByStuId(studentId);
+        // 查询学生成绩在全校分布情况
+        Set<Long> stuSubjectIdSet =
+                studentGradesVOByStuId.getGradeItem()
+                        .stream()
+                        .map(StudentGradesVO.GradeItem::getSubjectId)
+                        .collect(Collectors.toSet());
+        List<Subjects> subjects = subjectsService.listByIds(stuSubjectIdSet);
+        StudentAnalysisVO studentAnalysisVO = new StudentAnalysisVO();
+        studentAnalysisVO.setStudentGrade(studentGradesVOByStuId);
+        studentAnalysisVO.setSubjectAnalysis(analyzeGrades(subjects, studentGradesList));
+        return studentAnalysisVO;
+    }
+
+
+    /**
+     * 获取指定学院、专业或班级的成绩分析信息
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @since 2024/5/5 下午10:41
+     */
+    @Override
+    public List<SubjectAnalysis> getGradesAnalysisByFilter(GradeAnalysisFilterDTO gradeAnalysisFilterDTO) {
+        // 根据过滤条件查询学生信息
+        List<StudentInfo> filteredStudents = studentInfoService.list(new QueryWrapper<StudentInfo>()
+                .in(gradeAnalysisFilterDTO.getDepartmentIds() != null && !gradeAnalysisFilterDTO.getDepartmentIds().isEmpty(), "stuDeptId", gradeAnalysisFilterDTO.getDepartmentIds())
+                .in(gradeAnalysisFilterDTO.getMajorIds() != null && !gradeAnalysisFilterDTO.getMajorIds().isEmpty(), "stuMajorId", gradeAnalysisFilterDTO.getMajorIds())
+                .in(gradeAnalysisFilterDTO.getClassIds() != null && !gradeAnalysisFilterDTO.getClassIds().isEmpty(), "stuClassId", gradeAnalysisFilterDTO.getClassIds()));
+
+        // 获取过滤后学生的ID列表
+        List<Long> studentIds = filteredStudents.stream().map(StudentInfo::getId).collect(Collectors.toList());
+        // 如果查出来是空列表
+        if (studentIds.isEmpty())
+        {
+            return Collections.emptyList();
+        }
+        // 查询这些学生的成绩
+        List<StudentGrades> studentGradesList = studentGradesService.list(new QueryWrapper<StudentGrades>()
+                .in("stuId", studentIds));
+
+        // 查询涉及到的科目信息
+        List<Long> subjectIds = studentGradesList.stream().map(StudentGrades::getSubjectId).collect(Collectors.toList());
+        List<Subjects> subjectsList = subjectsService.listByIds(subjectIds);
+
+        // 分析成绩数据
+        return analyzeGrades(subjectsList, studentGradesList);
     }
 
     /**
@@ -128,38 +180,7 @@ public class AnalysisServiceImpl implements AnalysisService
             StudentInfoVO highestScoreStudent = studentInfoService.getStudentInfoVOById(maxGrade.getStuId());
             analysis.setHighestScoreStudentName(highestScoreStudent);
         });
-
         return analysis;
-    }
-
-
-    /**
-     * 获取指定学院、专业或班级的成绩分析信息
-     *
-     * @author CAIXYPROMISE
-     * @version 1.0
-     * @since 2024/5/5 下午10:41
-     */
-    public List<SubjectAnalysis> getGradesAnalysisByFilter(GradeAnalysisFilterDTO gradeAnalysisFilterDTO) {
-        // 根据过滤条件查询学生信息
-        List<StudentInfo> filteredStudents = studentInfoService.list(new QueryWrapper<StudentInfo>()
-                .eq(gradeAnalysisFilterDTO.getDepartmentId() != null, "stuDeptId", gradeAnalysisFilterDTO.getDepartmentId())
-                .eq(gradeAnalysisFilterDTO.getMajorId() != null, "stuMajorId", gradeAnalysisFilterDTO.getMajorId())
-                .eq(gradeAnalysisFilterDTO.getClassId() != null, "stuClassId", gradeAnalysisFilterDTO.getClassId()));
-
-        // 获取过滤后学生的ID列表
-        List<Long> studentIds = filteredStudents.stream().map(StudentInfo::getId).collect(Collectors.toList());
-
-        // 查询这些学生的成绩
-        List<StudentGrades> studentGradesList = studentGradesService.list(new QueryWrapper<StudentGrades>()
-                .in("stuId", studentIds));
-
-        // 查询涉及到的科目信息
-        List<Long> subjectIds = studentGradesList.stream().map(StudentGrades::getSubjectId).collect(Collectors.toList());
-        List<Subjects> subjectsList = subjectsService.listByIds(subjectIds);
-
-        // 分析成绩数据
-        return analyzeGrades(subjectsList, studentGradesList);
     }
 
 }

@@ -1,5 +1,11 @@
 package com.caixy.adminSystem.service;
 
+import com.caixy.adminSystem.model.dto.analysis.GradeAnalysisFilterDTO;
+import com.caixy.adminSystem.model.vo.analysis.StudentAnalysisVO;
+import com.caixy.adminSystem.model.vo.analysis.SubjectAnalysis;
+
+import java.util.List;
+
 /**
  * 数据分析服务类
  *
@@ -9,4 +15,14 @@ package com.caixy.adminSystem.service;
  **/
 public interface AnalysisService
 {
+    /**
+     * 
+     */
+    List<SubjectAnalysis> getAllSubjectAnalyses();
+
+//    SubjectAnalysis getSubjectAnalysisById(Long subjectId);
+
+    StudentAnalysisVO getAllSubjectAnalysesByStudentId(Long studentId);
+
+    List<SubjectAnalysis> getGradesAnalysisByFilter(GradeAnalysisFilterDTO gradeAnalysisFilterDTO);
 }

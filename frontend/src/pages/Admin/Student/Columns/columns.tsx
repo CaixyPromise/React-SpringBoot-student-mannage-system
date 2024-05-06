@@ -96,7 +96,12 @@ export const StudentColumns = ({
 ];
 
 
-export const ScoreColumn = (handleSave, handleDeleteScore):ProColumns[] => ([
+export const ScoreColumn = (
+    handleSave: (rowKey: any, record: API.GradeItem) => Promise<void>,
+    handleDeleteScore: {
+        (id: any, row?: API.GradeItem | undefined): Promise<void>;
+        (arg0: any, arg1: any): void;
+}):ProColumns[] => ([
         {
             title: "成绩id",
             dataIndex: "gradeId",

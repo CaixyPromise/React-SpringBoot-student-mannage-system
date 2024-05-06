@@ -3,6 +3,7 @@ package com.caixy.adminSystem.model.dto.analysis;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 成绩分析个体分析类
@@ -14,8 +15,20 @@ import java.io.Serializable;
 @Data
 public class GradeAnalysisFilterDTO implements Serializable
 {
-    Long departmentId;
-    Long majorId;
-    Long classId;
+    /**
+     * 需要查询的学院id
+     */
+    List<Long> departmentIds;
+
+    /**
+     * 需要查询的专业id
+     */
+    List<Long> majorIds;
+
+    /**
+     * 需要查询的班级id
+     */
+    List<Long> classIds;
+
     private static final long serialVersionUID = -1L;
 }

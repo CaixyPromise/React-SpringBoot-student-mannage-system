@@ -2,6 +2,8 @@ import {message} from "antd";
 import React from "react";
 import {getAllSubjectAnalysesByStudentIdUsingGET} from "@/services/backend/analysisController";
 import {getStudentGradesVoByStuIdUsingGET} from "@/services/backend/scoreController";
+import {StudentAnalysisOption} from "@/pages/Admin/Student/components/ScoreInfoModal/option";
+import {EChartsOption} from "echarts";
 
 const extraId = (currentRow: Student.CurrentRowProps): boolean | string =>
 {
@@ -21,8 +23,8 @@ const extraId = (currentRow: Student.CurrentRowProps): boolean | string =>
 const fetchStudentGradesAnalyses = async (
     currentRow: Student.CurrentRowProps,
     setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-    setData: React.Dispatch<React.SetStateAction<API.StudentAnalysisVO>>,
-): Promise<API.StudentAnalysisVO | undefined | null>=>
+    setData: React.Dispatch<React.SetStateAction<EChartsOption>>,
+): Promise<EChartsOption | undefined | null>=>
 {
     const id = extraId(currentRow);
     if (id === false)
@@ -36,8 +38,9 @@ const fetchStudentGradesAnalyses = async (
         const {data, code} = await getAllSubjectAnalysesByStudentIdUsingGET({studentId: id});
         if (code === 0 && data)
         {
-            setData(data);
-            return data;
+            const prepareData = StudentAnalysisOption(data);
+            setData(prepareData);
+            return prepareData;
         }
     }
     catch (e: any)

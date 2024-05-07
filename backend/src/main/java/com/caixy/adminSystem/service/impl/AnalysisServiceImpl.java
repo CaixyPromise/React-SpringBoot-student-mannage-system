@@ -1,10 +1,13 @@
 package com.caixy.adminSystem.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.caixy.adminSystem.common.ErrorCode;
+import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.model.dto.analysis.GradeAnalysisFilterDTO;
 import com.caixy.adminSystem.model.entity.StudentGrades;
 import com.caixy.adminSystem.model.entity.StudentInfo;
 import com.caixy.adminSystem.model.entity.Subjects;
+import com.caixy.adminSystem.model.enums.UserSexEnum;
 import com.caixy.adminSystem.model.vo.StudentGrades.StudentGradesVO;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
 import com.caixy.adminSystem.model.vo.analysis.StudentAnalysisVO;
@@ -98,19 +101,33 @@ public class AnalysisServiceImpl implements AnalysisService
 
 
     /**
-     * 获取指定学院、专业或班级的成绩分析信息
+     * 获取指定学院、专业、学科、性别或班级的成绩分析信息
      *
      * @author CAIXYPROMISE
-     * @version 1.0
+     * @version 2.0
      * @since 2024/5/5 下午10:41
+     *
+     * @update v2.0 05.07: 添加学科、性别筛选
      */
     @Override
-    public List<SubjectAnalysis> getGradesAnalysisByFilter(GradeAnalysisFilterDTO gradeAnalysisFilterDTO) {
+    public List<SubjectAnalysis> getGradesAnalysisByFilter(GradeAnalysisFilterDTO gradeAnalysisFilterDTO)
+    {
         // 根据过滤条件查询学生信息
-        List<StudentInfo> filteredStudents = studentInfoService.list(new QueryWrapper<StudentInfo>()
-                .in(gradeAnalysisFilterDTO.getDepartmentIds() != null && !gradeAnalysisFilterDTO.getDepartmentIds().isEmpty(), "stuDeptId", gradeAnalysisFilterDTO.getDepartmentIds())
-                .in(gradeAnalysisFilterDTO.getMajorIds() != null && !gradeAnalysisFilterDTO.getMajorIds().isEmpty(), "stuMajorId", gradeAnalysisFilterDTO.getMajorIds())
-                .in(gradeAnalysisFilterDTO.getClassIds() != null && !gradeAnalysisFilterDTO.getClassIds().isEmpty(), "stuClassId", gradeAnalysisFilterDTO.getClassIds()));
+        // v2.0-0507: 添加性别筛选
+        QueryWrapper<StudentInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(gradeAnalysisFilterDTO.getDepartmentIds() != null && !gradeAnalysisFilterDTO.getDepartmentIds().isEmpty(), "stuDeptId", gradeAnalysisFilterDTO.getDepartmentIds());
+        queryWrapper.in(gradeAnalysisFilterDTO.getMajorIds() != null && !gradeAnalysisFilterDTO.getMajorIds().isEmpty(), "stuMajorId", gradeAnalysisFilterDTO.getMajorIds());
+        queryWrapper.in(gradeAnalysisFilterDTO.getClassIds() != null && !gradeAnalysisFilterDTO.getClassIds().isEmpty(), "stuClassId", gradeAnalysisFilterDTO.getClassIds());
+        if (gradeAnalysisFilterDTO.getStuSex() != null)
+        {
+            UserSexEnum stuSexEnum = UserSexEnum.getEnumByCode(gradeAnalysisFilterDTO.getStuSex());
+            if (stuSexEnum == null)
+            {
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "性别参数错误");
+            }
+            queryWrapper.eq("stuSex", stuSexEnum.getCode());
+        }
+        List<StudentInfo> filteredStudents = studentInfoService.list(queryWrapper);
 
         // 获取过滤后学生的ID列表
         List<Long> studentIds = filteredStudents.stream().map(StudentInfo::getId).collect(Collectors.toList());
@@ -120,8 +137,12 @@ public class AnalysisServiceImpl implements AnalysisService
             return Collections.emptyList();
         }
         // 查询这些学生的成绩
+        // v2.0-0507: in取出学科id
         List<StudentGrades> studentGradesList = studentGradesService.list(new QueryWrapper<StudentGrades>()
-                .in("stuId", studentIds));
+                .in("stuId", studentIds)
+                .in(gradeAnalysisFilterDTO.getSubjectIds() != null && !gradeAnalysisFilterDTO.getSubjectIds().isEmpty(),
+                        "subjectId",
+                        gradeAnalysisFilterDTO.getSubjectIds()));
 
         // 查询涉及到的科目信息
         List<Long> subjectIds = studentGradesList.stream().map(StudentGrades::getSubjectId).collect(Collectors.toList());
@@ -137,24 +158,36 @@ public class AnalysisServiceImpl implements AnalysisService
      * @author CAIXYPROMISE
      * @version 1.0
      * @since 2024/5/5 下午10:16
+     *
+     * @update v2.0 05.07: 修复性能bug错误
      */
-    private List<SubjectAnalysis> analyzeGrades(List<Subjects> subjectsList, List<StudentGrades> studentGradesList)
-    {
+    private List<SubjectAnalysis> analyzeGrades(List<Subjects> subjectsList, List<StudentGrades> studentGradesList) {
         Map<Long, Subjects> subjectsMap = subjectsList.stream()
                 .collect(Collectors.toMap(Subjects::getId, Function.identity()));
 
         Map<Long, List<StudentGrades>> studentGradesMap = studentGradesList.stream()
                 .collect(Collectors.groupingBy(StudentGrades::getSubjectId));
 
+        // 获取所有相关学生的 ID
+        Set<Long> studentIds = studentGradesList.stream()
+                .map(StudentGrades::getStuId)
+                .collect(Collectors.toSet());
+
+        // 批量查询所有相关学生信息VO
+        Map<Long, StudentInfoVO> studentInfoMap = studentInfoService.getStudentInfoVoByIds(studentIds).stream()
+                .collect(Collectors.toMap(StudentInfoVO::getId, Function.identity()));
+
+        // 进行成绩分析
         List<SubjectAnalysis> subjectAnalysisList = new ArrayList<>();
         studentGradesMap.forEach((subjectId, grades) ->
         {
-            SubjectAnalysis analysis = createSubjectAnalysis(subjectId, grades, subjectsMap);
+            SubjectAnalysis analysis = createSubjectAnalysis(subjectId, grades, subjectsMap, studentInfoMap);
             subjectAnalysisList.add(analysis);
         });
 
         return subjectAnalysisList;
     }
+
 
     /**
      * 创建科目成绩分析信息
@@ -163,8 +196,7 @@ public class AnalysisServiceImpl implements AnalysisService
      * @version 1.0
      * @since 2024/5/5 下午10:16
      */
-    private SubjectAnalysis createSubjectAnalysis(Long subjectId, List<StudentGrades> grades, Map<Long, Subjects> subjectsMap)
-    {
+    private SubjectAnalysis createSubjectAnalysis(Long subjectId, List<StudentGrades> grades, Map<Long, Subjects> subjectsMap, Map<Long, StudentInfoVO> studentInfoMap) {
         double averageScore = grades.stream().mapToDouble(StudentGrades::getGrade).average().orElse(0.0);
         Optional<StudentGrades> maxGradeEntry = grades.stream().max(Comparator.comparingLong(StudentGrades::getGrade));
 
@@ -173,11 +205,10 @@ public class AnalysisServiceImpl implements AnalysisService
         analysis.setSubjectName(subjectsMap.get(subjectId).getName());
         analysis.setAverageScore(averageScore);
 
-        maxGradeEntry.ifPresent(maxGrade ->
-        {
+        maxGradeEntry.ifPresent(maxGrade -> {
             analysis.setHighestScore(maxGrade.getGrade());
             // 获取最高分学生信息
-            StudentInfoVO highestScoreStudent = studentInfoService.getStudentInfoVOById(maxGrade.getStuId());
+            StudentInfoVO highestScoreStudent = studentInfoMap.get(maxGrade.getStuId());
             analysis.setHighestScoreStudentName(highestScoreStudent);
         });
         return analysis;

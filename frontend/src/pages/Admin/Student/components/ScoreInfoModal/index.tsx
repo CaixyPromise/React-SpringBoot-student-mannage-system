@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Card, Descriptions, message, Modal, Spin} from "antd";
 import {fetchStudentGradesAnalyses, fetchStudentInfo} from "@/pages/Admin/Student/server";
 import StudentSex from "@/pages/Admin/Student/components/StudentSex";
@@ -8,17 +8,17 @@ import {validateScore} from "@/pages/Admin/Student/components/AddScoreInfoModal/
 import {deleteStudentGradesUsingPOST, updateStudentGradesUsingPOST} from "@/services/backend/scoreController";
 import EChartsReact from "echarts-for-react";
 import {StudentAnalysisOption} from "@/pages/Admin/Student/components/ScoreInfoModal/option";
+import {EChartsOption} from "echarts";
 
 const Index: React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps) =>
 {
+    const chartRef = useRef<EChartsReact>(null);
     const { scoreInfoModalVisible, setScoreInfoModalVisible, subjectItem, currentRow } = props;
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ studentData, setStudentData ] = useState<API.StudentGradesVO>({});
     const [ gradeItem, setGradeItem ] = useState<API.GradeItem[]>([])
     const [ analysesLoading, setAnalysesLoading ] = useState<boolean>(false);
-    const [ analysesData, setAnalysesData ] = useState<API.StudentAnalysisVO>({})
-    const [ echartOption, setEchartOption] = useState<any>({});
-
+    const [ analysesData, setAnalysesData ] = useState<EChartsOption>({})
 
     // 科目id -> 实体映射
     const optionMapById: {
@@ -38,13 +38,14 @@ const Index: React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps
                 await fetchStudentInfo(currentRow, setScoreInfoModalVisible, setLoading, setStudentData, setGradeItem);
             }
         }
-        loadData().then(() => {
-            if (analysesData && !analysesLoading)
-            {
-                setEchartOption(StudentAnalysisOption(analysesData))
-            }
-        });
+        loadData()
     }, [ scoreInfoModalVisible, currentRow ]);
+    // 当图表数据更新时，确保图表使用最新的数据
+    useEffect(() => {
+        if (chartRef.current) {
+            chartRef.current?.getEchartsInstance().setOption(analysesData);
+        }
+    }, [analysesData]);
 
     const handleUpdateScore = async (rowKey: any, record: API.GradeItem) =>
     {
@@ -98,12 +99,20 @@ const Index: React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps
     }
 
 
-
-
     return <>
         <Modal
             open={scoreInfoModalVisible}
             title={"学生信息"}
+            afterOpenChange={(visible) =>
+            {
+                if (visible)
+                {
+                    if (chartRef.current)
+                    {
+                        chartRef.current.getEchartsInstance().resize();
+                    }
+                }
+            }}
             onCancel={() => setScoreInfoModalVisible(false)}
             footer={null}
             width={1300}
@@ -124,7 +133,10 @@ const Index: React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps
                 <Card
                     title={"学生成绩分析"}
                 >
-                    <EChartsReact option={echartOption} />
+                    <EChartsReact
+                        ref={chartRef}
+                        option={analysesData}
+                    />
                 </Card>
                 <Card
                     // bordered={false}

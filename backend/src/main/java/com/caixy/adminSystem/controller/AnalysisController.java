@@ -44,7 +44,7 @@ public class AnalysisController
     }
 
     /**
-     * 获取指定科目成绩分析信息
+     * 获取指定学生成绩分析信息
      *
      * @author CAIXYPROMISE
      * @version 1.0

@@ -10,6 +10,7 @@ import {listStudentInfoByPageUsingPOST,} from "@/services/backend/studentControl
 import {StudentColumns} from "@/pages/Admin/Student/Columns/columns";
 import AddScoreInfoModal from "@/pages/Admin/Student/components/AddScoreInfoModal";
 import ScoreInfoModal from "@/pages/Admin/Student/components/ScoreInfoModal";
+import {fetchCollegeCascadeOption, fetchSubjectOption} from "@/utils/server";
 
 const Index = () =>
 {
@@ -26,7 +27,7 @@ const Index = () =>
     // 当前用户点击的数据
     const [ currentRow, setCurrentRow ] = useState<Student.CurrentRowProps>();
     const [ cascadeOption, setCascadeOption ] = useState<API.AllClassesOptionDataVO[]>([]);
-    const [ subjectOption, setSubjectOption ] = useState<OptionProps>();
+    const [ subjectOption, setSubjectOption ] = useState<OptionProps[]>();
 
     /**
      * 删除
@@ -48,53 +49,11 @@ const Index = () =>
         }
     }
 
-    const fetchCascadeOption = async () =>
-    {
-        try
-        {
-            const { data, code } = await getClassesOptionDataVoByPageUsingPOST({});
-            setCascadeOption(data || [])
-        }
-        catch (e: any)
-        {
-            message.error("获取选项配置失败: ", e.message)
-            setCascadeOption([])
-        }
-    }
-
-    const fetchSubjectOption = async () =>
-    {
-        try
-        {
-            const { data, code } = await getAllSubjectsVoUsingGET();
-            if (data && code === 0)
-            {
-                const optionList: OptionProps[] = []
-                data.map(item =>
-                {
-                    optionList.push({
-                        // @ts-ignore
-                        label: item.name,
-                        // @ts-ignore
-                        value: item.id,
-                        gradeMax: item.gradeMax,
-                        gradeMin: item.gradeMin
-                    })
-                })
-                // @ts-ignore
-                setSubjectOption(optionList)
-            }
-        }
-        catch (e: any)
-        {
-            message.error("获取选项配置失败: ", e.message)
-        }
-    }
 
     useEffect(() =>
     {
-        fetchCascadeOption();
-        fetchSubjectOption()
+        fetchCollegeCascadeOption(setCascadeOption);
+        fetchSubjectOption(setSubjectOption)
     }, [])
 
     const packageRequestBody = (): Student.PayloadBody | null =>
@@ -172,7 +131,7 @@ const Index = () =>
                 currentRow={currentRow}
                 subjectItem={subjectOption}
             />
-
+            {/*在这里被使用*/}
             <ScoreInfoModal
                 scoreInfoModalVisible={scoreInfoModalVisible}
                 setScoreInfoModalVisible={setScoreInfoModalVisible}

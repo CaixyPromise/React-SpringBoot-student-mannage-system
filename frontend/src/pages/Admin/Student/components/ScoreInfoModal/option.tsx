@@ -1,4 +1,6 @@
-const StudentAnalysisOption = (data: API.StudentAnalysisVO) =>
+import {EChartsOption} from "echarts";
+
+const StudentAnalysisOption = (data: API.StudentAnalysisVO): EChartsOption =>
 {
     // 提取数据源
     const subjects = data.subjectAnalysis || [];
@@ -52,7 +54,6 @@ const StudentAnalysisOption = (data: API.StudentAnalysisVO) =>
             { type: 'bar', name: '学生成绩', barGap: '5%', barCategoryGap: '20%' },
             { type: 'bar', name: '全校平均分', barGap: '5%', barCategoryGap: '20%' },
             { type: 'bar', name: '全校最高分', barGap: '5%', barCategoryGap: '20%' }
-
         ]
     };
 }

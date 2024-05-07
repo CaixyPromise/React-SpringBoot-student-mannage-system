@@ -18,17 +18,28 @@ public class GradeAnalysisFilterDTO implements Serializable
     /**
      * 需要查询的学院id
      */
-    List<Long> departmentIds;
+    private List<Long> departmentIds;
 
     /**
      * 需要查询的专业id
      */
-    List<Long> majorIds;
+    private List<Long> majorIds;
 
     /**
      * 需要查询的班级id
      */
-    List<Long> classIds;
+    private List<Long> classIds;
+
+    /**
+     * 性别
+     */
+    private Integer stuSex;
+
+    /**
+     * 学科id
+     */
+    private List<Long> subjectIds;
+
 
     private static final long serialVersionUID = -1L;
 }

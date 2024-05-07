@@ -7,6 +7,7 @@ import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoQueryRequest;
 import com.caixy.adminSystem.model.entity.StudentInfo;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -47,6 +48,8 @@ public interface StudentInfoService extends IService<StudentInfo>
      * @return
      */
     StudentInfoVO getStudentInfoVO(StudentInfo post);
+
+    List<StudentInfoVO> getStudentInfoVoByIds(Collection<Long> studentIds);
 
     StudentInfoVO getStudentInfoVOById(Long id);
 

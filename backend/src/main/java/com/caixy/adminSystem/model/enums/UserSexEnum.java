@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 
 /**
  * 用户角色枚举
- *
- 
  */
 @Getter
 public enum UserSexEnum
@@ -31,7 +29,8 @@ public enum UserSexEnum
 
     private final Integer code;
 
-    UserSexEnum(String text, String value, Integer code) {
+    UserSexEnum(String text, String value, Integer code)
+    {
         this.text = text;
         this.value = value;
         this.code = code;
@@ -42,7 +41,8 @@ public enum UserSexEnum
      *
      * @return
      */
-    public static List<String> getValues() {
+    public static List<String> getValues()
+    {
         return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
     }
 
@@ -52,24 +52,32 @@ public enum UserSexEnum
      * @param value
      * @return
      */
-    public static UserSexEnum getEnumByValue(String value) {
-        if (ObjectUtils.isEmpty(value)) {
+    public static UserSexEnum getEnumByValue(String value)
+    {
+        if (ObjectUtils.isEmpty(value))
+        {
             return null;
         }
-        for (UserSexEnum anEnum : UserSexEnum.values()) {
-            if (anEnum.value.equals(value)) {
+        for (UserSexEnum anEnum : UserSexEnum.values())
+        {
+            if (anEnum.value.equals(value))
+            {
                 return anEnum;
             }
         }
         return null;
     }
 
-    public static UserSexEnum getEnumByCode(Integer code) {
-        if (ObjectUtils.isEmpty(code)) {
+    public static UserSexEnum getEnumByCode(Integer code)
+    {
+        if (ObjectUtils.isEmpty(code))
+        {
             return null;
         }
-        for (UserSexEnum anEnum : UserSexEnum.values()) {
-            if (anEnum.code.equals(code)) {
+        for (UserSexEnum anEnum : UserSexEnum.values())
+        {
+            if (anEnum.code.equals(code))
+            {
                 return anEnum;
             }
         }

@@ -16,18 +16,18 @@ public class ClassesInfoAddRequest implements Serializable {
     /**
      * 名字
      */
-    String name;
+    private String name;
 
 
     /**
      * 学院id
      */
-    Long departId;
+    private Long departId;
 
     /**
      * 专业id
      */
-    Long majorId;
+    private Long majorId;
 
     private static final long serialVersionUID = 1L;
 }

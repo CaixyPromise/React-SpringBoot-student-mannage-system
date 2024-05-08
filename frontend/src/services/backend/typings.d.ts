@@ -391,6 +391,8 @@ declare namespace API {
     classIds?: number[];
     departmentIds?: number[];
     majorIds?: number[];
+    stuSex?: number;
+    subjectIds?: number[];
   };
 
   type GradeItem = {
@@ -815,8 +817,14 @@ declare namespace API {
 
   type SubjectAnalysis = {
     averageScore?: number;
+    excellentCount?: number;
+    excellentRate?: number;
+    failureCount?: number;
+    failureRate?: number;
     highestScore?: number;
     highestScoreStudentName?: StudentInfoVO;
+    subjectExcellentLevel?: number;
+    subjectFailureLevel?: number;
     subjectId?: number;
     subjectName?: string;
   };
@@ -824,6 +832,8 @@ declare namespace API {
   type Subjects = {
     createTime?: string;
     creatorId?: number;
+    gradeExcellent?: number;
+    gradeFail?: number;
     gradeMax?: number;
     gradeMin?: number;
     id?: number;
@@ -833,6 +843,8 @@ declare namespace API {
   };
 
   type SubjectsAddRequest = {
+    gradeExcellent?: number;
+    gradeFail?: number;
     gradeMax?: number;
     gradeMin?: number;
     name?: string;
@@ -862,6 +874,8 @@ declare namespace API {
   };
 
   type SubjectsUpdateRequest = {
+    gradeExcellent?: number;
+    gradeFail?: number;
     gradeMax?: number;
     gradeMin?: number;
     id?: number;
@@ -869,6 +883,8 @@ declare namespace API {
   };
 
   type SubjectsVO = {
+    gradeExcellent?: number;
+    gradeFail?: number;
     gradeMax?: number;
     gradeMin?: number;
     id?: number;

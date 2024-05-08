@@ -4,7 +4,7 @@ import {EChartsOption} from "echarts";
 const getAllSubjectAnalysis = (data: API.SubjectAnalysis[]): EChartsOption =>
 {
     const xAxisData = data.map(item => item.subjectName);
-    const averageScores = data.map(item => item.averageScore);
+    const averageScores = data.map(item => item.averageScore?.toFixed());
     const highestScores = data.map(item => item.highestScore);
 
     return {
@@ -76,7 +76,7 @@ const convertToPolarOption = (data: API.SubjectAnalysis[]): EChartsOption => {
                 const subject = data.find(item => item.subjectName === params[0].axisValue);
                 return `
           ${params[0].axisValue}<br/>
-          平均分: ${params[0].data}<br/>
+          平均分: ${(params[0].data)?.toFixed()}<br/>
           最高分: ${params[1].data}<br/>
           最高分学生: ${subject?.highestScoreStudentName.stuName} (${subject?.highestScoreStudentName.stuMajor})
         `;

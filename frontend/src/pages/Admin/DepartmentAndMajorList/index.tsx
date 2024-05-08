@@ -4,7 +4,7 @@ import {PlusOutlined} from '@ant-design/icons';
 import {ActionType, PageContainer, ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
 import {Button, Cascader, Empty, Form, Input, MenuProps, message, Modal} from 'antd';
-import React, {useRef, useState} from 'react';
+import React, {useMemo, useRef, useState} from 'react';
 import {
     createDepartmentColumns,
     DepartmentColumns,
@@ -29,6 +29,7 @@ import {
     listClassesInfoVoByPageUnderMajorUsingPOST,
     updateClassesInfoUsingPOST
 } from "@/services/backend/classesController";
+import {ProTableProps} from "@ant-design/pro-table/lib";
 
 interface DataSourceMajor
 {
@@ -89,6 +90,24 @@ const DepartmentAndMajorListPage: React.FC = () =>
 
     const [ dataSource, setDataSource ] = useState<DataSourceDepartment[]>([])
     const [ currentUpdateDepartment, setCurrentUpdateDepartment ] = useState()
+
+    const departmentsMajorsMap = useMemo(() =>
+    {
+        const map = new Map();
+        dataSource.forEach(department =>
+        {
+            department.majors.forEach(major =>
+            {
+                const key = `${department.departmentName}-${major.majorName}`;
+                map.set(key, {
+                    departmentId: department.departmentId,
+                    majorId: major.majorId
+                });
+            });
+        });
+        return map;
+    }, [ dataSource ]);
+
     const processData = (data) =>
     {
         const groupedByDepartment = {};
@@ -180,8 +199,6 @@ const DepartmentAndMajorListPage: React.FC = () =>
 
     const classesExpandedRowRender = (record: any) =>
     {
-        console.log("record is: ", record)
-        console.log("majorCurrentRef is: ", majorCurrentRow)
         const handleDeleteMajor = async (record: { majorId: API.DeleteRequest; }) =>
         {
             const { data, code } = await deleteMajorInfoUsingPOST({ id: record.majorId })
@@ -191,45 +208,16 @@ const DepartmentAndMajorListPage: React.FC = () =>
                 actionRef.current?.reloadAndRest?.()
             }
         }
-        const handleUpdateClick = (record) =>
+        const handleUpdateClick = (record: { majorName: string; departName: string; id: any; name: any; }) =>
         {
-            const findIdsByNames = (majorName: string, departName: string) =>
-            {
-                for (let department of dataSource)
-                {
-                    if (department.departmentName === departName)
-                    {
-                        for (let major of department.majors)
-                        {
-                            if (major.majorName === majorName)
-                            {
-                                return {
-                                    departmentId: department.departmentId,
-                                    majorId: major.majorId
-                                };
-                            }
-                        }
-                    }
-                }
-                return { departmentId: '', majorId: '' };
-            }
-
-            // 找到当前专业所属的学院ID
-            const { departmentId, majorId } = findIdsByNames(record.majorName, record.departName)
-            // // 设置当前操作的专业行及其学院ID
+            const key = `${record.departName}-${record.majorName}`;
+            const { departmentId, majorId } = departmentsMajorsMap.get(key) || { departmentId: '', majorId: '' };
             setClassesCurrentRow({
                 classesId: record.id,
                 classesName: record.name,
                 departmentId: departmentId,
                 majorId: majorId
-            })
-            // setClassesCurrentRow({
-            //     majorId: record,
-            //     classesId: record.id,
-            //     classesName: record.majorName,
-            //     departmentId: departmentId
-            // });
-
+            });
             // 显示更新专业的模态框
             setUpdateClassesModalVisible(true);
         };
@@ -278,13 +266,19 @@ const DepartmentAndMajorListPage: React.FC = () =>
             pagination={false}
             rowKey={"id"}
             request={fetchDataSource}
-            // tableRender={(_, dom) => (
-            //     isEmpty ? <Empty
-            //         description={<p>此学院尚未设立班级 <a
-            //             onClick={() => setCreateMajorModalVisible(true)}>现在去创建</a></p>}
-            //
-            //     /> : dom
-            // )}
+            tableRender={(props: ProTableProps<any, any>, defaultDom) =>
+            {
+                // @ts-ignore
+                const { dataSource } = props?.action;
+                if (dataSource && dataSource?.length === 0)
+                {  // 检查dataSource是否为空
+                    return <Empty
+                        description={<p>此学院尚未设立班级 <a
+                            onClick={() => setCreateClassesModalVisible(true)}>现在去创建</a></p>}
+                    />;
+                }
+                return defaultDom;
+            }}
         />
     }
     /**
@@ -613,26 +607,33 @@ const DepartmentAndMajorListPage: React.FC = () =>
                 }}
                 onOk={async () =>
                 {
-                    const { departmentMajor, className } = classForm.getFieldsValue();
-                    if (departmentMajor && className)
+                    try
                     {
-                        const majorId = departmentMajor[1];
-                        const departId = departmentMajor[0];
-                        const response = await addClassesInfoUsingPOST({
-                            majorId,
-                            departId,
-                            name: className
-                        })
-                        message.success("班级创建成功！")
+                        const { departmentMajor, className } = classForm.getFieldsValue();
+                        if (departmentMajor && className)
+                        {
+                            const majorId = departmentMajor[1];
+                            const departId = departmentMajor[0];
+                            const response = await addClassesInfoUsingPOST({
+                                majorId,
+                                departId,
+                                name: className
+                            })
+                            message.success("班级创建成功！")
 
-                        setCreateClassesModalVisible(false)
-                        classForm.resetFields()
-                        actionRef.current?.reload();
-                        return response;
+                            setCreateClassesModalVisible(false)
+                            classForm.resetFields()
+                            actionRef.current?.reload();
+                            return response;
+                        }
+                        else
+                        {
+                            message.error("请输入完整信息！")
+                        }
                     }
-                    else
+                    catch (error: any)
                     {
-                        message.error("请输入完整信息！")
+                        message.error(`班级创建失败: ${error.message}`)
                     }
                 }}
             >

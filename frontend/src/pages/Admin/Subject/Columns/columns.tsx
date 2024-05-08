@@ -39,6 +39,25 @@ export const SubjectColumns = ({
             <><Badge status="warning" text={`${record.gradeMin} 分`}/> </>
         )
     },
+
+    {
+        title: "优秀分数线",
+        width: 120,
+        dataIndex: "gradeExcellent",
+        valueType: "digit",
+        render: (_, record) => (
+            <><Badge status="success" text={`${record.gradeExcellent} 分`}/> </>
+        )
+    },
+    {
+        title: "不及格分数线",
+        width: 120,
+        dataIndex: "gradeFail",
+        valueType: "digit",
+        render: (_, record) => (
+            <><Badge status="error" text={`${record.gradeFail} 分`}/> </>
+        )
+    },
     {
         title: '创建人id',
         width: 120,

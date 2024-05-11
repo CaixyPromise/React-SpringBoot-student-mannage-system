@@ -3,15 +3,13 @@ package com.caixy.adminSystem.model.dto.studentInfo;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 创建请求
- *
- 
  */
 @Data
-public class StudentInfoAddRequest implements Serializable {
+public class StudentInfoAddRequest implements Serializable
+{
 
     /**
      * 学生姓名

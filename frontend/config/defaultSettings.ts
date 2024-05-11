@@ -10,12 +10,12 @@ const Settings: ProLayoutProps & {
   navTheme: 'light',
   // 拂晓蓝
   colorPrimary: '#1890ff',
-  layout: 'mix',
-  contentWidth: 'Fluid',
-  fixedHeader: false,
-  fixSiderbar: true,
+  layout: 'top',
+  "contentWidth": "1500px",
+  "fixedHeader": false,
+  "fixSiderbar": true,
   colorWeak: false,
-  title: '前端模板',
+  title: '高校新生质量分析系统',
   pwa: true,
   iconfontUrl: '',
   token: {

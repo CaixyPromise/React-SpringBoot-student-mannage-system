@@ -6,7 +6,10 @@ const getAllSubjectAnalysis = (data: API.SubjectAnalysis[]): EChartsOption =>
     const xAxisData = data.map(item => item.subjectName);
     const averageScores = data.map(item => item.averageScore?.toFixed());
     const highestScores = data.map(item => item.highestScore);
-
+    const excellentScores = data.map(item => item.excellentCount);
+    const excellentRates = data.map(item => item.excellentRate?.toFixed());
+    const failedScores = data.map(item => item.failureCount);
+    const failureRates = data.map(item => item.failureRate?.toFixed());
     return {
         tooltip: {
             trigger: 'axis',
@@ -19,6 +22,10 @@ const getAllSubjectAnalysis = (data: API.SubjectAnalysis[]): EChartsOption =>
                 return `${xAxisData[dataIndex]}<br/>
                         平均分: ${averageScores[dataIndex]}<br/>
                         最高分: ${highestScores[dataIndex]}<br/>
+                        优秀上线人数: ${excellentScores[dataIndex]}<br/>
+                        优秀率: ${excellentRates[dataIndex]}%<br/>
+                        不及格人数: ${failedScores[dataIndex]}<br/>
+                        不及格率: ${failureRates[dataIndex]}%<br/>
                         最高分学生: ${data[dataIndex].highestScoreStudentName.stuName}`;
             }
         },

@@ -92,6 +92,10 @@ public class AnalysisServiceImpl implements AnalysisService
                         .stream()
                         .map(StudentGradesVO.GradeItem::getSubjectId)
                         .collect(Collectors.toSet());
+        if (stuSubjectIdSet.isEmpty())
+        {
+            return new StudentAnalysisVO();
+        }
         List<Subjects> subjects = subjectsService.listByIds(stuSubjectIdSet);
         StudentAnalysisVO studentAnalysisVO = new StudentAnalysisVO();
         studentAnalysisVO.setStudentGrade(studentGradesVOByStuId);
@@ -161,7 +165,8 @@ public class AnalysisServiceImpl implements AnalysisService
      *
      * @update v2.0 05.07: 修复性能bug错误
      */
-    private List<SubjectAnalysis> analyzeGrades(List<Subjects> subjectsList, List<StudentGrades> studentGradesList) {
+    private List<SubjectAnalysis> analyzeGrades(List<Subjects> subjectsList, List<StudentGrades> studentGradesList)
+    {
         Map<Long, Subjects> subjectsMap = subjectsList.stream()
                 .collect(Collectors.toMap(Subjects::getId, Function.identity()));
 
@@ -196,14 +201,31 @@ public class AnalysisServiceImpl implements AnalysisService
      * @version 1.0
      * @since 2024/5/5 下午10:16
      */
-    private SubjectAnalysis createSubjectAnalysis(Long subjectId, List<StudentGrades> grades, Map<Long, Subjects> subjectsMap, Map<Long, StudentInfoVO> studentInfoMap) {
+    private SubjectAnalysis createSubjectAnalysis(Long subjectId, List<StudentGrades> grades, Map<Long, Subjects> subjectsMap, Map<Long, StudentInfoVO> studentInfoMap)
+    {
+        Subjects subject = subjectsMap.get(subjectId);
         double averageScore = grades.stream().mapToDouble(StudentGrades::getGrade).average().orElse(0.0);
         Optional<StudentGrades> maxGradeEntry = grades.stream().max(Comparator.comparingLong(StudentGrades::getGrade));
 
+        // 计算优秀和不及格的学生人数
+        long excellentCount = grades.stream().filter(g -> g.getGrade() >= subject.getGradeExcellent()).count();
+        long failureCount = grades.stream().filter(g -> g.getGrade() < subject.getGradeFail()).count();
+
+        // 计算优秀率和不及格率
+        double totalStudents = grades.size();
+        double excellentRate = (totalStudents > 0) ? (double) excellentCount / totalStudents * 100 : 0.0;
+        double failureRate = (totalStudents > 0) ? (double) failureCount / totalStudents * 100 : 0.0;
+
         SubjectAnalysis analysis = new SubjectAnalysis();
         analysis.setSubjectId(subjectId);
-        analysis.setSubjectName(subjectsMap.get(subjectId).getName());
+        analysis.setSubjectName(subject.getName());
+        analysis.setSubjectExcellentLevel(subject.getGradeExcellent());
+        analysis.setSubjectFailureLevel(subject.getGradeFail());
         analysis.setAverageScore(averageScore);
+        analysis.setExcellentCount(excellentCount);
+        analysis.setFailureCount(failureCount);
+        analysis.setExcellentRate(excellentRate);
+        analysis.setFailureRate(failureRate);
 
         maxGradeEntry.ifPresent(maxGrade -> {
             analysis.setHighestScore(maxGrade.getGrade());

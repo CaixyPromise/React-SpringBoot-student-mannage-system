@@ -27,7 +27,7 @@ const Footer: React.FC = () => {
               <GithubOutlined /> CaixyPromise
             </>
           ),
-          href: 'https://github.com/CaixyPromise',
+          href: '/',
           blankTarget: true,
         },
       ]}

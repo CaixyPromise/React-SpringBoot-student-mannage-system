@@ -51,6 +51,7 @@ public class StudentController
      * @return
      */
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addStudentInfo(@RequestBody StudentInfoAddRequest postAddRequest, HttpServletRequest request)
     {
         if (postAddRequest == null)

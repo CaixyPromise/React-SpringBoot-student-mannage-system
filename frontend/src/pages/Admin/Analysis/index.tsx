@@ -139,7 +139,7 @@ const Index: React.FC<IndexProps> = () =>
             title={"学生分析"}
         >
             <Card title={"科目成绩分析"}>
-                <Spin spinning={loading}>
+                <Spin spinning={loading} tip={"成绩报告分析中，请稍后..."}>
                     <EChartsReact option={allSubjectAnalysis}/>
                 </Spin>
             </Card>
@@ -193,7 +193,7 @@ const Index: React.FC<IndexProps> = () =>
 
                 <div>
                     <Card>
-                        <Spin spinning={loading}>
+                        <Spin spinning={loading} tip={"成绩报告分析中，请稍后..."}>
                             <div className={styles.chartBox}>
                                 <div className={styles.chartItem}>
                                     <EChartsReact option={filterPolarCharts} className={styles.chart}/>

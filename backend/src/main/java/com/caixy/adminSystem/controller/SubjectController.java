@@ -60,6 +60,7 @@ public class SubjectController
         }
         Subjects post = new Subjects();
         BeanUtils.copyProperties(postAddRequest, post);
+
         subjectsService.validSubjects(post, true);
         User loginUser = userService.getLoginUser(request);
         post.setCreatorId(loginUser.getId());

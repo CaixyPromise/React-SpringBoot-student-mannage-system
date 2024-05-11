@@ -286,15 +286,18 @@ public class ClassesController
      * @since 2024/4/30 下午2:50
      */
     @PostMapping("/get/classes")
-    public BaseResponse<List<AllClassesOptionDataVO>> getClassesOptionDataVOByPage(@RequestBody ClassesInfoQueryRequest postQueryRequest) {
+    public BaseResponse<List<AllClassesOptionDataVO>> getClassesOptionDataVOByPage(@RequestBody ClassesInfoQueryRequest postQueryRequest)
+    {
         List<DepartmentMajorClassDTO> rawData = classesInfoService.fetchAllClassesData();
         Map<Long, List<DepartmentMajorClassDTO>> groupedByDepartment =
                 rawData.stream()
-                        .collect(Collectors.groupingBy(dto -> dto.getDepartmentId() != null ? dto.getDepartmentId() : -1));
+                        .collect(Collectors.groupingBy(dto -> dto.getDepartmentId() != null ? dto.getDepartmentId() :
+                                                              -1));
 
         List<AllClassesOptionDataVO> result = groupedByDepartment.entrySet().stream().map(deptEntry -> {
             DepartmentMajorClassDTO firstDept = deptEntry.getValue().get(0);
-            AllClassesOptionDataVO deptOption = new AllClassesOptionDataVO(String.valueOf(deptEntry.getKey()), firstDept.getDepartmentName());
+            AllClassesOptionDataVO deptOption =
+                    new AllClassesOptionDataVO(String.valueOf(deptEntry.getKey()), firstDept.getDepartmentName());
             Map<Long, List<DepartmentMajorClassDTO>> groupedByMajor =
                     deptEntry.getValue().stream()
                             .collect(Collectors.groupingBy(dto -> dto.getMajorId() != null ? dto.getMajorId() : -1));

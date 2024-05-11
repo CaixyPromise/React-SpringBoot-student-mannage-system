@@ -34,5 +34,15 @@ public class SubjectsVO implements Serializable
      */
     private Long gradeMin;
 
+    /**
+     * 优秀分数线
+     */
+    private Long gradeExcellent;
+
+    /**
+     * 不及格分数线
+     */
+    private Long gradeFail;
+
     private static final long serialVersionUID = 1L;
 }

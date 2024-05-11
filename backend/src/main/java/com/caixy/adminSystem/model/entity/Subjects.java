@@ -35,6 +35,16 @@ public class Subjects implements Serializable
     private Long gradeMin;
 
     /**
+     * 不及格分数线
+     */
+    private Long gradeFail;
+
+    /**
+     * 优秀分数线
+     */
+    private Long gradeExcellent;
+
+    /**
      * 创建人id
      */
     private Long creatorId;
@@ -48,6 +58,7 @@ public class Subjects implements Serializable
      * 更新时间
      */
     private Date updateTime;
+
 
     /**
      * 是否删除

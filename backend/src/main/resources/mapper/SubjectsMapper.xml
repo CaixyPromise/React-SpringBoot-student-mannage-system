@@ -3,11 +3,14 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.caixy.adminSystem.mapper.SubjectsMapper">
+
     <resultMap id="BaseResultMap" type="com.caixy.adminSystem.model.entity.Subjects">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
             <result property="gradeMax" column="gradeMax" jdbcType="BIGINT"/>
             <result property="gradeMin" column="gradeMin" jdbcType="BIGINT"/>
+            <result property="gradeFail" column="gradeFail" jdbcType="BIGINT"/>
+            <result property="gradeExcellent" column="gradeExcellent" jdbcType="BIGINT"/>
             <result property="creatorId" column="creatorId" jdbcType="BIGINT"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
@@ -16,7 +19,8 @@
 
     <sql id="Base_Column_List">
         id,name,gradeMax,
-        gradeMin,creatorId,createTime,
-        updateTime,isDelete
+        gradeMin,gradeFail,gradeExcellent,
+        creatorId,createTime,updateTime,
+        isDelete
     </sql>
 </mapper>

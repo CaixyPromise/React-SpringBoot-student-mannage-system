@@ -6,7 +6,7 @@ import {PlusOutlined} from "@ant-design/icons";
 import {getClassesOptionDataVoByPageUsingPOST} from "@/services/backend/classesController";
 import UpdateInfoModal from "@/pages/Admin/Student/components/UpdateInfoModal";
 import CreateInfoModal from "@/pages/Admin/Student/components/CreateInfoModal";
-import {listStudentInfoByPageUsingPOST,} from "@/services/backend/studentController";
+import {deleteStudentInfoUsingPOST, listStudentInfoByPageUsingPOST,} from "@/services/backend/studentController";
 import {StudentColumns} from "@/pages/Admin/Student/Columns/columns";
 import AddScoreInfoModal from "@/pages/Admin/Student/components/AddScoreInfoModal";
 import ScoreInfoModal from "@/pages/Admin/Student/components/ScoreInfoModal";
@@ -38,14 +38,19 @@ const Index = () =>
      */
     const handleDelete = async (record: { id: any; }) =>
     {
-        console.log(record)
-        const { data, code } = await deleteSubjectsUsingPOST({
-            id: record.id,
-        })
-        if (code === 0 && data)
+        try {
+            const { data, code } = await deleteStudentInfoUsingPOST({
+                id: record.id,
+            })
+            if (code === 0 && data)
+            {
+                message.success('删除成功，即将刷新')
+                actionRef.current?.reloadAndRest?.()
+            }
+        }
+        catch (e)
         {
-            message.success('删除成功，即将刷新')
-            actionRef.current?.reloadAndRest?.()
+            message.error(`删除失败: ${e.message}`)
         }
     }
 

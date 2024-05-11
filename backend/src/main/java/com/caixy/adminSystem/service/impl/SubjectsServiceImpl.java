@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.caixy.adminSystem.common.ErrorCode;
 import com.caixy.adminSystem.exception.BusinessException;
+import com.caixy.adminSystem.mapper.SubjectsMapper;
 import com.caixy.adminSystem.model.dto.subject.SubjectsQueryRequest;
 import com.caixy.adminSystem.model.entity.Subjects;
 import com.caixy.adminSystem.model.vo.Subjects.SubjectsVO;
 import com.caixy.adminSystem.service.SubjectsService;
-import com.caixy.adminSystem.mapper.SubjectsMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -18,23 +18,29 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
-* @author CAIXYPROMISE
-* @description 针对表【subjects】的数据库操作Service实现
-* @createDate 2024-04-02 22:30:06
-*/
+ * @author CAIXYPROMISE
+ * @description 针对表【subjects】的数据库操作Service实现
+ * @createDate 2024-04-02 22:30:06
+ */
 @Service
 public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
-    implements SubjectsService{
+        implements SubjectsService
+{
 
     @Override
     public void validSubjects(Subjects subjects, boolean add)
     {
-        QueryWrapper<Subjects> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("name", subjects.getName());
-        if (this.count(queryWrapper) > 0)
+        if (add)
         {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "学科名称已存在");
+            QueryWrapper<Subjects> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("name", subjects.getName());
+            if (this.count(queryWrapper) > 0)
+            {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "学科名称已存在");
+            }
         }
+        // 校验分数和分数线合法性
+        validScoreAndLine(subjects);
     }
 
     @Override
@@ -92,8 +98,71 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
     @Override
     public boolean checkGradeIsValid(Long grade, Subjects subjects)
     {
-        return grade <= subjects.getGradeMin() || grade >= subjects.getGradeMax();
+        return grade < subjects.getGradeMin() || grade > subjects.getGradeMax();
     }
+
+
+    private static void validScoreAndLine(Subjects subjects)
+    {
+        // 判断数值是否在安全区间内
+        Long scoreMax = subjects.getGradeMax();
+        Long scoreMin = subjects.getGradeMin();
+
+        // 检查分数是否为null
+        if (scoreMin == null || scoreMax == null)
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "分数不能为null");
+        }
+
+        // 检查分数是否超过极值
+        if (scoreMin < 0 || scoreMax <= 0)
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "分数必须大于0");
+        }
+
+        // 检查最大分数是否设置在合理的范围内
+        if (scoreMax > 2000)
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "最大分数不能超过2000");
+        }
+
+        // 检查最小分数是否大于最大分数
+        if (scoreMin > scoreMax)
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "最小分数不能大于最大分数");
+        }
+
+        if (scoreMin.equals(scoreMax))
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "最小分数和最大分数不能相等");
+        }
+
+        // 检查分数线是否在合理范围内
+        Long excellentLine = subjects.getGradeExcellent();
+        Long failLine = subjects.getGradeFail();
+
+        if (excellentLine == null || failLine == null)
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "分数线不能为null");
+        }
+
+        if (excellentLine < 0 || failLine < 0)
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "分数线必须大于等于0");
+        }
+
+        if (excellentLine > scoreMax || failLine > scoreMax)
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "分数线不能大于最大分数");
+        }
+
+        if (excellentLine <= failLine)
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "优秀分数线必须小于不及格分数线");
+        }
+    }
+
+
 }
 
 

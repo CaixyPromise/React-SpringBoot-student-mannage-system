@@ -3,7 +3,6 @@ import {Cascader, Form, Input, message, Modal, Select} from "antd";
 import {userSexOption} from "@/pages/Admin/Student/Columns/option";
 import React from "react";
 import {ActionType} from "@ant-design/pro-components";
-import {PayloadBody} from "@/pages/Admin/Student/typing";
 
 interface CreateProps
 {
@@ -11,15 +10,36 @@ interface CreateProps
     setCreateModalVisible: (value: boolean) => void
     cascadeOption: API.AllClassesOptionDataVO[]
     actionRef: React.MutableRefObject<ActionType | undefined>,
-    packageRequestBody: () => PayloadBody | null
+    packageRequestBody: () => Student.PayloadBody | null
 }
 
 
-const Index: React.FC<CreateProps> = (payload : CreateProps ) =>
+const Index: React.FC<CreateProps> = (payload: CreateProps) =>
 {
-    const [form] = Form.useForm();
-    const {createModalVisible, setCreateModalVisible, cascadeOption, packageRequestBody, actionRef} = payload
-
+    const [ form ] = Form.useForm();
+    const { createModalVisible, setCreateModalVisible, cascadeOption, actionRef } = payload
+    const packageRequestBody: () => (null | {
+        stuSex: any;
+        stuDeptId: any;
+        stuMajorId: any;
+        stuName: any;
+        stuClassId: any
+    }) = () =>
+    {
+        const formValue = form.getFieldsValue()
+        const [departId, majorId, classId] = formValue.subjectName
+        if (formValue.stuName === "" || departId === undefined || majorId === undefined || classId === undefined)
+        {
+            return null
+        }
+        return {
+            stuClassId: classId,
+            stuDeptId: departId,
+            stuMajorId: majorId,
+            stuName: formValue.stuName,
+            stuSex: formValue.stuSex,
+        }
+    }
     return <>
         <Modal title={"新建"}
                open={createModalVisible}
@@ -27,6 +47,7 @@ const Index: React.FC<CreateProps> = (payload : CreateProps ) =>
                {
                    // console.log(form.getFieldsValue())
                    const requestBody = packageRequestBody();
+
                    if (requestBody !== null)
                    {
                        try
@@ -51,6 +72,7 @@ const Index: React.FC<CreateProps> = (payload : CreateProps ) =>
                    }
                    else
                    {
+                       console.log(form.getFieldsValue())
                        message.error("学生信息名称不能为空或未选择所属学院")
                    }
                }}

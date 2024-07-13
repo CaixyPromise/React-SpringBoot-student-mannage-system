@@ -3,13 +3,9 @@ import React, {useEffect, useState} from "react";
 import {CloseOutlined, PlusOutlined} from "@ant-design/icons";
 import {
     batchAddStudentGradesUsingPOST,
-    deleteStudentGradesUsingPOST,
-    updateStudentGradesUsingPOST
 } from "@/services/backend/scoreController";
 import {fetchStudentInfo} from "@/pages/Admin/Student/server";
 import StudentSex from "@/pages/Admin/Student/components/StudentSex";
-import {ProTable} from "@ant-design/pro-components";
-import {ScoreColumn} from "@/pages/Admin/Student/Columns/columns";
 import {validateScore} from "@/pages/Admin/Student/components/AddScoreInfoModal/utils";
 
 

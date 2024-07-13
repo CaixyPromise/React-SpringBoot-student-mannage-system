@@ -3,7 +3,6 @@ import {Cascader, Form, Input, message, Modal, Select} from "antd";
 import {userSexOption} from "@/pages/Admin/Student/Columns/option";
 import React from "react";
 import {ActionType} from "@ant-design/pro-components";
-import {PayloadBody} from "@/pages/Admin/Student/typing";
 
 
 interface UpdateProps
@@ -13,17 +12,17 @@ interface UpdateProps
     cascadeOption: API.AllClassesOptionDataVO[]
     actionRef: React.MutableRefObject<ActionType | undefined>,
     currentRow: {
-        packageRequestBody: () => PayloadBody | null;
+        packageRequestBody: () => Student.PayloadBody | null;
         id?: string | undefined;
         subjectName?: string[] | undefined;
         stuName?: string | undefined;
         stuSex?: number | undefined;
     },
-    packageRequestBody: PayloadBody | null
+    packageRequestBody: Student.PayloadBody | null
 }
 
 
-const Index: React.FC<UpdateProps> = ( payload : UpdateProps) =>
+const Index: React.FC<UpdateProps> = (payload: UpdateProps) =>
 {
     const [ form ] = Form.useForm();
     const {
@@ -34,35 +33,50 @@ const Index: React.FC<UpdateProps> = ( payload : UpdateProps) =>
                open={updateModalVisible}
                onOk={async () =>
                {
-                   console.log(form.getFieldsValue())
-                   const requestBody = packageRequestBody();
-                   if (requestBody)
+                   const formValue = form.getFieldsValue();
+                   const { subjectName, stuName, stuSex } = formValue;
+                   console.log(subjectName, stuName, stuSex)
+                   if (!(subjectName && stuName && stuSex))
                    {
-                       try
+                       message.error("请填写完整信息")
+                       return
+                   }
+                   const [ departId, majorId, classId ] = formValue.subjectName
+
+                   if (formValue.stuName === "" || departId === undefined || majorId === undefined || classId === undefined)
+                   {
+                       return null
+                   }
+
+                   try
+                   {
+                       const { data, code } = await updateStudentInfoUsingPOST({
+                           // @ts-ignore
+                           id: currentRow.id,
+                           stuClassId: classId,
+                           stuDeptId: departId,
+                           stuMajorId: majorId,
+                           stuName: formValue.stuName,
+                           stuSex: formValue.stuSex,
+                       })
+                       if (code === 0)
                        {
-                           const { data, code } = await updateStudentInfoUsingPOST(
-                               { id: currentRow.id, ...requestBody })
-                           if (code === 0)
-                           {
-                               message.success("添加成功")
-                           }
-                       }
-                       catch (e: any)
-                       {
-                           message.error(e.message)
-                       }
-                       finally
-                       {
-                           setUpdateModalVisible(false)
-                           form.resetFields()
-                           actionRef.current?.reloadAndRest?.()
+                           message.success("修改成功")
                        }
                    }
-                   else
+                   catch (e: any)
                    {
-                       message.error("科目名称不能为空")
+                       message.error(e.message)
                    }
-               }}
+                   finally
+                   {
+                       setUpdateModalVisible(false)
+                       form.resetFields()
+                       actionRef.current?.reloadAndRest?.()
+                   }
+               }
+
+               }
                onCancel={() =>
                {
                    setUpdateModalVisible(false);

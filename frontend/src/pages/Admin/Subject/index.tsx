@@ -375,6 +375,7 @@ const Index = () =>
                                const { data, code } = await updateSubjectsUsingPOST({
                                    ...currentRow,
                                    ...formData,
+                                   // @ts-ignore
                                    id: currentRow?.id,
                                })
                                if (code === 0)

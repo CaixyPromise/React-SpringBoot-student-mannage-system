@@ -14,6 +14,7 @@ import com.caixy.adminSystem.model.entity.ClassesInfo;
 import com.caixy.adminSystem.model.entity.User;
 import com.caixy.adminSystem.model.vo.ClassesInfo.AllClassesOptionDataVO;
 import com.caixy.adminSystem.model.vo.ClassesInfo.ClassesInfoVO;
+import com.caixy.adminSystem.model.vo.ClassesInfo.DepartMajorClassTreeVO;
 import com.caixy.adminSystem.service.ClassesInfoService;
 import com.caixy.adminSystem.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -37,12 +35,22 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ClassesController
 {
-
     @Resource
     private ClassesInfoService classesInfoService;
 
     @Resource
     private UserService userService;
+
+    @GetMapping("/get/selection/class-tree")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<List<DepartMajorClassTreeVO>> getAllSelectionClassesTree(
+            @RequestParam(name = "courseSelectionId") Long courseSelectionId
+        )
+    {
+        List<DepartMajorClassTreeVO> classTreeByCourseSelectionId = classesInfoService.getClassTreeByCourseSelectionId(
+                courseSelectionId);
+        return ResultUtils.success(classTreeByCourseSelectionId);
+    }
 
     // region 增删改查
 
@@ -62,7 +70,6 @@ public class ClassesController
         }
         ClassesInfo post = new ClassesInfo();
         BeanUtils.copyProperties(postAddRequest, post);
-
         classesInfoService.validClassesInfo(post, true);
         User loginUser = userService.getLoginUser(request);
         post.setCreatorId(loginUser.getId());
@@ -286,7 +293,7 @@ public class ClassesController
      * @since 2024/4/30 下午2:50
      */
     @PostMapping("/get/classes")
-    public BaseResponse<List<AllClassesOptionDataVO>> getClassesOptionDataVOByPage(@RequestBody ClassesInfoQueryRequest postQueryRequest)
+    public BaseResponse<List<AllClassesOptionDataVO>> getClassesOptionDataVOByPage(@RequestBody ClassesOptionVORequest classesOptionVORequest)
     {
         List<DepartmentMajorClassDTO> rawData = classesInfoService.fetchAllClassesData();
         Map<Long, List<DepartmentMajorClassDTO>> groupedByDepartment =
@@ -302,13 +309,19 @@ public class ClassesController
                     deptEntry.getValue().stream()
                             .collect(Collectors.groupingBy(dto -> dto.getMajorId() != null ? dto.getMajorId() : -1));
 
-            List<AllClassesOptionDataVO> majorOptions = groupedByMajor.entrySet().stream().map(majorEntry -> {
-                if (majorEntry.getKey() == -1) return null; // Skip if majorId is -1 (null in database)
+            List<AllClassesOptionDataVO> majorOptions = groupedByMajor.entrySet().stream().map(majorEntry ->
+            {
+                if (majorEntry.getKey() == -1)
+                    return null; // 过滤掉没有专业ID的数据
                 DepartmentMajorClassDTO firstMajor = majorEntry.getValue().get(0);
+
                 AllClassesOptionDataVO majorOption =
                         new AllClassesOptionDataVO(String.valueOf(majorEntry.getKey()), firstMajor.getMajorName());
+                Set<Long> excludeClassIds = new HashSet<>(Optional.ofNullable(classesOptionVORequest.getExcludeClassIds())
+                                                                  .orElseGet(ArrayList::new));
                 List<AllClassesOptionDataVO> classOptions = majorEntry.getValue().stream()
-                        .filter(classDto -> classDto.getClassId() != null) // Ensure class ID is not null
+                        .filter(classDto -> classDto.getClassId() != null) // 过滤掉没有班级ID的数据
+                        .filter(classDto -> !excludeClassIds.contains(classDto.getClassId()))
                         .map(classEntry -> new AllClassesOptionDataVO(String.valueOf(classEntry.getClassId()), classEntry.getClassName(), new ArrayList<>()))
                         .collect(Collectors.toList());
                 majorOption.setChildren(classOptions.isEmpty() ? new ArrayList<>() : classOptions);

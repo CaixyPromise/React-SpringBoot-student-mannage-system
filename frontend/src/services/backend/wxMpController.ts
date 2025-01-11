@@ -3,7 +3,7 @@
 import { request } from '@umijs/max';
 
 /** check GET /api/ */
-export async function checkUsingGET(
+export async function checkUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.checkUsingGET1Params,
   options?: { [key: string]: any },
@@ -18,7 +18,7 @@ export async function checkUsingGET(
 }
 
 /** receiveMessage POST /api/ */
-export async function receiveMessageUsingPOST(options?: { [key: string]: any }) {
+export async function receiveMessageUsingPost1(options?: { [key: string]: any }) {
   return request<any>('/api/', {
     method: 'POST',
     ...(options || {}),
@@ -26,7 +26,7 @@ export async function receiveMessageUsingPOST(options?: { [key: string]: any }) 
 }
 
 /** setMenu GET /api/setMenu */
-export async function setMenuUsingGET(options?: { [key: string]: any }) {
+export async function setMenuUsingGet1(options?: { [key: string]: any }) {
   return request<string>('/api/setMenu', {
     method: 'GET',
     ...(options || {}),

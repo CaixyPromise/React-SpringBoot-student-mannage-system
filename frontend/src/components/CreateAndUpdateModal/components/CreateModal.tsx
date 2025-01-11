@@ -1,4 +1,4 @@
-import {addUserUsingPOST} from "@/services/backend/userController";
+import {addUserUsingPost1} from "@/services/backend/userController";
 import {ProColumns, ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
 import {message, Modal} from 'antd';

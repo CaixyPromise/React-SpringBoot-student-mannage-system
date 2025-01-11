@@ -7,20 +7,23 @@
     <resultMap id="BaseResultMap" type="com.caixy.adminSystem.model.entity.Subjects">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="courseType" column="courseType" jdbcType="INTEGER" />
             <result property="gradeMax" column="gradeMax" jdbcType="BIGINT"/>
             <result property="gradeMin" column="gradeMin" jdbcType="BIGINT"/>
             <result property="gradeFail" column="gradeFail" jdbcType="BIGINT"/>
             <result property="gradeExcellent" column="gradeExcellent" jdbcType="BIGINT"/>
+            <result property="gradeCredit" column="gradeCredit" jdbcType="DOUBLE"/>
             <result property="creatorId" column="creatorId" jdbcType="BIGINT"/>
+            <result property="creditHours" column="creditHours" jdbcType="INTEGER"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,name,gradeMax,
-        gradeMin,gradeFail,gradeExcellent,
-        creatorId,createTime,updateTime,
+        id,name,courseType,gradeMax,gradeMin,
+        gradeFail,gradeExcellent,gradeCredit,
+        creatorId,creditHours,createTime,updateTime,
         isDelete
     </sql>
 </mapper>

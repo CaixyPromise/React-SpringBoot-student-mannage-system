@@ -3,7 +3,7 @@
 import { request } from '@umijs/max';
 
 /** addStudentGrades POST /api/score/add */
-export async function addStudentGradesUsingPOST(
+export async function addStudentGradesUsingPost1(
   body: API.StudentGradesAddRequest,
   options?: { [key: string]: any },
 ) {
@@ -18,7 +18,7 @@ export async function addStudentGradesUsingPOST(
 }
 
 /** batchAddStudentGrades POST /api/score/add/batch */
-export async function batchAddStudentGradesUsingPOST(
+export async function batchAddStudentGradesUsingPost1(
   body: API.StudentGradesAddRequest[],
   options?: { [key: string]: any },
 ) {
@@ -33,7 +33,7 @@ export async function batchAddStudentGradesUsingPOST(
 }
 
 /** deleteStudentGrades POST /api/score/delete */
-export async function deleteStudentGradesUsingPOST(
+export async function deleteStudentGradesUsingPost1(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
 ) {
@@ -48,7 +48,7 @@ export async function deleteStudentGradesUsingPOST(
 }
 
 /** editStudentGrades POST /api/score/edit */
-export async function editStudentGradesUsingPOST(
+export async function editStudentGradesUsingPost1(
   body: API.StudentGradesEditRequest,
   options?: { [key: string]: any },
 ) {
@@ -63,7 +63,7 @@ export async function editStudentGradesUsingPOST(
 }
 
 /** getStudentGradesVOByStuId GET /api/score/get/stu/grade */
-export async function getStudentGradesVoByStuIdUsingGET(
+export async function getStudentGradesVoByStuIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getStudentGradesVOByStuIdUsingGET1Params,
   options?: { [key: string]: any },
@@ -78,7 +78,7 @@ export async function getStudentGradesVoByStuIdUsingGET(
 }
 
 /** getStudentGradesVOById GET /api/score/get/vo */
-export async function getStudentGradesVoByIdUsingGET(
+export async function getStudentGradesVoByIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getStudentGradesVOByIdUsingGET1Params,
   options?: { [key: string]: any },
@@ -93,7 +93,7 @@ export async function getStudentGradesVoByIdUsingGET(
 }
 
 /** listStudentGradesByPage POST /api/score/list/page */
-export async function listStudentGradesByPageUsingPOST(
+export async function listStudentGradesByPageUsingPost1(
   body: API.StudentGradesQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -108,7 +108,7 @@ export async function listStudentGradesByPageUsingPOST(
 }
 
 /** listStudentGradesVOByPage POST /api/score/list/page/vo */
-export async function listStudentGradesVoByPageUsingPOST(
+export async function listStudentGradesVoByPageUsingPost1(
   body: API.StudentGradesQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -123,7 +123,7 @@ export async function listStudentGradesVoByPageUsingPOST(
 }
 
 /** listMyStudentGradesVOByPage POST /api/score/my/list/page/vo */
-export async function listMyStudentGradesVoByPageUsingPOST(
+export async function listMyStudentGradesVoByPageUsingPost1(
   body: API.StudentGradesQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -138,7 +138,7 @@ export async function listMyStudentGradesVoByPageUsingPOST(
 }
 
 /** searchStudentGradesVOByPage POST /api/score/search/page/vo */
-export async function searchStudentGradesVoByPageUsingPOST(
+export async function searchStudentGradesVoByPageUsingPost1(
   body: API.StudentGradesQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -153,7 +153,7 @@ export async function searchStudentGradesVoByPageUsingPOST(
 }
 
 /** updateStudentGrades POST /api/score/update */
-export async function updateStudentGradesUsingPOST(
+export async function updateStudentGradesUsingPost1(
   body: API.StudentGradesUpdateRequest,
   options?: { [key: string]: any },
 ) {

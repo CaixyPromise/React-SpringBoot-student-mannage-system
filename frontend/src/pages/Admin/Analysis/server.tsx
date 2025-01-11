@@ -1,7 +1,7 @@
-import {getClassesOptionDataVoByPageUsingPOST} from "@/services/backend/classesController";
+import {getClassesOptionDataVoByPageUsingPost1} from "@/services/backend/classesController";
 import {message} from "antd";
 import React from "react";
-import {getAllSubjectAnalysesUsingGET, getGradesAnalysisByFilterUsingPOST} from "@/services/backend/analysisController";
+import {getAllSubjectAnalysesUsingGet1, getGradesAnalysisByFilterUsingPost1} from "@/services/backend/analysisController";
 import {EChartsOption} from "echarts";
 import {convertToPolarOption, getAllSubjectAnalysis} from "@/pages/Admin/Analysis/Echarts-option";
 
@@ -17,7 +17,7 @@ const fetchAllSubjectAnalysis = async (setData: React.Dispatch<React.SetStateAct
 {
     try
     {
-        const { data, code } = await getAllSubjectAnalysesUsingGET();
+        const { data, code } = await getAllSubjectAnalysesUsingGet1();
         if (data && code === 0)
         {
             setData(getAllSubjectAnalysis(data))
@@ -37,7 +37,7 @@ const fetchAnalysisByFilter = async (
 {
     try
     {
-        const { data, code } = await getGradesAnalysisByFilterUsingPOST(payload);
+        const { data, code } = await getGradesAnalysisByFilterUsingPost1(payload);
         if (code === 0 && data )
         {
             setFilterCharts(convertToPolarOption(data));

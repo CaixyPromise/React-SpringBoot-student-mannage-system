@@ -1,4 +1,4 @@
-import {userLogoutUsingPOST} from '@/services/backend/userController';
+import {userLogoutUsingPost1} from '@/services/backend/userController';
 import {LogoutOutlined, SettingOutlined, UserOutlined} from '@ant-design/icons';
 import {history, useModel} from '@umijs/max';
 import {Avatar, Button, Space} from 'antd';
@@ -20,7 +20,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) =>
      */
     const loginOut = async () =>
     {
-        await userLogoutUsingPOST();
+        await userLogoutUsingPost1();
         const { search, pathname } = window.location;
         const urlParams = new URL(window.location.href).searchParams;
         /** 此方法会跳转到 redirect 参数所在的位置 */

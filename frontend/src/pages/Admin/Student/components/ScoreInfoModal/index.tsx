@@ -5,7 +5,7 @@ import StudentSex from "@/pages/Admin/Student/components/StudentSex";
 import {ProTable} from "@ant-design/pro-components";
 import {ScoreColumn} from "@/pages/Admin/Student/Columns/columns";
 import {validateScore} from "@/pages/Admin/Student/components/AddScoreInfoModal/utils";
-import {deleteStudentGradesUsingPOST, updateStudentGradesUsingPOST} from "@/services/backend/scoreController";
+import {deleteStudentGradesUsingPost1, updateStudentGradesUsingPost1} from "@/services/backend/scoreController";
 import EChartsReact from "echarts-for-react";
 import {StudentAnalysisOption} from "@/pages/Admin/Student/components/ScoreInfoModal/option";
 import {EChartsOption} from "echarts";
@@ -59,7 +59,7 @@ const Index: React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps
         // 更新成绩
         try
         {
-            const { data, code } = await updateStudentGradesUsingPOST({
+            const { data, code } = await updateStudentGradesUsingPost1({
                 id: rowKey,
                 grade: record.grade,
             })
@@ -84,7 +84,7 @@ const Index: React.FC<Student.ScoreModalProps> = (props: Student.ScoreModalProps
             {
                 return
             }
-            const { code } = await deleteStudentGradesUsingPOST({ id })
+            const { code } = await deleteStudentGradesUsingPost1({ id })
             if (code === 0)
             {
                 message.success("成绩删除成功");

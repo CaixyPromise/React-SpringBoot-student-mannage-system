@@ -1,4 +1,4 @@
-import {updateStudentInfoUsingPOST} from "@/services/backend/studentController";
+import {updateStudentInfoUsingPost1} from "@/services/backend/studentController";
 import {Cascader, Form, Input, message, Modal, Select} from "antd";
 import {userSexOption} from "@/pages/Admin/Student/Columns/option";
 import React from "react";
@@ -50,7 +50,7 @@ const Index: React.FC<UpdateProps> = (payload: UpdateProps) =>
 
                    try
                    {
-                       const { data, code } = await updateStudentInfoUsingPOST({
+                       const { data, code } = await updateStudentInfoUsingPost1({
                            // @ts-ignore
                            id: currentRow.id,
                            stuClassId: classId,

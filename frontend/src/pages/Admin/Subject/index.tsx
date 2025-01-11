@@ -3,10 +3,10 @@ import {SubjectColumns} from "@/pages/Admin/Subject/Columns/columns";
 import React, {useRef, useState} from "react";
 import {Button, Form, Input, InputNumber, message, Modal, Select, Space} from "antd";
 import {
-    addSubjectsUsingPOST,
-    deleteSubjectsUsingPOST,
-    listSubjectsByPageUsingPOST,
-    updateSubjectsUsingPOST
+    addSubjectsUsingPost1,
+    deleteSubjectsUsingPost1,
+    listSubjectsByPageUsingPost1,
+    updateSubjectsUsingPost1
 } from "@/services/backend/subjectController";
 import {PlusOutlined} from "@ant-design/icons";
 
@@ -23,12 +23,13 @@ const Index = () =>
     const [ currentRow, setCurrentRow ] = useState<Subject.CurrentRow>();
     const [ isPercentFail, setIsPercentFail ] = useState(true);
     const [ isPercentExcellent, setIsPercentExcellent ] = useState(true);
+    const [ postSelectModal, setPostSelectModal] = useState<boolean>(false);
+
 
     const handleScoreTypeChange = (value: number, type: string) =>
     {
         let { gradeMax, gradeMin } = form.getFieldsValue();
 
-        console.log(form.getFieldsValue())
         if (gradeMax === undefined || gradeMin === undefined)
         {
             gradeMax = 150;
@@ -60,7 +61,7 @@ const Index = () =>
 
     const handleDelete = async (record: { id: any; }) =>
     {
-        const { data, code } = await deleteSubjectsUsingPOST({
+        const { data, code } = await deleteSubjectsUsingPost1({
             id: record.id,
         })
         if (code === 0 && data)
@@ -160,22 +161,16 @@ const Index = () =>
 
     const setCurrentRowFunction = (record: API.SubjectsVO) =>
     {
-        const payload: Subject.CurrentRow = {
-            id: record.id as unknown as string,
-            name: record.name,
-            gradeMin: record.gradeMin,
-            gradeMax: record.gradeMax,
-            gradeExcellent: record?.gradeExcellent,
-            gradeFail: record?.gradeFail,
-        }
-        setCurrentRow(payload)
+        console.log("currentRow: ", record)
+        setCurrentRow(record)
         form.setFieldsValue({
-            ...payload
+            ...record
         })
     }
 
     const ModalFormItemComponent = () =>
     {
+        console.log("currentRow", currentRow)
         const onGradeInputChange = (value: number | null) =>
         {
             if (value !== null)
@@ -195,6 +190,22 @@ const Index = () =>
             <Form form={form}>
                 <Form.Item name={"name"} label={"科目名称"}>
                     <Input/>
+                </Form.Item>
+                <Form.Item
+                  name="gradeCredit"
+                  label="课程学分"
+                  tooltip="不得超过24学分"
+                  initialValue={form.getFieldValue("gradeCredit") ?? null}
+                >
+                  <InputNumber min={0} max={24}/>
+                </Form.Item>
+                <Form.Item
+                  name="creditHours"
+                  label="课程学时"
+                  tooltip="不得超过240学时"
+                  initialValue={form.getFieldValue("creditHours") ?? null}
+                >
+                  <InputNumber min={0} max={240}/>
                 </Form.Item>
                 <Form.Item name="gradeMin" initialValue={form.getFieldValue("gradeMin") ?? null} label="科目分数最小值">
                     <InputNumber
@@ -254,7 +265,6 @@ const Index = () =>
                         </Form.Item>
                     </Space.Compact>
                 </Form.Item>
-
             </Form>
         );
     }
@@ -265,7 +275,8 @@ const Index = () =>
                 columns={SubjectColumns({
                     handleDeleteFunction: handleDelete,
                     setCurrentRow: setCurrentRowFunction,
-                    setUpdateModalVisible
+                    setUpdateModalVisible,
+                    setPostSelectModal
                 })}
                 actionRef={actionRef}
                 rowKey="id"
@@ -286,7 +297,7 @@ const Index = () =>
                     const sortField = Object.keys(sort)?.[0];
                     const sortOrder = sort?.[sortField] ?? undefined;
 
-                    const { data, code } = await listSubjectsByPageUsingPOST({
+                    const { data, code } = await listSubjectsByPageUsingPost1({
                         ...params,
                         sortField,
                         sortOrder,
@@ -323,7 +334,7 @@ const Index = () =>
                            }
                            try
                            {
-                               const { data, code } = await addSubjectsUsingPOST({
+                               const { data, code } = await addSubjectsUsingPost1({
                                    ...formData
                                })
                                if (code === 0)
@@ -372,7 +383,7 @@ const Index = () =>
                            }
                            try
                            {
-                               const { data, code } = await updateSubjectsUsingPOST({
+                               const { data, code } = await updateSubjectsUsingPost1({
                                    ...currentRow,
                                    ...formData,
                                    // @ts-ignore
@@ -407,7 +418,6 @@ const Index = () =>
             >
                 <ModalFormItemComponent key={"modify"}/>
             </Modal>
-
         </PageContainer>
     </>
 }

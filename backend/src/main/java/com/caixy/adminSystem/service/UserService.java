@@ -108,5 +108,8 @@ public interface UserService extends IService<User> {
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
     Long makeRegister(String userAccount, String userPassword);
+
+    User findUserByAccount(String userAccount);
+
     Long makeRegister(User user);
 }

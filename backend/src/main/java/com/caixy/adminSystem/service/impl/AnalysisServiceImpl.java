@@ -177,6 +177,9 @@ public class AnalysisServiceImpl implements AnalysisService
         Set<Long> studentIds = studentGradesList.stream()
                 .map(StudentGrades::getStuId)
                 .collect(Collectors.toSet());
+        if (studentIds.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         // 批量查询所有相关学生信息VO
         Map<Long, StudentInfoVO> studentInfoMap = studentInfoService.getStudentInfoVoByIds(studentIds).stream()

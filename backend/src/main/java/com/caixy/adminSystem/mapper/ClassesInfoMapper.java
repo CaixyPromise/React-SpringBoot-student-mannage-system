@@ -4,8 +4,10 @@ import com.caixy.adminSystem.model.dto.classesInfo.DepartmentMajorClassDTO;
 import com.caixy.adminSystem.model.entity.ClassesInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.caixy.adminSystem.model.vo.ClassesInfo.ClassesInfoVO;
+import com.caixy.adminSystem.model.vo.ClassesInfo.DepartMajorClassDTO;
 
 import java.util.List;
+import java.util.Set;
 
 /**
 * @author CAIXYPROMISE
@@ -16,6 +18,7 @@ import java.util.List;
 public interface ClassesInfoMapper extends BaseMapper<ClassesInfo> {
     List<ClassesInfoVO> selectClassByMajorAndDepartId(Long departId, Long majorId);
     List<DepartmentMajorClassDTO> fetchAllClassesData();
+    List<DepartMajorClassDTO> selectDepartMajorClassList(List<Long> classIds);
 }
 
 

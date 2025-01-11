@@ -1,7 +1,7 @@
 import {message} from "antd";
 import React from "react";
-import {getAllSubjectAnalysesByStudentIdUsingGET} from "@/services/backend/analysisController";
-import {getStudentGradesVoByStuIdUsingGET} from "@/services/backend/scoreController";
+import {getAllSubjectAnalysesByStudentIdUsingGet1} from "@/services/backend/analysisController";
+import {getStudentGradesVoByStuIdUsingGet1} from "@/services/backend/scoreController";
 import {StudentAnalysisOption} from "@/pages/Admin/Student/components/ScoreInfoModal/option";
 import {EChartsOption} from "echarts";
 
@@ -35,7 +35,7 @@ const fetchStudentGradesAnalyses = async (
     setLoading(true);
     try {
         // @ts-ignore
-        const {data, code} = await getAllSubjectAnalysesByStudentIdUsingGET({studentId: id});
+        const {data, code} = await getAllSubjectAnalysesByStudentIdUsingGet1({studentId: id});
         if (code === 0 && data)
         {
             const prepareData = StudentAnalysisOption(data);
@@ -74,7 +74,7 @@ const fetchStudentInfo = async (
     try
     {
         // @ts-ignore
-        const { data, code } = await getStudentGradesVoByStuIdUsingGET({ stuId: id })
+        const { data, code } = await getStudentGradesVoByStuIdUsingGet1({ stuId: id })
         if (code === 0 && data)
         {
             setStudentData(data);

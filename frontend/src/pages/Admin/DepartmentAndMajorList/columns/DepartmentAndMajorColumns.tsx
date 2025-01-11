@@ -1,6 +1,6 @@
 import {ProColumns} from "@ant-design/pro-components";
 import React from "react";
-import {Select, Space, Typography} from "antd";
+import { Space, Typography} from "antd";
 import {DepartmentAndMajor} from "@/constants/departmentAndMajor";
 
 export const DepartmentColumns = ({
@@ -136,14 +136,6 @@ export const subClassesColumns = ({
 export const createDepartmentColumns: ProColumns[] = [
     {
         title: "学院名称",
-        dataIndex: "name",
-        valueType: "text"
-    }
-]
-
-export const createUpdateColumns: ProColumns[] = [
-    {
-        title: "专业名称",
         dataIndex: "name",
         valueType: "text"
     }

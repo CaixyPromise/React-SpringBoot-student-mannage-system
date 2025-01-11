@@ -1,7 +1,9 @@
 package com.caixy.adminSystem.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.caixy.adminSystem.model.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -9,20 +11,20 @@ import java.util.Date;
 /**
  * @TableName subjects
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "subjects")
 @Data
-public class Subjects implements Serializable
+public class Subjects extends BaseEntity
 {
-    /**
-     * id
-     */
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
-
     /**
      * 科目名称
      */
     private String name;
+
+    /**
+     * 课程类型
+     */
+    private Integer courseType;
 
     /**
      * 最高分
@@ -45,27 +47,17 @@ public class Subjects implements Serializable
     private Long gradeExcellent;
 
     /**
+    * 课程学分
+    */
+    private Double gradeCredit;
+
+    /**
      * 创建人id
      */
     private Long creatorId;
 
     /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-
-    /**
-     * 是否删除
-     */
-    @TableLogic
-    private Integer isDelete;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    * 课程学时
+    */
+    private Integer creditHours;
 }

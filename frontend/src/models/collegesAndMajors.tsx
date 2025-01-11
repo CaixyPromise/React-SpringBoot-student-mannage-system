@@ -1,4 +1,4 @@
-import {getAllDepartmentAndMajorUsingGET} from "@/services/backend/majorInfoController";
+import {getAllDepartmentAndMajorUsingGet1} from "@/services/backend/majorInfoController";
 import {useEffect, useState} from "react";
 import LocalStorageUtils from "@/utils/LocalStorageUtils";
 import {DepartmentAndMajor} from "@/constants/departmentAndMajor";
@@ -18,7 +18,7 @@ const useCollegesAndMajors = () =>
                 setCollegesAndMajors(JSON.parse(getStrogeData));
                 return;
             }
-            const response = await getAllDepartmentAndMajorUsingGET();
+            const response = await getAllDepartmentAndMajorUsingGet1();
             if (response.data)
             {
                 const transformedData: DepartmentAndMajor = response.data.reduce((acc, department) =>

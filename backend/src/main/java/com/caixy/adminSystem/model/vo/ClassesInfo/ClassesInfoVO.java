@@ -35,6 +35,11 @@ public class ClassesInfoVO implements Serializable
      * 专业名称
      */
     private String majorName;
+    
+    /**
+    * 年级
+    */
+    private Integer grade;
 
     /**
      * 创建人Id

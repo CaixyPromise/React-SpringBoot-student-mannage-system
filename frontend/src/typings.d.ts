@@ -1,3 +1,5 @@
+import type {SortOrder} from "antd/lib/table/interface";
+
 declare module 'slash2';
 declare module '*.css';
 declare module '*.less';
@@ -63,10 +65,9 @@ interface InitialState {
 }
 
 
-interface ColumnsFunctionProps
-{
+interface ColumnsFunctionProps {
   setCurrentRow: (currentRow: any) => void
-  setUpdateModalVisible:  React.Dispatch<React.SetStateAction<any>>
+  setUpdateModalVisible: React.Dispatch<React.SetStateAction<any>>
   handleDeleteFunction: (record: any) => void
 }
 
@@ -74,4 +75,22 @@ interface OptionProps {
   value: string;
   label: string;
   children?: OptionProps[]
+}
+
+interface OptionItem<T> {
+  value: T;
+  label: string;
+  children?: OptionItem<T>[]
+}
+
+type Option<T> = Array<OptionItem<T>>;
+
+type PageRequest = {
+  params: {
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+  },
+  sort: Record<string, SortOrder>,
+  filter: Record<string, (string | number)[] | null>
 }

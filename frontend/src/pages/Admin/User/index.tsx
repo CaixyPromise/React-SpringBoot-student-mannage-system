@@ -1,6 +1,6 @@
 import CreateModal from '@/pages/Admin/User/components/CreateModal';
 import UpdateModal from '@/pages/Admin/User/components/UpdateModal';
-import { deleteUserUsingPOST, listUserByPageUsingPOST } from '@/services/backend/userController';
+import { deleteUserUsingPost1, listUserByPageUsingPost1 } from '@/services/backend/userController';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
@@ -31,7 +31,7 @@ const UserAdminPage: React.FC = () => {
     const hide = message.loading('正在删除');
     if (!row) return true;
     try {
-      await deleteUserUsingPOST({
+      await deleteUserUsingPost1({
         id: row.id as any,
       });
       hide();
@@ -152,7 +152,7 @@ const UserAdminPage: React.FC = () => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
 
-          const { data, code } = await listUserByPageUsingPOST({
+          const { data, code } = await listUserByPageUsingPost1({
             ...params,
             sortField,
             sortOrder,

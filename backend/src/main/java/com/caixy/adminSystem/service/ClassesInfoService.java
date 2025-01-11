@@ -8,6 +8,7 @@ import com.caixy.adminSystem.model.dto.classesInfo.DepartmentMajorClassDTO;
 import com.caixy.adminSystem.model.entity.ClassesInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.caixy.adminSystem.model.vo.ClassesInfo.ClassesInfoVO;
+import com.caixy.adminSystem.model.vo.ClassesInfo.DepartMajorClassTreeVO;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -64,4 +65,5 @@ public interface ClassesInfoService extends IService<ClassesInfo> {
 
     List<ClassesInfoVO> getClassesInfoVOPageUnderMajor(ClassesInfoQueryUnderMajorRequest classesInfoQueryRequest);
 
+    List<DepartMajorClassTreeVO> getClassTreeByCourseSelectionId(Long courseSelectionId);
 }

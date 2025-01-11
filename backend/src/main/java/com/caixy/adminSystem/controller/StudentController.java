@@ -59,15 +59,7 @@ public class StudentController
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
-        StudentInfo post = new StudentInfo();
-        BeanUtils.copyProperties(postAddRequest, post);
-        // 参数校验
-        studentInfoService.validStudentInfo(post, true);
-        post.setCreatorId(loginUser.getId());
-        boolean result = studentInfoService.save(post);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-        long newStudentInfoId = post.getId();
-        return ResultUtils.success(newStudentInfoId);
+        return ResultUtils.success(studentInfoService.addStudentInfo(postAddRequest, request, loginUser));
     }
 
     /**
@@ -78,19 +70,15 @@ public class StudentController
      * @return
      */
     @PostMapping("/delete")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteStudentInfo(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request)
     {
         if (deleteRequest == null || deleteRequest.getId() <= 0)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
-        // 判断是否存在
-        StudentInfo oldStudentInfo = studentInfoService.getById(id);
-        ThrowUtils.throwIf(oldStudentInfo == null, ErrorCode.NOT_FOUND_ERROR);
-
-        boolean b = studentInfoService.removeById(id);
+        boolean b = studentInfoService.deleteStudent(id);
         return ResultUtils.success(b);
     }
 

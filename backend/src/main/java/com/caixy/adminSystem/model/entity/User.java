@@ -4,7 +4,11 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户
@@ -12,6 +16,9 @@ import lombok.Data;
  */
 @TableName(value ="user")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements Serializable {
     /**
      * id
@@ -53,6 +60,11 @@ public class User implements Serializable {
      * 用户专业id
      */
     private Long userMajor;
+    
+    /**
+    * 用户班级
+    */
+    private Long userClass;
 
     /**
      * 用户昵称

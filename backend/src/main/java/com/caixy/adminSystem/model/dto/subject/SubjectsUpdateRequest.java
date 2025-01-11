@@ -41,5 +41,21 @@ public class SubjectsUpdateRequest implements Serializable
      */
     private Long gradeFail;
 
+    /**
+     * 课程学分
+     */
+    private Double gradeCredit;
+
+    /**
+     * 课程类型
+     */
+    private Integer courseType;
+
+
+    /**
+     * 课程学时
+     */
+    private Integer creditHours;
+
     private static final long serialVersionUID = 1L;
 }

@@ -28,6 +28,11 @@ public class ClassesInfoAddRequest implements Serializable {
      * 专业id
      */
     private Long majorId;
+    
+    /**
+    * 年级
+    */
+    private Integer grade;
 
     private static final long serialVersionUID = 1L;
 }

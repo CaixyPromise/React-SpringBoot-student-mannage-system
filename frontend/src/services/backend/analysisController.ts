@@ -3,7 +3,7 @@
 import { request } from '@umijs/max';
 
 /** getAllSubjectAnalyses GET /api/analysis/all */
-export async function getAllSubjectAnalysesUsingGET(options?: { [key: string]: any }) {
+export async function getAllSubjectAnalysesUsingGet1(options?: { [key: string]: any }) {
   return request<API.BaseResponseListSubjectAnalysis_>('/api/analysis/all', {
     method: 'GET',
     ...(options || {}),
@@ -11,7 +11,7 @@ export async function getAllSubjectAnalysesUsingGET(options?: { [key: string]: a
 }
 
 /** getGradesAnalysisByFilter POST /api/analysis/depart */
-export async function getGradesAnalysisByFilterUsingPOST(
+export async function getGradesAnalysisByFilterUsingPost1(
   body: API.GradeAnalysisFilterDTO,
   options?: { [key: string]: any },
 ) {
@@ -26,7 +26,7 @@ export async function getGradesAnalysisByFilterUsingPOST(
 }
 
 /** getAllSubjectAnalysesByStudentId GET /api/analysis/student */
-export async function getAllSubjectAnalysesByStudentIdUsingGET(
+export async function getAllSubjectAnalysesByStudentIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getAllSubjectAnalysesByStudentIdUsingGET1Params,
   options?: { [key: string]: any },

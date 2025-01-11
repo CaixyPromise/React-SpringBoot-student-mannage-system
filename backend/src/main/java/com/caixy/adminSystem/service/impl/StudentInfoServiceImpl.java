@@ -1,26 +1,27 @@
 package com.caixy.adminSystem.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.caixy.adminSystem.common.ErrorCode;
 import com.caixy.adminSystem.exception.BusinessException;
+import com.caixy.adminSystem.exception.ThrowUtils;
 import com.caixy.adminSystem.mapper.StudentInfoMapper;
+import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoAddRequest;
 import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoQueryRequest;
-import com.caixy.adminSystem.model.entity.ClassesInfo;
-import com.caixy.adminSystem.model.entity.DepartmentInfo;
-import com.caixy.adminSystem.model.entity.MajorInfo;
-import com.caixy.adminSystem.model.entity.StudentInfo;
+import com.caixy.adminSystem.model.entity.*;
+import com.caixy.adminSystem.model.enums.UserRoleEnum;
 import com.caixy.adminSystem.model.enums.UserSexEnum;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
-import com.caixy.adminSystem.service.ClassesInfoService;
-import com.caixy.adminSystem.service.DepartmentInfoService;
-import com.caixy.adminSystem.service.MajorInfoService;
-import com.caixy.adminSystem.service.StudentInfoService;
+import com.caixy.adminSystem.service.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,12 +36,65 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
 {
     @Resource
     private MajorInfoService majorInfoService;
-
     @Resource
     private ClassesInfoService classesInfoService;
-
     @Resource
-    DepartmentInfoService departmentInfoService;
+    private DepartmentInfoService departmentInfoService;
+    @Resource
+    private UserService userService;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long addStudentInfo(StudentInfoAddRequest postAddRequest, HttpServletRequest request, User loginUser)
+    {
+        StudentInfo post = new StudentInfo();
+        BeanUtils.copyProperties(postAddRequest, post);
+        // 参数校验
+        validStudentInfo(post, true);
+        post.setCreatorId(loginUser.getId());
+        boolean result = this.save(post);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        long newStudentInfoId = post.getId();
+        User newUser = User.builder()
+                           .userAccount(post.getStuId())
+                           .userPassword(post.getStuId())
+                           .id(newStudentInfoId)
+                           .userDepartment(post.getStuDeptId())
+                           .userMajor(post.getStuMajorId())
+                           .userClass(post.getStuClassId())
+                           .userRoleLevel(0)
+                           .userRole(UserRoleEnum.STUDENT.getValue())
+                           .userName(post.getStuName())
+                           .userSex(post.getStuSex())
+                           .build();
+        long register = userService.makeRegister(newUser);
+        ThrowUtils.throwIf(register < 0, ErrorCode.OPERATION_ERROR);
+        return newStudentInfoId;
+    }
+
+    /**
+     * 删除学生
+     * 
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/1/7 0:04
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean deleteStudent(Long stuId)
+    {
+        StudentInfo studentInfo = getById(stuId);
+        if (studentInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "学生不存在");
+        }
+        User userByAccount = userService.findUserByAccount(studentInfo.getStuId());
+        if (userByAccount == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "学生不存在");
+        }
+        boolean removeStu = this.removeById(stuId);
+        boolean removeAccount = userService.removeById(userByAccount.getId());
+        return removeAccount && removeStu;
+    }
 
 
     @Override
@@ -55,6 +109,20 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         if (!majorExistById)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "专业不存在");
+        }
+        if (add)
+        {
+            String stuId = post.getStuId();
+            if (StringUtils.isBlank(stuId) || stuId.length() < 8)
+            {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "学号不合法");
+            }
+            LambdaQueryWrapper<StudentInfo> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(StudentInfo::getStuId, stuId);
+            if (this.count(queryWrapper) > 0)
+            {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "学号已存在");
+            }
         }
     }
 
@@ -145,18 +213,21 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         Set<Long> departIds = new HashSet<>();
         Set<Long> majorIds = new HashSet<>();
         Set<Long> classIds = new HashSet<>();
-        studentInfoList.forEach(item -> {
+        studentInfoList.forEach(item ->
+        {
             departIds.add(item.getStuDeptId());
             majorIds.add(item.getStuMajorId());
             classIds.add(item.getStuClassId());
         });
 
         Map<Long, String> departMap = departmentInfoService.listByIds(departIds).stream()
-                .collect(Collectors.toMap(DepartmentInfo::getId, DepartmentInfo::getName));
+                                                           .collect(Collectors.toMap(DepartmentInfo::getId,
+                                                                   DepartmentInfo::getName));
         Map<Long, String> majorMap = majorInfoService.listByIds(majorIds).stream()
-                .collect(Collectors.toMap(MajorInfo::getId, MajorInfo::getName));
+                                                     .collect(Collectors.toMap(MajorInfo::getId, MajorInfo::getName));
         Map<Long, String> classMap = classesInfoService.listByIds(classIds).stream()
-                .collect(Collectors.toMap(ClassesInfo::getId, ClassesInfo::getName));
+                                                       .collect(Collectors.toMap(ClassesInfo::getId,
+                                                               ClassesInfo::getName));
 
         return studentInfoList.stream().map(item ->
         {

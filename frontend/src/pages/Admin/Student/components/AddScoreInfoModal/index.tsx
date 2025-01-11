@@ -2,7 +2,7 @@ import {Button, Card, Descriptions, Form, FormListFieldData, InputNumber, messag
 import React, {useEffect, useState} from "react";
 import {CloseOutlined, PlusOutlined} from "@ant-design/icons";
 import {
-    batchAddStudentGradesUsingPOST,
+    batchAddStudentGradesUsingPost1,
 } from "@/services/backend/scoreController";
 import {fetchStudentInfo} from "@/pages/Admin/Student/server";
 import StudentSex from "@/pages/Admin/Student/components/StudentSex";
@@ -102,7 +102,7 @@ const Index: React.FC<Student.AddScoreModalProps> = (props: Student.AddScoreModa
                 }
             })
             console.log("formData is: ", formData)
-            const { data, code } = await batchAddStudentGradesUsingPOST(formData);
+            const { data, code } = await batchAddStudentGradesUsingPost1(formData);
             if (code === 0 && data)
             {
                 message.success("成绩添加成功");

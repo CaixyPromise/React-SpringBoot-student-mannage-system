@@ -1,6 +1,7 @@
 package com.caixy.adminSystem.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.caixy.adminSystem.common.ErrorCode;
@@ -16,10 +17,8 @@ import com.caixy.adminSystem.model.vo.LoginUserVO;
 import com.caixy.adminSystem.model.vo.UserVO;
 import com.caixy.adminSystem.service.UserService;
 import com.caixy.adminSystem.utils.EncryptionUtils;
-import com.caixy.adminSystem.utils.RedisOperatorService;
 import com.caixy.adminSystem.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -39,17 +38,8 @@ import static com.caixy.adminSystem.constant.UserConstant.USER_LOGIN_STATE;
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService
 {
-
-    /**
-     * 盐值，混淆密码
-     */
-    public static final String SALT = "caixy";
-
     @Resource
     private EncryptionUtils encryptionUtils;
-
-    @Resource
-    private RedisOperatorService redisOperatorService;
 
     @Override
     public long userRegister(String userAccount, String userPassword)
@@ -106,7 +96,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
         // 3. 记录用户的登录态
-        User userVo = new User();
+        User userVo = User.builder().build();
         BeanUtils.copyProperties(user, userVo);
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, userVo);
         // 登录成功
@@ -254,10 +244,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Long makeRegister(String userAccount, String userPassword)
     {
-        User user = new User();
-        user.setUserAccount(userAccount);
-        user.setUserPassword(userPassword);
+        User user = User.builder()
+                        .userAccount(userAccount)
+                        .userPassword(userPassword)
+                        .build();
         return this.makeRegister(user);
+    }
+
+    @Override
+    public User findUserByAccount(String userAccount) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUserAccount, userAccount);
+        return this.getOne(queryWrapper);
     }
 
     // 重载的 makeRegister 方法，接收 User 对象

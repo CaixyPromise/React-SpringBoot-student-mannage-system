@@ -3,10 +3,13 @@ package com.caixy.adminSystem.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoAddRequest;
 import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoQueryRequest;
 import com.caixy.adminSystem.model.entity.StudentInfo;
+import com.caixy.adminSystem.model.entity.User;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,6 +20,10 @@ import java.util.List;
  */
 public interface StudentInfoService extends IService<StudentInfo>
 {
+    Long addStudentInfo(StudentInfoAddRequest postAddRequest, HttpServletRequest request, User loginUser);
+
+    Boolean deleteStudent(Long stuId);
+
     /**
      * 校验
      *

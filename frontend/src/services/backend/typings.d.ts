@@ -1,4 +1,9 @@
 declare namespace API {
+  type activateTaskByIdUsingGET1Params = {
+    /** taskId */
+    taskId: number;
+  };
+
   type AllClassesOptionDataVO = {
     children?: AllClassesOptionDataVO[];
     label?: string;
@@ -17,6 +22,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseCourseSelectionInfoVO_ = {
+    code?: number;
+    data?: CourseSelectionInfoVO;
+    message?: string;
+  };
+
   type BaseResponseDepartmentInfoVO_ = {
     code?: number;
     data?: DepartmentInfoVO;
@@ -26,12 +37,6 @@ declare namespace API {
   type BaseResponseDepartmentWithMajorsVO_ = {
     code?: number;
     data?: DepartmentWithMajorsVO;
-    message?: string;
-  };
-
-  type BaseResponseInt_ = {
-    code?: number;
-    data?: number;
     message?: string;
   };
 
@@ -47,9 +52,33 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListCourseSelectionInfoVO_ = {
+    code?: number;
+    data?: CourseSelectionInfoVO[];
+    message?: string;
+  };
+
+  type BaseResponseListDepartMajorClassTreeVO_ = {
+    code?: number;
+    data?: DepartMajorClassTreeVO[];
+    message?: string;
+  };
+
   type BaseResponseListDepartmentWithMajorsVO_ = {
     code?: number;
     data?: DepartmentWithMajorsVO[];
+    message?: string;
+  };
+
+  type BaseResponseListSemestersVO_ = {
+    code?: number;
+    data?: SemestersVO[];
+    message?: string;
+  };
+
+  type BaseResponseListStudentCourseSubjectVO_ = {
+    code?: number;
+    data?: StudentCourseSubjectVO[];
     message?: string;
   };
 
@@ -95,6 +124,18 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsePageCourseSelectionInfo_ = {
+    code?: number;
+    data?: PageCourseSelectionInfo_;
+    message?: string;
+  };
+
+  type BaseResponsePageCourseSelectionInfoVO_ = {
+    code?: number;
+    data?: PageCourseSelectionInfoVO_;
+    message?: string;
+  };
+
   type BaseResponsePageDepartmentInfo_ = {
     code?: number;
     data?: PageDepartmentInfo_;
@@ -107,15 +148,21 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponsePagePost_ = {
+  type BaseResponsePageSemestersVO_ = {
     code?: number;
-    data?: PagePost_;
+    data?: PageSemestersVO_;
     message?: string;
   };
 
-  type BaseResponsePagePostVO_ = {
+  type BaseResponsePageStudentCourseSelection_ = {
     code?: number;
-    data?: PagePostVO_;
+    data?: PageStudentCourseSelection_;
+    message?: string;
+  };
+
+  type BaseResponsePageStudentCourseSubjectVO_ = {
+    code?: number;
+    data?: PageStudentCourseSubjectVO_;
     message?: string;
   };
 
@@ -149,6 +196,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsePageTeacherInfoVO_ = {
+    code?: number;
+    data?: PageTeacherInfoVO_;
+    message?: string;
+  };
+
   type BaseResponsePageUser_ = {
     code?: number;
     data?: PageUser_;
@@ -161,9 +214,9 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponsePostVO_ = {
+  type BaseResponseSemestersVO_ = {
     code?: number;
-    data?: PostVO;
+    data?: SemestersVO;
     message?: string;
   };
 
@@ -176,6 +229,12 @@ declare namespace API {
   type BaseResponseStudentAnalysisVO_ = {
     code?: number;
     data?: StudentAnalysisVO;
+    message?: string;
+  };
+
+  type BaseResponseStudentCourseSubjectVO_ = {
+    code?: number;
+    data?: StudentCourseSubjectVO;
     message?: string;
   };
 
@@ -194,6 +253,12 @@ declare namespace API {
   type BaseResponseSubjectsVO_ = {
     code?: number;
     data?: SubjectsVO;
+    message?: string;
+  };
+
+  type BaseResponseTeacherInfoVO_ = {
+    code?: number;
+    data?: TeacherInfoVO;
     message?: string;
   };
 
@@ -233,6 +298,7 @@ declare namespace API {
 
   type ClassesInfoAddRequest = {
     departId?: number;
+    grade?: number;
     majorId?: number;
     name?: string;
   };
@@ -267,6 +333,7 @@ declare namespace API {
 
   type ClassesInfoUpdateRequest = {
     departId?: number;
+    grade?: number;
     id?: number;
     majorId?: number;
     name?: string;
@@ -276,14 +343,97 @@ declare namespace API {
     createTime?: string;
     creatorId?: number;
     departName?: string;
+    grade?: number;
     id?: number;
     majorName?: string;
     name?: string;
     updateTime?: string;
   };
 
+  type ClassesOptionVORequest = {
+    excludeClassIds?: number[];
+  };
+
+  type ClassLeafVO = {
+    classId?: number;
+    className?: string;
+  };
+
+  type CourseSelectionInfo = {
+    createTime?: string;
+    creatorId?: number;
+    endDate?: string;
+    id?: number;
+    isActive?: number;
+    isDelete?: number;
+    minCredit?: number;
+    semesterId?: number;
+    startDate?: string;
+    taskName?: string;
+    updateTime?: string;
+  };
+
+  type CourseSelectionInfoEditRequest = {
+    content?: string;
+    id?: number;
+    tags?: string[];
+    title?: string;
+  };
+
+  type CourseSelectionInfoQueryRequest = {
+    content?: string;
+    current?: number;
+    id?: number;
+    notId?: number;
+    pageSize?: number;
+    searchText?: string;
+    sortField?: string;
+    sortOrder?: string;
+    tags?: string[];
+    title?: string;
+    userId?: number;
+  };
+
+  type CourseSelectionInfoUpdateRequest = {
+    content?: string;
+    id?: number;
+    tags?: string[];
+    title?: string;
+  };
+
+  type CourseSelectionInfoVO = {
+    createTime?: string;
+    creatorId?: number;
+    endDate?: string;
+    id?: number;
+    isActive?: number;
+    isDelete?: number;
+    minCredit?: number;
+    semesterId?: number;
+    semesterName?: string;
+    startDate?: string;
+    taskName?: string;
+    updateTime?: string;
+  };
+
+  type CreateCourseSelectionRequest = {
+    classIds?: number[];
+    courseSettings?: SelectCourseData[];
+    endDate?: string;
+    minCredit?: number;
+    semesterId?: number;
+    startDate?: string;
+    taskName?: string;
+  };
+
   type DeleteRequest = {
     id?: number;
+  };
+
+  type DepartMajorClassTreeVO = {
+    children?: MajorClassTreeVO[];
+    departId?: number;
+    departName?: string;
   };
 
   type DepartmentInfo = {
@@ -327,12 +477,22 @@ declare namespace API {
     majors?: MajorInnerInfo[];
   };
 
+  type getAllSelectionClassesTreeUsingGET1Params = {
+    /** courseSelectionId */
+    courseSelectionId: number;
+  };
+
   type getAllSubjectAnalysesByStudentIdUsingGET1Params = {
     /** studentId */
     studentId: number;
   };
 
   type getClassesInfoVOByIdUsingGET1Params = {
+    /** id */
+    id?: number;
+  };
+
+  type getCourseSelectionInfoVOByIdUsingGET1Params = {
     /** id */
     id?: number;
   };
@@ -352,7 +512,17 @@ declare namespace API {
     departmentId: number;
   };
 
-  type getPostVOByIdUsingGET1Params = {
+  type getSelectTaskCoursesByTaskIdUsingGET1Params = {
+    /** taskId */
+    taskId: number;
+  };
+
+  type getSemestersVOByIdUsingGET1Params = {
+    /** id */
+    id: number;
+  };
+
+  type getStudentCourseSelectionVOByIdUsingGET1Params = {
     /** id */
     id?: number;
   };
@@ -373,6 +543,11 @@ declare namespace API {
   };
 
   type getSubjectsVOByIdUsingGET1Params = {
+    /** id */
+    id?: number;
+  };
+
+  type getTeacherInfoVOByIdUsingGET1Params = {
     /** id */
     id?: number;
   };
@@ -402,6 +577,11 @@ declare namespace API {
     subjectName?: string;
   };
 
+  type listAvailableSubjectsUsingGET1Params = {
+    /** courseSelectionId */
+    courseSelectionId: number;
+  };
+
   type LoginUserVO = {
     createTime?: string;
     id?: number;
@@ -410,6 +590,12 @@ declare namespace API {
     userName?: string;
     userProfile?: string;
     userRole?: string;
+  };
+
+  type MajorClassTreeVO = {
+    children?: ClassLeafVO[];
+    majorId?: number;
+    majorName?: string;
   };
 
   type MajorInfoAddRequest = {
@@ -452,6 +638,11 @@ declare namespace API {
     majorName?: string;
   };
 
+  type ModifyCourseSelectionClassesRequest = {
+    classIds?: number[];
+    courseSelectionId?: number;
+  };
+
   type OrderItem = {
     asc?: boolean;
     column?: string;
@@ -483,6 +674,43 @@ declare namespace API {
     total?: number;
   };
 
+  type PageCourseSelectionInfo_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: CourseSelectionInfo[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
+  type PageCourseSelectionInfoVO_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: CourseSelectionInfoVO[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
+  type pageCourseSelectionUsingGET1Params = {
+    /** pageNum */
+    pageNum?: number;
+    /** pageSize */
+    pageSize?: number;
+    /** semesterId */
+    semesterId?: number;
+    /** taskName */
+    taskName?: string;
+  };
+
   type PageDepartmentInfo_ = {
     countId?: string;
     current?: number;
@@ -509,27 +737,40 @@ declare namespace API {
     total?: number;
   };
 
-  type PagePost_ = {
+  type PageSemestersVO_ = {
     countId?: string;
     current?: number;
     maxLimit?: number;
     optimizeCountSql?: boolean;
     orders?: OrderItem[];
     pages?: number;
-    records?: Post[];
+    records?: SemestersVO[];
     searchCount?: boolean;
     size?: number;
     total?: number;
   };
 
-  type PagePostVO_ = {
+  type PageStudentCourseSelection_ = {
     countId?: string;
     current?: number;
     maxLimit?: number;
     optimizeCountSql?: boolean;
     orders?: OrderItem[];
     pages?: number;
-    records?: PostVO[];
+    records?: StudentCourseSelection[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
+  type PageStudentCourseSubjectVO_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: StudentCourseSubjectVO[];
     searchCount?: boolean;
     size?: number;
     total?: number;
@@ -600,6 +841,19 @@ declare namespace API {
     total?: number;
   };
 
+  type PageTeacherInfoVO_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: TeacherInfoVO[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
   type PageUser_ = {
     countId?: string;
     current?: number;
@@ -626,52 +880,87 @@ declare namespace API {
     total?: number;
   };
 
-  type Post = {
-    content?: string;
-    createTime?: string;
-    favourNum?: number;
-    id?: number;
-    isDelete?: number;
-    tags?: string;
-    thumbNum?: number;
-    title?: string;
-    updateTime?: string;
-    userId?: number;
+  type putTaskHoldByIdUsingGET1Params = {
+    /** taskId */
+    taskId: number;
   };
 
-  type PostAddRequest = {
-    content?: string;
-    tags?: string[];
-    title?: string;
+  type SelectCourseData = {
+    courseId?: number;
+    maxStudents?: number;
   };
 
-  type PostEditRequest = {
-    content?: string;
-    id?: number;
-    tags?: string[];
-    title?: string;
+  type SemestersAddRequest = {
+    endDate?: string;
+    name?: string;
+    startDate?: string;
   };
 
-  type PostFavourAddRequest = {
-    postId?: number;
-  };
-
-  type PostFavourQueryRequest = {
+  type SemestersQueryRequest = {
     current?: number;
+    endDateBegin?: string;
+    endDateEnd?: string;
+    id?: number;
+    isActive?: number;
+    name?: string;
     pageSize?: number;
-    postQueryRequest?: PostQueryRequest;
     sortField?: string;
     sortOrder?: string;
-    userId?: number;
+    startDateBegin?: string;
+    startDateEnd?: string;
   };
 
-  type PostQueryRequest = {
+  type SemestersSetActiveRequest = {
+    id?: number;
+  };
+
+  type SemestersUpdateRequest = {
+    endDate?: string;
+    id?: number;
+    name?: string;
+    startDate?: string;
+  };
+
+  type SemestersVO = {
+    endDate?: string;
+    id?: number;
+    isActive?: number;
+    name?: string;
+    startDate?: string;
+  };
+
+  type StudentAnalysisVO = {
+    studentGrade?: StudentGradesVO;
+    subjectAnalysis?: SubjectAnalysis[];
+  };
+
+  type StudentCourseSelection = {
+    courseSelectionId?: number;
+    id?: number;
+    isDelete?: number;
+    selectTime?: string;
+    studentId?: number;
+    subjectId?: number;
+  };
+
+  type StudentCourseSelectionAddRequest = {
+    content?: string;
+    tags?: string[];
+    title?: string;
+  };
+
+  type StudentCourseSelectionEditRequest = {
+    content?: string;
+    id?: number;
+    tags?: string[];
+    title?: string;
+  };
+
+  type StudentCourseSelectionQueryRequest = {
     content?: string;
     current?: number;
-    favourUserId?: number;
     id?: number;
     notId?: number;
-    orTags?: string[];
     pageSize?: number;
     searchText?: string;
     sortField?: string;
@@ -681,35 +970,21 @@ declare namespace API {
     userId?: number;
   };
 
-  type PostThumbAddRequest = {
-    postId?: number;
-  };
-
-  type PostUpdateRequest = {
+  type StudentCourseSelectionUpdateRequest = {
     content?: string;
     id?: number;
     tags?: string[];
     title?: string;
   };
 
-  type PostVO = {
-    content?: string;
-    createTime?: string;
-    favourNum?: number;
-    hasFavour?: boolean;
-    hasThumb?: boolean;
-    id?: number;
-    tagList?: string[];
-    thumbNum?: number;
-    title?: string;
-    updateTime?: string;
-    user?: UserVO;
-    userId?: number;
-  };
-
-  type StudentAnalysisVO = {
-    studentGrade?: StudentGradesVO;
-    subjectAnalysis?: SubjectAnalysis[];
+  type StudentCourseSubjectVO = {
+    enrolledCount?: number;
+    full?: boolean;
+    gradeCredit?: number;
+    maxStudents?: number;
+    selected?: boolean;
+    subjectId?: number;
+    subjectName?: string;
   };
 
   type StudentGrades = {
@@ -766,6 +1041,7 @@ declare namespace API {
   type StudentInfoAddRequest = {
     stuClassId?: number;
     stuDeptId?: number;
+    stuId?: string;
     stuMajorId?: number;
     stuName?: string;
     stuSex?: number;
@@ -815,6 +1091,11 @@ declare namespace API {
     stuSex?: number;
   };
 
+  type StudentSelectCourseRequest = {
+    courseSelectionId?: number;
+    subjectIds?: number[];
+  };
+
   type SubjectAnalysis = {
     averageScore?: number;
     excellentCount?: number;
@@ -830,8 +1111,11 @@ declare namespace API {
   };
 
   type Subjects = {
+    courseType?: number;
     createTime?: string;
     creatorId?: number;
+    creditHours?: number;
+    gradeCredit?: number;
     gradeExcellent?: number;
     gradeFail?: number;
     gradeMax?: number;
@@ -843,6 +1127,8 @@ declare namespace API {
   };
 
   type SubjectsAddRequest = {
+    courseType?: number;
+    creditHours?: number;
     gradeExcellent?: number;
     gradeFail?: number;
     gradeMax?: number;
@@ -874,6 +1160,9 @@ declare namespace API {
   };
 
   type SubjectsUpdateRequest = {
+    courseType?: number;
+    creditHours?: number;
+    gradeCredit?: number;
     gradeExcellent?: number;
     gradeFail?: number;
     gradeMax?: number;
@@ -883,12 +1172,63 @@ declare namespace API {
   };
 
   type SubjectsVO = {
+    courseType?: number;
+    creditHours?: number;
+    gradeCredit?: number;
     gradeExcellent?: number;
     gradeFail?: number;
     gradeMax?: number;
     gradeMin?: number;
     id?: number;
     name?: string;
+  };
+
+  type TeacherInfoAddRequest = {
+    teacherDeptId?: number;
+    teacherId?: string;
+    teacherMajorId?: number;
+    teacherName?: string;
+    teacherSex?: number;
+  };
+
+  type TeacherInfoEditRequest = {
+    content?: string;
+    id?: number;
+    tags?: string[];
+    title?: string;
+  };
+
+  type TeacherInfoQueryRequest = {
+    content?: string;
+    creatorId?: number;
+    current?: number;
+    id?: number;
+    notId?: number;
+    pageSize?: number;
+    searchText?: string;
+    sortField?: string;
+    sortOrder?: string;
+    tags?: string[];
+    title?: string;
+  };
+
+  type TeacherInfoUpdateRequest = {
+    id?: number;
+    teacherDeptId?: number;
+    teacherMajorId?: number;
+    teacherName?: string;
+    teacherSex?: number;
+  };
+
+  type TeacherInfoVO = {
+    id?: number;
+    teacherDepart?: string;
+    teacherDeptId?: number;
+    teacherId?: string;
+    teacherMajor?: string;
+    teacherMajorId?: number;
+    teacherName?: string;
+    teacherSex?: number;
   };
 
   type uploadFileUsingPOST1Params = {
@@ -902,6 +1242,7 @@ declare namespace API {
     updateTime?: string;
     userAccount?: string;
     userAvatar?: string;
+    userClass?: number;
     userDepartment?: number;
     userEmail?: string;
     userMajor?: number;

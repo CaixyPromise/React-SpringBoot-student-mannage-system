@@ -136,6 +136,13 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "最小分数和最大分数不能相等");
         }
+        Integer creditHours = subjects.getCreditHours();
+        if (creditHours == null || creditHours <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "学时不能为null且必须大于0");
+        }
+        if (creditHours > 240) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "学时不能超过240");
+        }
 
         // 检查分数线是否在合理范围内
         Long excellentLine = subjects.getGradeExcellent();

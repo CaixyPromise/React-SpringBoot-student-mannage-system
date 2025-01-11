@@ -16,7 +16,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,name,departId,
+        id,name,departId
         majorId,creatorId,createTime,
         updateTime,isDelete
     </sql>
@@ -60,4 +60,31 @@
         ORDER BY
             d.name, m.name, c.name;
     </select>
+
+
+    <select id="selectDepartMajorClassList"
+            resultType="com.caixy.adminSystem.model.vo.ClassesInfo.DepartMajorClassDTO">
+        SELECT
+            c.id AS classId,
+            c.name AS className,
+            c.majorId,
+            m.name AS majorName,
+            c.departId,
+            d.name AS departName
+        FROM
+            classes_info c
+        LEFT JOIN
+                major_info m ON c.majorId = m.id AND m.isDelete = 0
+        LEFT JOIN
+                department_info d ON c.departId = d.id AND d.isDelete = 0
+        WHERE
+            c.id IN
+            <foreach collection="classIds" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        AND
+            c.isDelete = 0
+
+    </select>
+
 </mapper>

@@ -3,7 +3,7 @@
 import { request } from '@umijs/max';
 
 /** addClassesInfo POST /api/classes/add */
-export async function addClassesInfoUsingPOST(
+export async function addClassesInfoUsingPost1(
   body: API.ClassesInfoAddRequest,
   options?: { [key: string]: any },
 ) {
@@ -18,7 +18,7 @@ export async function addClassesInfoUsingPOST(
 }
 
 /** deleteClassesInfo POST /api/classes/delete */
-export async function deleteClassesInfoUsingPOST(
+export async function deleteClassesInfoUsingPost1(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
 ) {
@@ -33,7 +33,7 @@ export async function deleteClassesInfoUsingPOST(
 }
 
 /** editClassesInfo POST /api/classes/edit */
-export async function editClassesInfoUsingPOST(
+export async function editClassesInfoUsingPost1(
   body: API.ClassesInfoEditRequest,
   options?: { [key: string]: any },
 ) {
@@ -48,8 +48,8 @@ export async function editClassesInfoUsingPOST(
 }
 
 /** getClassesOptionDataVOByPage POST /api/classes/get/classes */
-export async function getClassesOptionDataVoByPageUsingPOST(
-  body: API.ClassesInfoQueryRequest,
+export async function getClassesOptionDataVoByPageUsingPost1(
+  body: API.ClassesOptionVORequest,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseListAllClassesOptionDataVO_>('/api/classes/get/classes', {
@@ -63,7 +63,7 @@ export async function getClassesOptionDataVoByPageUsingPOST(
 }
 
 /** listClassesInfoVOByPageUnderMajor POST /api/classes/get/classes/under-major */
-export async function listClassesInfoVoByPageUnderMajorUsingPOST(
+export async function listClassesInfoVoByPageUnderMajorUsingPost1(
   body: API.ClassesInfoQueryUnderMajorRequest,
   options?: { [key: string]: any },
 ) {
@@ -77,8 +77,26 @@ export async function listClassesInfoVoByPageUnderMajorUsingPOST(
   });
 }
 
+/** getAllSelectionClassesTree GET /api/classes/get/selection/class-tree */
+export async function getAllSelectionClassesTreeUsingGet1(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getAllSelectionClassesTreeUsingGET1Params,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseListDepartMajorClassTreeVO_>(
+    '/api/classes/get/selection/class-tree',
+    {
+      method: 'GET',
+      params: {
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+}
+
 /** getClassesInfoVOById GET /api/classes/get/vo */
-export async function getClassesInfoVoByIdUsingGET(
+export async function getClassesInfoVoByIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getClassesInfoVOByIdUsingGET1Params,
   options?: { [key: string]: any },
@@ -93,7 +111,7 @@ export async function getClassesInfoVoByIdUsingGET(
 }
 
 /** listClassesInfoByPage POST /api/classes/list/page */
-export async function listClassesInfoByPageUsingPOST(
+export async function listClassesInfoByPageUsingPost1(
   body: API.ClassesInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -108,7 +126,7 @@ export async function listClassesInfoByPageUsingPOST(
 }
 
 /** listClassesInfoVOByPage POST /api/classes/list/page/vo */
-export async function listClassesInfoVoByPageUsingPOST(
+export async function listClassesInfoVoByPageUsingPost1(
   body: API.ClassesInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -123,7 +141,7 @@ export async function listClassesInfoVoByPageUsingPOST(
 }
 
 /** listMyClassesInfoVOByPage POST /api/classes/my/list/page/vo */
-export async function listMyClassesInfoVoByPageUsingPOST(
+export async function listMyClassesInfoVoByPageUsingPost1(
   body: API.ClassesInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -138,7 +156,7 @@ export async function listMyClassesInfoVoByPageUsingPOST(
 }
 
 /** searchClassesInfoVOByPage POST /api/classes/search/page/vo */
-export async function searchClassesInfoVoByPageUsingPOST(
+export async function searchClassesInfoVoByPageUsingPost1(
   body: API.ClassesInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -153,7 +171,7 @@ export async function searchClassesInfoVoByPageUsingPOST(
 }
 
 /** updateClassesInfo POST /api/classes/update */
-export async function updateClassesInfoUsingPOST(
+export async function updateClassesInfoUsingPost1(
   body: API.ClassesInfoUpdateRequest,
   options?: { [key: string]: any },
 ) {

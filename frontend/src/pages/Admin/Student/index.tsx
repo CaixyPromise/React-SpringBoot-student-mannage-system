@@ -1,12 +1,12 @@
 import {type ActionType, PageContainer, ProTable} from "@ant-design/pro-components";
 import React, {useEffect, useRef, useState} from "react";
 import {Button, Form, message} from "antd";
-import {deleteSubjectsUsingPOST, getAllSubjectsVoUsingGET} from "@/services/backend/subjectController";
+import {deleteSubjectsUsingPost1, getAllSubjectsVoUsingGet1} from "@/services/backend/subjectController";
 import {PlusOutlined} from "@ant-design/icons";
-import {getClassesOptionDataVoByPageUsingPOST} from "@/services/backend/classesController";
+import {getClassesOptionDataVoByPageUsingPost1} from "@/services/backend/classesController";
 import UpdateInfoModal from "@/pages/Admin/Student/components/UpdateInfoModal";
 import CreateInfoModal from "@/pages/Admin/Student/components/CreateInfoModal";
-import {deleteStudentInfoUsingPOST, listStudentInfoByPageUsingPOST,} from "@/services/backend/studentController";
+import {deleteStudentInfoUsingPost1, listStudentInfoByPageUsingPost1,} from "@/services/backend/studentController";
 import {StudentColumns} from "@/pages/Admin/Student/Columns/columns";
 import AddScoreInfoModal from "@/pages/Admin/Student/components/AddScoreInfoModal";
 import ScoreInfoModal from "@/pages/Admin/Student/components/ScoreInfoModal";
@@ -39,7 +39,7 @@ const Index = () =>
     const handleDelete = async (record: { id: any; }) =>
     {
         try {
-            const { data, code } = await deleteStudentInfoUsingPOST({
+            const { data, code } = await deleteStudentInfoUsingPost1({
                 id: record.id,
             })
             if (code === 0 && data)
@@ -106,7 +106,7 @@ const Index = () =>
                     const sortField = Object.keys(sort)?.[0];
                     const sortOrder = sort?.[sortField] ?? undefined;
 
-                    const { data, code } = await listStudentInfoByPageUsingPOST({
+                    const { data, code } = await listStudentInfoByPageUsingPost1({
                         ...params,
                         sortField,
                         sortOrder,

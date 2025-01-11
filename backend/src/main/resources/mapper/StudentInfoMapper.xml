@@ -6,6 +6,7 @@
 
     <resultMap id="BaseResultMap" type="com.caixy.adminSystem.model.entity.StudentInfo">
             <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="stuId" column="stuId" jdbcType="VARCHAR"/>
             <result property="stuName" column="stuName" jdbcType="VARCHAR"/>
             <result property="stuSex" column="stuSex" jdbcType="TINYINT"/>
             <result property="stuDeptId" column="stuDeptId" jdbcType="BIGINT"/>
@@ -14,7 +15,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,stuName,stuSex,
+        id,stuId,stuName,stuSex,
         stuDeptId,stuMajorId,stuClassId
     </sql>
 </mapper>

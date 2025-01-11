@@ -1,29 +1,26 @@
-import {getClassesOptionDataVoByPageUsingPOST} from "@/services/backend/classesController";
+import {getClassesOptionDataVoByPageUsingPost1} from "@/services/backend/classesController";
 import {message} from "antd";
-import {getAllSubjectsVoUsingGET} from "@/services/backend/subjectController";
+import {getAllSubjectsVoUsingGet1} from "@/services/backend/subjectController";
 import React from "react";
 
-const fetchCollegeCascadeOption = async (setCascadeOption: React.Dispatch<React.SetStateAction<API.AllClassesOptionDataVO[]>>) =>
+const fetchCollegeCascadeOption = async (setCascadeOption?: React.Dispatch<React.SetStateAction<API.AllClassesOptionDataVO[]>>) =>
 {
-    let returnValue: API.AllClassesOptionDataVO[] = []
-    try
-    {
-        const { data, code } = await getClassesOptionDataVoByPageUsingPOST({});
+    const returnValue: API.AllClassesOptionDataVO[] = []
+    try {
+        const { data, code } = await getClassesOptionDataVoByPageUsingPost1({});
         if (data && code === 0)
         {
-            setCascadeOption(data)
+            setCascadeOption?.(data)
+            // 直接修改 returnValue 的内容
+            returnValue.push(...data);
         }
-        // @ts-ignore
-        returnValue = data
-
     }
     catch (e: any)
     {
         message.error("获取选项配置失败: ", e.message)
-        setCascadeOption([])
+        setCascadeOption?.([])
     }
     return returnValue
-
 }
 
 const fetchSubjectOption = async (setSubjectOption: React.Dispatch<React.SetStateAction<OptionProps[]>>) =>
@@ -31,7 +28,7 @@ const fetchSubjectOption = async (setSubjectOption: React.Dispatch<React.SetStat
     let returnValue: OptionProps[] = []
     try
     {
-        const { data, code } = await getAllSubjectsVoUsingGET();
+        const { data, code } = await getAllSubjectsVoUsingGet1();
         if (data && code === 0)
         {
             const optionList: OptionProps[] = []

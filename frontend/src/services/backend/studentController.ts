@@ -3,7 +3,7 @@
 import { request } from '@umijs/max';
 
 /** addStudentInfo POST /api/student/add */
-export async function addStudentInfoUsingPOST(
+export async function addStudentInfoUsingPost1(
   body: API.StudentInfoAddRequest,
   options?: { [key: string]: any },
 ) {
@@ -18,7 +18,7 @@ export async function addStudentInfoUsingPOST(
 }
 
 /** deleteStudentInfo POST /api/student/delete */
-export async function deleteStudentInfoUsingPOST(
+export async function deleteStudentInfoUsingPost1(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
 ) {
@@ -33,7 +33,7 @@ export async function deleteStudentInfoUsingPOST(
 }
 
 /** editStudentInfo POST /api/student/edit */
-export async function editStudentInfoUsingPOST(
+export async function editStudentInfoUsingPost1(
   body: API.StudentInfoEditRequest,
   options?: { [key: string]: any },
 ) {
@@ -48,7 +48,7 @@ export async function editStudentInfoUsingPOST(
 }
 
 /** getStudentInfoVOById GET /api/student/get/vo */
-export async function getStudentInfoVoByIdUsingGET(
+export async function getStudentInfoVoByIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getStudentInfoVOByIdUsingGET1Params,
   options?: { [key: string]: any },
@@ -63,7 +63,7 @@ export async function getStudentInfoVoByIdUsingGET(
 }
 
 /** listStudentInfoByPage POST /api/student/list/page */
-export async function listStudentInfoByPageUsingPOST(
+export async function listStudentInfoByPageUsingPost1(
   body: API.StudentInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -78,7 +78,7 @@ export async function listStudentInfoByPageUsingPOST(
 }
 
 /** listMyStudentInfoVOByPage POST /api/student/my/list/page/vo */
-export async function listMyStudentInfoVoByPageUsingPOST(
+export async function listMyStudentInfoVoByPageUsingPost1(
   body: API.StudentInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -93,7 +93,7 @@ export async function listMyStudentInfoVoByPageUsingPOST(
 }
 
 /** searchStudentInfoVOByPage POST /api/student/search/page/vo */
-export async function searchStudentInfoVoByPageUsingPOST(
+export async function searchStudentInfoVoByPageUsingPost1(
   body: API.StudentInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -108,7 +108,7 @@ export async function searchStudentInfoVoByPageUsingPOST(
 }
 
 /** updateStudentInfo POST /api/student/update */
-export async function updateStudentInfoUsingPOST(
+export async function updateStudentInfoUsingPost1(
   body: API.StudentInfoUpdateRequest,
   options?: { [key: string]: any },
 ) {

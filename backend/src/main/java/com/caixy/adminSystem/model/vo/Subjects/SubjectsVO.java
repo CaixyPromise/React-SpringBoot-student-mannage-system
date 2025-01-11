@@ -25,6 +25,16 @@ public class SubjectsVO implements Serializable
     private String name;
 
     /**
+    * 课程类型
+    */
+    private Integer courseType;
+
+    /**
+    * 课程学分
+    */
+    private Double gradeCredit;
+
+    /**
      * 科目最大值
      */
     private Long gradeMax;
@@ -43,6 +53,11 @@ public class SubjectsVO implements Serializable
      * 不及格分数线
      */
     private Long gradeFail;
+
+    /**
+     * 课程学时
+     */
+    private Integer creditHours;
 
     private static final long serialVersionUID = 1L;
 }

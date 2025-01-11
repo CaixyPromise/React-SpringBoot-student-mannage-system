@@ -3,7 +3,7 @@
 import { request } from '@umijs/max';
 
 /** addMajorInfo POST /api/major/add */
-export async function addMajorInfoUsingPOST(
+export async function addMajorInfoUsingPost1(
   body: API.MajorInfoAddRequest,
   options?: { [key: string]: any },
 ) {
@@ -18,7 +18,7 @@ export async function addMajorInfoUsingPOST(
 }
 
 /** deleteMajorInfo POST /api/major/delete */
-export async function deleteMajorInfoUsingPOST(
+export async function deleteMajorInfoUsingPost1(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
 ) {
@@ -33,7 +33,7 @@ export async function deleteMajorInfoUsingPOST(
 }
 
 /** downloadTemplate GET /api/major/download/template/major */
-export async function downloadTemplateUsingGET(options?: { [key: string]: any }) {
+export async function downloadTemplateUsingGet1(options?: { [key: string]: any }) {
   return request<any>('/api/major/download/template/major', {
     method: 'GET',
     ...(options || {}),
@@ -41,7 +41,7 @@ export async function downloadTemplateUsingGET(options?: { [key: string]: any })
 }
 
 /** getAllDepartmentAndMajor GET /api/major/get/all */
-export async function getAllDepartmentAndMajorUsingGET(options?: { [key: string]: any }) {
+export async function getAllDepartmentAndMajorUsingGet1(options?: { [key: string]: any }) {
   return request<API.BaseResponseListDepartmentWithMajorsVO_>('/api/major/get/all', {
     method: 'GET',
     ...(options || {}),
@@ -49,7 +49,7 @@ export async function getAllDepartmentAndMajorUsingGET(options?: { [key: string]
 }
 
 /** getMajorInfoVOById GET /api/major/get/vo */
-export async function getMajorInfoVoByIdUsingGET(
+export async function getMajorInfoVoByIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getMajorInfoVOByIdUsingGET1Params,
   options?: { [key: string]: any },
@@ -64,7 +64,7 @@ export async function getMajorInfoVoByIdUsingGET(
 }
 
 /** listMajorInfoByPage POST /api/major/list/page */
-export async function listMajorInfoByPageUsingPOST(
+export async function listMajorInfoByPageUsingPost1(
   body: API.MajorInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -79,7 +79,7 @@ export async function listMajorInfoByPageUsingPOST(
 }
 
 /** updateMajorInfo POST /api/major/update */
-export async function updateMajorInfoUsingPOST(
+export async function updateMajorInfoUsingPost1(
   body: API.MajorInfoUpdateRequest,
   options?: { [key: string]: any },
 ) {
@@ -94,7 +94,7 @@ export async function updateMajorInfoUsingPOST(
 }
 
 /** upload POST /api/major/upload */
-export async function uploadUsingPOST(body: {}, file?: File, options?: { [key: string]: any }) {
+export async function uploadUsingPost1(body: {}, file?: File, options?: { [key: string]: any }) {
   const formData = new FormData();
 
   if (file) {

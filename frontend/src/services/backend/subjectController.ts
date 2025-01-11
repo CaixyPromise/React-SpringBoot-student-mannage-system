@@ -3,7 +3,7 @@
 import { request } from '@umijs/max';
 
 /** addSubjects POST /api/subject/add */
-export async function addSubjectsUsingPOST(
+export async function addSubjectsUsingPost1(
   body: API.SubjectsAddRequest,
   options?: { [key: string]: any },
 ) {
@@ -18,7 +18,7 @@ export async function addSubjectsUsingPOST(
 }
 
 /** deleteSubjects POST /api/subject/delete */
-export async function deleteSubjectsUsingPOST(
+export async function deleteSubjectsUsingPost1(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
 ) {
@@ -33,7 +33,7 @@ export async function deleteSubjectsUsingPOST(
 }
 
 /** editSubjects POST /api/subject/edit */
-export async function editSubjectsUsingPOST(
+export async function editSubjectsUsingPost1(
   body: API.SubjectsEditRequest,
   options?: { [key: string]: any },
 ) {
@@ -48,7 +48,7 @@ export async function editSubjectsUsingPOST(
 }
 
 /** getAllSubjectsVO GET /api/subject/get/all */
-export async function getAllSubjectsVoUsingGET(options?: { [key: string]: any }) {
+export async function getAllSubjectsVoUsingGet1(options?: { [key: string]: any }) {
   return request<API.BaseResponseListSubjectsVO_>('/api/subject/get/all', {
     method: 'GET',
     ...(options || {}),
@@ -56,7 +56,7 @@ export async function getAllSubjectsVoUsingGET(options?: { [key: string]: any })
 }
 
 /** getSubjectsVOById GET /api/subject/get/vo */
-export async function getSubjectsVoByIdUsingGET(
+export async function getSubjectsVoByIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getSubjectsVOByIdUsingGET1Params,
   options?: { [key: string]: any },
@@ -71,7 +71,7 @@ export async function getSubjectsVoByIdUsingGET(
 }
 
 /** listSubjectsByPage POST /api/subject/list/page */
-export async function listSubjectsByPageUsingPOST(
+export async function listSubjectsByPageUsingPost1(
   body: API.SubjectsQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -86,7 +86,7 @@ export async function listSubjectsByPageUsingPOST(
 }
 
 /** listSubjectsVOByPage POST /api/subject/list/page/vo */
-export async function listSubjectsVoByPageUsingPOST(
+export async function listSubjectsVoByPageUsingPost1(
   body: API.SubjectsQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -101,7 +101,7 @@ export async function listSubjectsVoByPageUsingPOST(
 }
 
 /** listMySubjectsVOByPage POST /api/subject/my/list/page/vo */
-export async function listMySubjectsVoByPageUsingPOST(
+export async function listMySubjectsVoByPageUsingPost1(
   body: API.SubjectsQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -116,7 +116,7 @@ export async function listMySubjectsVoByPageUsingPOST(
 }
 
 /** searchSubjectsVOByPage POST /api/subject/search/page/vo */
-export async function searchSubjectsVoByPageUsingPOST(
+export async function searchSubjectsVoByPageUsingPost1(
   body: API.SubjectsQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -131,7 +131,7 @@ export async function searchSubjectsVoByPageUsingPOST(
 }
 
 /** updateSubjects POST /api/subject/update */
-export async function updateSubjectsUsingPOST(
+export async function updateSubjectsUsingPost1(
   body: API.SubjectsUpdateRequest,
   options?: { [key: string]: any },
 ) {

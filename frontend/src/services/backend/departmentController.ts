@@ -3,7 +3,7 @@
 import { request } from '@umijs/max';
 
 /** addDepartmentInfo POST /api/department/add */
-export async function addDepartmentInfoUsingPOST(
+export async function addDepartmentInfoUsingPost1(
   body: API.DepartmentInfoAddRequest,
   options?: { [key: string]: any },
 ) {
@@ -18,7 +18,7 @@ export async function addDepartmentInfoUsingPOST(
 }
 
 /** deleteDepartmentInfo POST /api/department/delete */
-export async function deleteDepartmentInfoUsingPOST(
+export async function deleteDepartmentInfoUsingPost1(
   body: API.DeleteRequest,
   options?: { [key: string]: any },
 ) {
@@ -33,7 +33,7 @@ export async function deleteDepartmentInfoUsingPOST(
 }
 
 /** getDepartmentInfoVOById GET /api/department/get/vo */
-export async function getDepartmentInfoVoByIdUsingGET(
+export async function getDepartmentInfoVoByIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getDepartmentInfoVOByIdUsingGET1Params,
   options?: { [key: string]: any },
@@ -48,7 +48,7 @@ export async function getDepartmentInfoVoByIdUsingGET(
 }
 
 /** getMajorUnderDepartment GET /api/department/get/vo/department-major */
-export async function getMajorUnderDepartmentUsingGET(
+export async function getMajorUnderDepartmentUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getMajorUnderDepartmentUsingGET1Params,
   options?: { [key: string]: any },
@@ -66,7 +66,7 @@ export async function getMajorUnderDepartmentUsingGET(
 }
 
 /** listDepartmentInfoByPage POST /api/department/list/page */
-export async function listDepartmentInfoByPageUsingPOST(
+export async function listDepartmentInfoByPageUsingPost1(
   body: API.DepartmentInfoQueryRequest,
   options?: { [key: string]: any },
 ) {
@@ -81,7 +81,7 @@ export async function listDepartmentInfoByPageUsingPOST(
 }
 
 /** updateDepartmentInfo POST /api/department/update */
-export async function updateDepartmentInfoUsingPOST(
+export async function updateDepartmentInfoUsingPost1(
   body: API.DepartmentInfoUpdateRequest,
   options?: { [key: string]: any },
 ) {

@@ -10,7 +10,6 @@ import java.io.Serializable;
 @Data
 public class StudentInfoAddRequest implements Serializable
 {
-
     /**
      * 学生姓名
      */
@@ -35,6 +34,11 @@ public class StudentInfoAddRequest implements Serializable
      * 学生班级Id
      */
     private Long stuClassId;
+
+    /**
+    * 学生学号
+    */
+    private String stuId;
 
     private static final long serialVersionUID = 1L;
 }

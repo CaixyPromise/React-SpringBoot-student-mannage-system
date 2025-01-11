@@ -33,6 +33,11 @@ public class ClassesInfoUpdateRequest implements Serializable {
      * 班级id
      */
     Long id;
+
+    /**
+     * 年级
+     */
+    private Integer grade;
     
     
     private static final long serialVersionUID = 1L;

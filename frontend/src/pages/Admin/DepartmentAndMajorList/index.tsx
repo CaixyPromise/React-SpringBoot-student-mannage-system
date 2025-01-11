@@ -3,7 +3,7 @@ import UpdateModal from '@/components/CreateAndUpdateModal/components/UpdateModa
 import {PlusOutlined} from '@ant-design/icons';
 import {ActionType, PageContainer, ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
-import {Button, Cascader, Empty, Form, Input, MenuProps, message, Modal} from 'antd';
+import {Button, Cascader, Empty, Form, Input, InputNumber, MenuProps, message, Modal} from 'antd';
 import React, {useMemo, useRef, useState} from 'react';
 import {
     createDepartmentColumns,
@@ -13,21 +13,21 @@ import {
     updateMajorColumns
 } from "@/pages/Admin/DepartmentAndMajorList/columns/DepartmentAndMajorColumns";
 import {
-    addMajorInfoUsingPOST,
-    deleteMajorInfoUsingPOST,
-    listMajorInfoByPageUsingPOST,
-    updateMajorInfoUsingPOST
+    addMajorInfoUsingPost1,
+    deleteMajorInfoUsingPost1,
+    listMajorInfoByPageUsingPost1,
+    updateMajorInfoUsingPost1
 } from "@/services/backend/majorInfoController";
 import {
-    addDepartmentInfoUsingPOST,
-    deleteDepartmentInfoUsingPOST,
-    updateDepartmentInfoUsingPOST
+    addDepartmentInfoUsingPost1,
+    deleteDepartmentInfoUsingPost1,
+    updateDepartmentInfoUsingPost1
 } from "@/services/backend/departmentController";
 import Dropdown from "antd/es/dropdown/dropdown";
 import {
-    addClassesInfoUsingPOST,
-    listClassesInfoVoByPageUnderMajorUsingPOST,
-    updateClassesInfoUsingPOST
+    addClassesInfoUsingPost1,
+    listClassesInfoVoByPageUnderMajorUsingPost1,
+    updateClassesInfoUsingPost1
 } from "@/services/backend/classesController";
 import {ProTableProps} from "@ant-design/pro-table/lib";
 
@@ -144,7 +144,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
     {
         const handleDeleteMajor = async (record: { majorId: API.DeleteRequest; }) =>
         {
-            const { data, code } = await deleteMajorInfoUsingPOST({ id: record.majorId })
+            const { data, code } = await deleteMajorInfoUsingPost1({ id: record.majorId })
             if (code === 0 && data)
             {
                 message.success('删除成功，即将刷新')
@@ -201,7 +201,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
     {
         const handleDeleteMajor = async (record: { majorId: API.DeleteRequest; }) =>
         {
-            const { data, code } = await deleteMajorInfoUsingPOST({ id: record.majorId })
+            const { data, code } = await deleteMajorInfoUsingPost1({ id: record.majorId })
             if (code === 0 && data)
             {
                 message.success('删除成功，即将刷新')
@@ -216,7 +216,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
                 classesId: record.id,
                 classesName: record.name,
                 departmentId: departmentId,
-                majorId: majorId
+                majorId: majorId,
             });
             // 显示更新专业的模态框
             setUpdateClassesModalVisible(true);
@@ -228,7 +228,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
             success: boolean
         } = async () =>
         {
-            const { code, data } = await listClassesInfoVoByPageUnderMajorUsingPOST({
+            const { code, data } = await listClassesInfoVoByPageUnderMajorUsingPost1({
                 majorId: record.majorId,
                 departmentId: record.departmentId
             })
@@ -288,7 +288,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
      */
     const handleDeleteDepartment = async (record) =>
     {
-        const { data, code } = await deleteDepartmentInfoUsingPOST({
+        const { data, code } = await deleteDepartmentInfoUsingPost1({
             id: record.departmentId
         })
         if (code === 0 && data)
@@ -302,7 +302,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
     {
         try
         {
-            const { data, code } = await addDepartmentInfoUsingPOST({
+            const { data, code } = await addDepartmentInfoUsingPost1({
                 name: record.name
             })
             if (code === 0)
@@ -328,8 +328,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
     {
         try
         {
-            console.log("update record is: ", record)
-            const { data, code } = await updateDepartmentInfoUsingPOST({
+            const { data, code } = await updateDepartmentInfoUsingPost1({
                 name: record.name,
                 id: record.departmentId
             })
@@ -357,7 +356,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
         try
         {
             console.log("handleAddMajor record is: ", record)
-            const { data, code } = await addMajorInfoUsingPOST({
+            const { data, code } = await addMajorInfoUsingPost1({
                 departmentId: record.departmentId,
                 name: record.majorName
             })
@@ -384,7 +383,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
     {
         try
         {
-            const { data, code } = await updateMajorInfoUsingPOST({
+            const { data, code } = await updateMajorInfoUsingPost1({
                 name: record.majorName,
                 id: record.majorId,
                 departId: record.departmentId
@@ -462,12 +461,15 @@ const DepartmentAndMajorListPage: React.FC = () =>
                     >
                         <PlusOutlined/> 新建学院
                     </Button>,
-                    <Button type={"primary"}
-                            onClick={() => setCreateClassesModalVisible(true)}
+                    <Button
+                      type={"primary"}
+                      key={"class"}
+                      onClick={() => setCreateClassesModalVisible(true)}
                     >
                         <PlusOutlined/>新建班级
                     </Button>,
                     <Dropdown.Button
+                        key={"major"}
                         icon={<PlusOutlined/>}
                         type="primary"
                         menu={{
@@ -488,7 +490,7 @@ const DepartmentAndMajorListPage: React.FC = () =>
                     const sortField = Object.keys(sort)?.[0];
                     const sortOrder = sort?.[sortField] ?? undefined;
 
-                    const { data, code } = await listMajorInfoByPageUsingPOST({
+                    const { data, code } = await listMajorInfoByPageUsingPost1({
                         ...params,
                         sortField,
                         sortOrder,
@@ -609,15 +611,15 @@ const DepartmentAndMajorListPage: React.FC = () =>
                 {
                     try
                     {
-                        const { departmentMajor, className } = classForm.getFieldsValue();
-                        if (departmentMajor && className)
+                        const { departmentMajor, classesName } = classForm.getFieldsValue();
+                        if (departmentMajor && classesName)
                         {
                             const majorId = departmentMajor[1];
                             const departId = departmentMajor[0];
-                            const response = await addClassesInfoUsingPOST({
+                            const response = await addClassesInfoUsingPost1({
                                 majorId,
                                 departId,
-                                name: className
+                                name: classesName,
                             })
                             message.success("班级创建成功！")
 
@@ -658,7 +660,6 @@ const DepartmentAndMajorListPage: React.FC = () =>
                     <Form.Item name={"className"} label={"班级名称"}
                                rules={[ { required: true, message: '请输入班级名称!' } ]}>
                         <Input placeholder={"班级名称"}></Input>
-
                     </Form.Item>
                 </Form>
             </Modal>
@@ -674,16 +675,16 @@ const DepartmentAndMajorListPage: React.FC = () =>
                 }}
                 onOk={async () =>
                 {
-                    const { departmentMajor, className } = classForm.getFieldsValue();
-                    if (departmentMajor && className)
+                    const { departmentMajor, classesName } = classForm.getFieldsValue();
+                    if (departmentMajor && classesName)
                     {
                         const majorId = departmentMajor[1];
                         const departId = departmentMajor[0];
-                        const response = await updateClassesInfoUsingPOST({
+                        const response = await updateClassesInfoUsingPost1({
                             id: classesCurrentRow.classesId,
                             majorId,
                             departId,
-                            name: className
+                            name: classesName,
                         });
                         if (response.code === 0)
                         {
@@ -735,9 +736,14 @@ const DepartmentAndMajorListPage: React.FC = () =>
                     >
                         <Input placeholder="班级名称"/>
                     </Form.Item>
+                    <Form.Item
+                      name="grade"
+                      label={"年级"}
+                      rules={[ { required: true, message: '请输入年级!' } ]}>
+                      <InputNumber placeholder={"年级"}></InputNumber>
+                    </Form.Item>
                 </Form>
             </Modal>
-
         </PageContainer>
     );
 };

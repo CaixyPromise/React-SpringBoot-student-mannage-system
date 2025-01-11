@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caixy.adminSystem.mapper.CourseSelectionSubjectMapper">
+
+    <resultMap id="BaseResultMap" type="com.caixy.adminSystem.model.entity.CourseSelectionSubject">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="courseSelectionId" column="courseSelectionId" jdbcType="BIGINT"/>
+            <result property="subjectId" column="subjectId" jdbcType="BIGINT"/>
+            <result property="maxStudents" column="maxStudents" jdbcType="INTEGER"/>
+            <result property="enrolledCount" column="enrolledCount" jdbcType="INTEGER"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,courseSelectionId,subjectId,
+        maxStudents,enrolledCount,
+        createTime,updateTime,isDelete
+    </sql>
+    <!-- 根据选课任务 ID 查询科目列表 -->
+    <select id="getSubjectsByCourseSelectionId" resultType="com.caixy.adminSystem.model.vo.Subjects.SubjectsVO">
+        SELECT
+            s.id,
+            s.name,
+            s.courseType,
+            s.gradeCredit,
+            s.gradeMax,
+            s.gradeMin,
+            s.gradeExcellent,
+            s.gradeFail
+        FROM subjects s
+        WHERE s.id IN (
+            SELECT css.subjectId
+            FROM course_selection_subject css
+            WHERE css.courseSelectionId = #{courseSelectionId}
+              AND css.isDelete = 0
+        )
+          AND s.isDelete = 0
+    </select>
+
+
+    <!-- 1. 查询可选科目的 subjectId 列表 -->
+    <select id="getSubjectIdsBySelectionId" resultType="java.lang.Long">
+        SELECT subjectId
+        FROM course_selection_subject
+        WHERE courseSelectionId = #{courseSelectionId}
+          AND isDelete = 0;
+    </select>
+
+    <!-- 2. 查询可选科目映射信息 -->
+    <select id="getSubjectMappingBySelectionId" resultType="com.caixy.adminSystem.model.entity.CourseSelectionSubject">
+        SELECT id, courseSelectionId, subjectId, maxStudents, enrolledCount
+        FROM course_selection_subject
+        WHERE courseSelectionId = #{courseSelectionId}
+          AND isDelete = 0;
+    </select>
+
+    <!-- 根据 选课任务ID 和 科目IDs 查询记录 -->
+    <select id="listBySelectionAndSubjects"
+            resultType="com.caixy.adminSystem.model.entity.CourseSelectionSubject">
+        SELECT
+        id, courseSelectionId, subjectId, maxStudents, enrolledCount
+        FROM course_selection_subject
+        WHERE isDelete = 0
+        AND courseSelectionId = #{courseSelectionId}
+        AND subjectId IN
+        <foreach collection="subjectIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+    </select>
+
+    <!-- 批量更新已选人数 (自增1) -->
+    <update id="incrementEnrolledCountBatch">
+        UPDATE course_selection_subject
+        SET enrolledCount = enrolledCount + 1
+        WHERE id IN
+        <foreach collection="ids" item="cid" open="(" separator="," close=")">
+            #{cid}
+        </foreach>
+    </update>
+
+    <!-- 批量递减已选人数 -->
+    <update id="decrementEnrolledCountBatch">
+        UPDATE course_selection_subject
+        SET enrolledCount = enrolledCount - 1
+        WHERE id IN
+        <foreach collection="ids" item="cid" open="(" separator="," close=")">
+            #{cid}
+        </foreach>
+    </update>
+
+</mapper>

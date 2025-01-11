@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caixy.adminSystem.mapper.StudentCourseSelectionMapper">
+
+    <resultMap id="BaseResultMap" type="com.caixy.adminSystem.model.entity.StudentCourseSelection">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="studentId" column="studentId" jdbcType="BIGINT"/>
+            <result property="courseSelectionId" column="courseSelectionId" jdbcType="BIGINT"/>
+            <result property="subjectId" column="subjectId" jdbcType="BIGINT"/>
+            <result property="selectTime" column="selectTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,studentId,courseSelectionId,subjectId,
+        selectTime,updateTime,isDelete
+    </sql>
+
+    <select id="getSelectedSubjectIdsByStudent" resultType="java.lang.Long">
+        SELECT subjectId
+        FROM student_course_selection
+        WHERE studentId = #{studentId}
+          AND courseSelectionId = #{courseSelectionId}
+          AND isDelete = 0
+    </select>
+
+    <!-- 批量插入学生选课记录 -->
+    <insert id="insertStudentSelections">
+        INSERT INTO student_course_selection (studentId, courseSelectionId, subjectId, selectTime)
+        VALUES
+        <foreach collection="records" item="record" separator=",">
+            (#{record.studentId}, #{record.courseSelectionId}, #{record.subjectId}, NOW())
+        </foreach>
+    </insert>
+
+    <!-- 查询学生是否已选过某些科目 -->
+    <select id="listSelectedSubjects" resultType="com.caixy.adminSystem.model.entity.StudentCourseSelection">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM
+            student_course_selection
+        WHERE
+            isDelete = 0
+            AND
+                studentId = #{studentId}
+            AND
+                courseSelectionId = #{courseSelectionId}
+            AND
+                subjectId
+                IN
+                <foreach collection="subjectIds" item="sid" open="(" separator="," close=")">
+                    #{sid}
+                </foreach>
+    </select>
+
+    <!-- 退选操作: 将相关记录 isDelete = 1 -->
+    <update id="deleteStudentSelections">
+        UPDATE student_course_selection
+        SET isDelete = 1
+        WHERE isDelete = 0
+        AND studentId = #{studentId}
+        AND courseSelectionId = #{courseSelectionId}
+        AND subjectId IN
+        <foreach collection="subjectIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+    </update>
+</mapper>

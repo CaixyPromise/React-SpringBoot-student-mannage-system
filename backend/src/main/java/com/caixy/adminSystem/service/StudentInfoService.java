@@ -60,6 +60,8 @@ public interface StudentInfoService extends IService<StudentInfo>
 
     StudentInfoVO getStudentInfoVOById(Long id);
 
+    List<StudentInfoVO> getStudentsByCourseSelectionAndSubject(Long courseSelectionId, Long subjectId);
+
     /**
      * 分页获取帖子封装
      *

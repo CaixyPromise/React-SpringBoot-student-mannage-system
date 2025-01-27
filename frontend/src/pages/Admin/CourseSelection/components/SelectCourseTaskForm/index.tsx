@@ -1,28 +1,38 @@
-// SelectCourseTaskForm.tsx
 import React, {useEffect, useMemo, useState, forwardRef, useImperativeHandle} from "react";
 import {
   Button,
   Cascader,
+  Col,
   DatePicker,
   Form,
   FormInstance,
   Input,
   InputNumber,
   message,
+  Row,
   Select,
   Space,
   Spin,
 } from "antd";
 import dayjs from "dayjs";
 import {ClockCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import {getSemestersUsingGet1} from "@/services/backend/semestersController";
 import {getClassesOptionDataVoByPageUsingPost1} from "@/services/backend/classesController";
 import {getAllSubjectsVoUsingGet1} from "@/services/backend/subjectController";
+import TeacherSelect from "@/components/TeacherSelect";
+import {period_option, weeks_option} from "@/pages/Admin/CourseSelection/components/SelectCourseTaskForm/config";
+import SemesterSelect from "@/components/SemesterSelect";
 
 export interface CourseSetting {
   courseId: number;
   maxStudents: number;
+  classTeacher: number;
+  classRoom: string;
+  classTimes: Array<{
+    dayOfWeek: number;
+    period: number;
+  }>;
 }
+
 
 export interface SelectCourseFormProps {
   semesterId: number;
@@ -35,6 +45,34 @@ export interface SelectCourseFormProps {
   endDate: string;
   courseSettings: CourseSetting[];
 }
+
+const classTimesRules = [
+  {
+    validator: async (_, classTimes) => {
+      if (!classTimes || classTimes.length === 0) {
+        return Promise.reject(new Error('请至少添加一个上课时间！'));
+      }
+
+      // 校验时间冲突
+      const seenTimes = new Set();
+      for (const time of classTimes) {
+        const { dayOfWeek, period } = time || {};
+        if (!dayOfWeek || !period) {
+          return Promise.reject(new Error('请完整填写每一行的上课时间！'));
+        }
+
+        const key = `${dayOfWeek}-${period}`;
+        if (seenTimes.has(key)) {
+          return Promise.reject(new Error(`上课时间冲突：${weeks_option.find(w => w.value === dayOfWeek)?.label} ${period_option.find(p => p.value === period)?.label}`));
+        }
+        seenTimes.add(key);
+      }
+
+      return Promise.resolve();
+    },
+  },
+];
+
 
 export interface SelectCourseTaskFormRef {
   submit: () => Promise<void>;
@@ -54,6 +92,7 @@ interface GradeNode {
   label: string;
   children?: GradeNode[];
 }
+
 
 /** 1. 递归构建 value->node 的映射，便于后面通过 value 快速找到节点 */
 const buildNodeMap = (nodes: GradeNode[], map = new Map<string, GradeNode>()) => {
@@ -83,7 +122,6 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
     const form = externalForm || internalForm; // 使用外部传入的 form 或内部创建的 form
 
     const [loading, setLoading] = useState<boolean>(false);
-    const [semesterOption, setSemesterOption] = useState<API.SemestersVO[]>([]);
     const [gradeOption, setGradeOption] = useState<API.AllClassesOptionDataVO[]>([]);
     const [subjectOption, setSubjectOption] = useState<
       Array<{ label: string; value: number }>
@@ -96,6 +134,7 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
         0: "#ff0000",
       };
     }, []);
+
 
     const querySubject = async () => {
       try {
@@ -132,7 +171,7 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
 
     // 计算已设置课程中的最小学分
     const minSelectedCredit = useMemo(() => {
-      if (!courseSettingsValues || courseSettingsValues.length === 0) return 0;
+      if (!courseSettingsValues || courseSettingsValues.length === 0) return 1;
       let minCredit = Infinity;
       courseSettingsValues.forEach(cs => {
         const credit = subjectMap[cs?.courseId]?.gradeCredit;
@@ -142,31 +181,6 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
       });
       return isFinite(minCredit) ? minCredit : 1;
     }, [courseSettingsValues, subjectMap]);
-
-
-    const querySemesters = async () => {
-      try {
-        const response = await getSemestersUsingGet1();
-        if (response.code === 0 && response.data) {
-          const sortedSemesters = response.data.sort((a: API.SemestersVO, b: API.SemestersVO) => {
-            // 优先判断 isActive
-            if (a.isActive === 1 && b.isActive !== 1) return -1;
-            if (b.isActive === 1 && a.isActive !== 1) return 1;
-
-            // 比较日期范围，最近的日期靠前
-            const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
-            const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
-            return dateB - dateA; // 日期越近越前
-          });
-
-          setSemesterOption(sortedSemesters);
-        } else {
-          message.error(`获取学期列表失败: ${response.message}`);
-        }
-      } catch (error) {
-        message.error(`获取学期列表异常: ${error}`);
-      }
-    };
 
     const queryDistinctGradeList = async () => {
       try {
@@ -221,7 +235,7 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
           minCredit,
           semesterId,
           courseTime,
-          courseSettings
+          courseSettings,
         } = values;
 
         // 把 dayjs 对象格式化成字符串
@@ -268,7 +282,7 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
 
     useEffect(() => {
       setLoading(true);
-      Promise.all([querySemesters(), queryDistinctGradeList(), querySubject()]).finally(() =>
+      Promise.all([queryDistinctGradeList(), querySubject()]).finally(() =>
         setLoading(false)
       );
     }, [excludeClassIds]);
@@ -286,22 +300,13 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
             courseTime: [null, null],
             minCredit: 1,
             courseSettings: [],
+            classTimes: [],
+            classRoom: [],
+            classTeacher: ""
           }}
         >
           <Form.Item name="semesterId" label="选课学期" rules={[{required: true}]}>
-            <Select placeholder="请选择学期">
-              {semesterOption.map((semester) => (
-                <Select.Option key={semester.id} value={semester.id}>
-                  <span style={{color: colorSemester[semester.isActive]}}>
-                    {semester.name} [
-                    {`${dayjs(semester.startDate).format("YYYY-MM-DD")} ~ ${dayjs(
-                      semester.endDate
-                    ).format("YYYY-MM-DD")}`}
-                    ] {semester.isActive === 1 && "（当前学期）"}
-                  </span>
-                </Select.Option>
-              ))}
-            </Select>
+            <SemesterSelect placeholder="请选择学期" />
           </Form.Item>
 
           <Form.Item
@@ -321,6 +326,7 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
           >
             <Input placeholder="请输入选课任务名称"/>
           </Form.Item>
+
           {/* 添加带标签的 Form.List */}
           <Form.Item label="选课课程设置" required>
             <Form.List
@@ -335,49 +341,156 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
                 },
               ]}
             >
-              {(fields, {add, remove}, {errors}) => (
+              {(fields, { add, remove }, { errors }) => (
                 <>
                   {fields.map((field) => {
-                    // 获取当前已选择的课程（除当前行外）
+                    // 用于排除已选课程
                     const currentSettings: CourseSetting[] = form.getFieldValue('courseSettings') || [];
                     const alreadySelected = new Set<number>();
-                    currentSettings.forEach((item: CourseSetting, index: number) => {
-                      if (index !== field.name && item?.courseId) {
+                    currentSettings.forEach((item: CourseSetting, idx: number) => {
+                      if (idx !== field.name && item?.courseId) {
                         alreadySelected.add(item.courseId);
                       }
                     });
 
                     return (
-                      <Space key={field.key} align="baseline" style={{display: 'flex', marginBottom: 8}}>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'courseId']}
-                          rules={[{required: true, message: '请选择课程'}]}
-                        >
-                          <Select
-                            placeholder="请选择课程"
-                            options={subjectOption.filter(opt => !alreadySelected.has(opt.value))}
-                            style={{width: 200}}
-                          />
-                        </Form.Item>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'maxStudents']}
-                          rules={[{required: true, message: '请输入最大选课人数'}]}
-                        >
-                          <InputNumber min={1} placeholder="最大人数"/>
-                        </Form.Item>
+                      <div
+                        key={field.key}
+                        style={{ marginBottom: 16, border: '1px solid #f0f0f0', padding: 16 }}
+                      >
+                        <Row gutter={16}>
+                          {/* 课程 */}
+                          <Col span={6}>
+                            <Form.Item
+                              {...field}
+                              label="课程"
+                              name={[field.name, 'courseId']}
+                              rules={[{ required: true, message: '请选择课程' }]}
+                            >
+                              <Select
+                                placeholder="请选择课程"
+                                style={{ width: '100%' }}
+                                options={subjectOption.filter(opt => !alreadySelected.has(opt.value))}
+                              />
+                            </Form.Item>
+                          </Col>
+
+                          {/* 课程老师 */}
+                          <Col span={6}>
+                            <Form.Item
+                              label="课程老师"
+                              name={[field.name, 'classTeacher']}
+                              rules={[{ required: true, message: '请选择老师' }]}
+                            >
+                              <TeacherSelect />
+                            </Form.Item>
+                          </Col>
+
+                          {/* 最大人数 */}
+                          <Col span={6}>
+                            <Form.Item
+                              {...field}
+                              label="最大人数"
+                              name={[field.name, 'maxStudents']}
+                              rules={[{ required: true, message: '请输入最大人数' }]}
+                            >
+                              <InputNumber
+                                min={1}
+                                style={{ width: '100%' }}
+                                placeholder="最大人数"
+                              />
+                            </Form.Item>
+                          </Col>
+
+                          {/* 上课教室 */}
+                          <Col span={6}>
+                            <Form.Item
+                              label="上课教室"
+                              name={[field.name, 'classRoom']}
+                              rules={[
+                                { required: true, message: '请填写上课教室' },
+                                { max: 20, message: '教室长度不能超过20个字符' },
+                              ]}
+                            >
+                              <Input placeholder="请填写上课教室" />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16}>
+                          <Col span={24}>
+                            {/* 上课时间（嵌套 Form.List） */}
+                            <Form.Item label="上课时间" required>
+                              <Form.List
+                                name={[field.name, 'classTimes']}
+                                rules={classTimesRules}
+                              >
+                                {(timeFields, { add: addTime, remove: removeTime }) => (
+                                  <>
+                                    {timeFields.map(({ key, name, ...restField }) => (
+                                      <Space key={key} align="baseline" style={{ marginBottom: 8 }}>
+                                        <Form.Item
+                                          {...restField}
+                                          name={[name, 'dayOfWeek']}
+                                          rules={[{ required: true, message: '请选择星期几' }]}
+                                        >
+                                          <Select
+                                            placeholder="选择星期"
+                                            style={{ width: 120 }}
+                                            options={weeks_option}
+                                          />
+                                        </Form.Item>
+
+                                        <Form.Item
+                                          {...restField}
+                                          name={[name, 'period']}
+                                          rules={[{ required: true, message: '请选择课时' }]}
+                                        >
+                                          <Select
+                                            placeholder="选择课时"
+                                            style={{ width: 150 }}
+                                            options={period_option}
+                                          />
+                                        </Form.Item>
+
+                                        <Button type="link" danger onClick={() => removeTime(name)}>
+                                          删除
+                                        </Button>
+                                      </Space>
+                                    ))}
+
+                                    <Form.Item>
+                                      <Button
+                                        type="dashed"
+                                        onClick={() => addTime()}
+                                        icon={<PlusOutlined />}
+                                      >
+                                        添加上课时间
+                                      </Button>
+                                    </Form.Item>
+                                  </>
+                                )}
+                              </Form.List>
+                            </Form.Item>
+                          </Col>
+                        </Row>
+
                         <Button type="link" danger onClick={() => remove(field.name)}>
-                          删除
+                          删除本条课程设置
                         </Button>
-                      </Space>
+                      </div>
                     );
                   })}
                   <Form.Item>
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
+                    <Button
+                      type="dashed"
+                      onClick={() => add()}
+                      block
+                      icon={<PlusOutlined />}
+                    >
                       添加课程设置
                     </Button>
-                    <Form.ErrorList errors={errors}/>
+                    <Form.ErrorList errors={errors} />
                   </Form.Item>
                 </>
               )}
@@ -444,6 +557,7 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
               />
             </Form.Item>
           </Space>
+
         </Form>
       </Spin>
     );

@@ -1,6 +1,7 @@
 package com.caixy.adminSystem.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -22,8 +23,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 学期信息表服务实现
@@ -168,6 +170,26 @@ public class SemestersServiceImpl extends ServiceImpl<SemestersMapper, Semesters
         queryWrapper.eq("isActive", 1);
         queryWrapper.eq("isDelete", 0);
         return this.getOne(queryWrapper);
+    }
+
+    /**
+     * 批量获取学期信息vo
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/1/26 22:54
+     */
+    @Override
+    public Map<Long, SemestersVO> getSemestersVOListByIds(Collection<Long> semesterId) {
+        if (CollUtil.isEmpty(semesterId)) {
+            return new HashMap<>();
+        }
+        LambdaQueryWrapper<Semesters> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Semesters::getId, semesterId);
+        queryWrapper.eq(Semesters::getIsDelete, 0);
+        return this.list(queryWrapper).stream()
+                .map(semesters -> getSemestersVO(semesters, null))
+                .collect(Collectors.toMap(SemestersVO::getId, Function.identity()));
     }
 
     /**

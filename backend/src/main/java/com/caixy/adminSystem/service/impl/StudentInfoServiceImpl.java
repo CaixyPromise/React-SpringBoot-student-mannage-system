@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.caixy.adminSystem.common.ErrorCode;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.exception.ThrowUtils;
+import com.caixy.adminSystem.mapper.StudentCourseSelectionMapper;
 import com.caixy.adminSystem.mapper.StudentInfoMapper;
 import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoAddRequest;
 import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoQueryRequest;
@@ -42,6 +43,8 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
     private DepartmentInfoService departmentInfoService;
     @Resource
     private UserService userService;
+    @Resource
+    private StudentCourseSelectionMapper studentCourseSelectionMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -183,6 +186,36 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         return getStudentInfoVO(studentInfo);
     }
 
+    /**
+     * 根据选课任务ID和科目ID查询选了该科目的所有学生信息VO
+     *
+     * @param courseSelectionId 选课任务ID
+     * @param subjectId 科目ID
+     * @return 学生信息VO列表
+     */
+    @Override
+    public List<StudentInfoVO> getStudentsByCourseSelectionAndSubject(Long courseSelectionId, Long subjectId) {
+        // 构建查询条件，查找符合条件的学生选课记录
+        LambdaQueryWrapper<StudentCourseSelection> query = new LambdaQueryWrapper<>();
+        query.eq(StudentCourseSelection::getCourseSelectionId, courseSelectionId)
+             .eq(StudentCourseSelection::getSubjectId, subjectId)
+             .eq(StudentCourseSelection::getIsDelete, 0);
+
+        // 查询学生选课记录列表
+        List<StudentCourseSelection> selections = studentCourseSelectionMapper.selectList(query);
+        if (selections == null || selections.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 提取所有学生ID
+        Set<Long> studentIds = selections.stream()
+                                         .map(StudentCourseSelection::getStudentId)
+                                         .collect(Collectors.toSet());
+
+        // 使用 studentInfoService 批量获取学生信息VO
+        return getStudentInfoVoByIds(studentIds);
+    }
+
 
     @Override
     public Page<StudentInfoVO> getStudentInfoVOPage(Page<StudentInfo> postPage)
@@ -240,7 +273,3 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         }).collect(Collectors.toList());
     }
 }
-
-
-
-

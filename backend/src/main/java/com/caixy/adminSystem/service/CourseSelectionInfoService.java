@@ -6,10 +6,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.caixy.adminSystem.model.dto.courseSelectionInfo.CourseSelectionInfoQueryRequest;
 import com.caixy.adminSystem.model.dto.courseSelectionInfo.CreateCourseSelectionRequest;
 import com.caixy.adminSystem.model.entity.CourseSelectionInfo;
-import com.caixy.adminSystem.model.vo.Subjects.SubjectsVO;
+import com.caixy.adminSystem.model.vo.Subjects.CourseSelectSubjectVO;
 import com.caixy.adminSystem.model.vo.courseSelectionInfo.CourseSelectionInfoVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -65,7 +66,11 @@ public interface CourseSelectionInfoService extends IService<CourseSelectionInfo
 
     Boolean putTaskActiveById(Long taskId);
 
-    List<SubjectsVO> getSelectTaskCourses(Long taskId);
+    List<CourseSelectionInfoVO> getCourseTaskByIds(Collection<Long> courseSelectionIds);
+
+    List<CourseSelectSubjectVO> getSelectTaskCourses(Long taskId);
 
     List<CourseSelectionInfoVO> getStudentTasks(Long studentId);
+
+    List<CourseSelectionInfoVO> getCourseSelectionInfoBySemesterId(Long semesterId);
 }

@@ -29,6 +29,8 @@ public interface UserConstant {
     */
     String STUDENT_ROLE = "student";
 
+    String TEACHER_ROLE = "teacher";
+
     /**
      * 被封号
      */

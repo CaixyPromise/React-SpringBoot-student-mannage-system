@@ -12,9 +12,11 @@ import com.caixy.adminSystem.exception.ThrowUtils;
 import com.caixy.adminSystem.model.dto.courseSelectionInfo.*;
 import com.caixy.adminSystem.model.entity.CourseSelectionInfo;
 import com.caixy.adminSystem.model.entity.User;
+import com.caixy.adminSystem.model.vo.Subjects.CourseSelectSubjectVO;
 import com.caixy.adminSystem.model.vo.Subjects.SubjectsVO;
 import com.caixy.adminSystem.model.vo.courseSelectionInfo.CourseSelectionInfoVO;
 import com.caixy.adminSystem.service.CourseSelectionInfoService;
+import com.caixy.adminSystem.service.CourseSelectionSubjectService;
 import com.caixy.adminSystem.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +38,9 @@ public class CourseSelectionInfoController
     @Resource
     private CourseSelectionInfoService courseSelectionInfoService;
 
+    @Resource
+    private CourseSelectionSubjectService courseSelectionSubjectService;
+    
     @Resource
     private UserService userService;
 
@@ -272,13 +277,14 @@ public class CourseSelectionInfoController
      * @version 2025/1/10 3:18
      */
     @GetMapping("/get/select-task/courses")
-    public BaseResponse<List<SubjectsVO>> getSelectTaskCoursesByTaskId(@RequestParam Long taskId)
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<List<CourseSelectSubjectVO>> getSelectTaskCoursesByTaskId(@RequestParam Long taskId)
     {
         if (taskId < 0)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        List<SubjectsVO> result = courseSelectionInfoService.getSelectTaskCourses(taskId);
+        List<CourseSelectSubjectVO> result = courseSelectionInfoService.getSelectTaskCourses(taskId);
         return ResultUtils.success(result);
     }
 
@@ -312,12 +318,37 @@ public class CourseSelectionInfoController
 
     @GetMapping("/get/student/available-selection-task")
     @AuthCheck(mustRole = UserConstant.STUDENT_ROLE)
-    public BaseResponse<List<CourseSelectionInfoVO>> getUserCourseSelectionInfo(HttpServletRequest request) {
+    public BaseResponse<List<CourseSelectionInfoVO>> getUserCourseSelectionInfo(HttpServletRequest request)
+    {
         User loginUser = userService.getLoginUser(request);
         List<CourseSelectionInfoVO> courseSelectionInfoVO = courseSelectionInfoService
                 .getStudentTasks(loginUser.getId());
         return ResultUtils.success(courseSelectionInfoVO);
     }
+
+    @GetMapping("/get/bySemesterId")
+    public BaseResponse<List<CourseSelectionInfoVO>> getCourseSelectionInfoBySemesterId(@RequestParam Long semesterId)
+    {
+        List<CourseSelectionInfoVO> courseSelectionInfoVO = courseSelectionInfoService.getCourseSelectionInfoBySemesterId(
+                semesterId);
+        return ResultUtils.success(courseSelectionInfoVO);
+    }
+
+    /**
+     * 获取任务下的科目id
+     * 
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/1/21 3:11
+     */
+    @GetMapping("/get/subject/by-taskId")
+    public BaseResponse<List<SubjectsVO>> getCourseSelectSubjectByTaskId(
+            @RequestParam Long taskId
+    ) {
+        List<SubjectsVO> courseSelectSubjectVO = courseSelectionSubjectService.getSelectSubjectByTaskId(taskId);
+        return ResultUtils.success(courseSelectSubjectVO);
+    }
+
 
     // endregion
 

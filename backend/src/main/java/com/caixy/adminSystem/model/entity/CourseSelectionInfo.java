@@ -55,4 +55,5 @@ public class CourseSelectionInfo extends BaseEntity {
     * 任务状态 1-正常 0-搁置(暂停执行) 和 删除不同的是，删除是废弃，搁置是可能重新开启
     */
     private Integer isActive;
+
 }

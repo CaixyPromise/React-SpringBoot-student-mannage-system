@@ -16,7 +16,7 @@ import java.util.Map;
 * @Entity com.caixy.adminSystem.model.entity.CourseSelectionInfo
 */
 public interface CourseSelectionInfoMapper extends BaseMapper<CourseSelectionInfo> {
-    List<CourseSelectionInfoVO> getStudentTasks(
+    List<CourseSelectionInfo> getStudentTasks(
             @Param("currentSemesterId") Long currentSemesterId,
             @Param("currentTime") Date currentTime,
             @Param("studentClassId") Long studentClassId

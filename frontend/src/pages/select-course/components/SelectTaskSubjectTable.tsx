@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Button, message, Table, Tag } from "antd";
+import {Badge, Button, message, Table, Tag, Tooltip} from "antd";
 import { ProColumns } from "@ant-design/pro-components";
 import {
   cancelCourseUsingPost1,
@@ -8,6 +8,7 @@ import {
 } from "@/services/backend/studentCourseSelectionController";
 import dayjs from "dayjs";
 import useDebounce from "@/hooks/useDebounce";
+import ClassTimesDisplay from "@/components/ClassTimesDisplay";
 
 const handleSelect = async (subjectIds: number[], courseSelectionId: number) => {
   // 处理选课逻辑
@@ -98,6 +99,41 @@ const SelectTaskSubjectTable: React.FC<{
       title: "已选人数",
       dataIndex: "enrolledCount",
       key: "enrolledCount",
+    },
+    {
+      title: "上课地点",
+      render: (text: string, record: API.CourseSelectionInfoVO) => {
+        return <>
+          <span>{record.classRoom}</span>
+        </>
+      }
+    },
+    {
+      title: "上课时间",
+      dataIndex: "classTimes",
+      render: (classTimes: API.ClassTime[]) => <ClassTimesDisplay classTimes={classTimes} />,
+    },
+    {
+      title: "授课教师",
+      render: (text: string, record: API.CourseSelectionInfoVO) => {
+        const {teacherName, teacherId, teacherMajor, teacherDepart} = record?.teacherInfo;
+
+        return (
+          <Tooltip
+            title={
+              <div style={{
+                marginBottom: "4px"
+              }}>
+                <div>教师编号: {teacherId}</div>
+                <div>教师专业: {teacherMajor}</div>
+                <div>教师部门: {teacherDepart}</div>
+              </div>
+            }
+          >
+            <span>{teacherName}</span>
+          </Tooltip>
+        )
+      }
     },
     {
       title: "操作",

@@ -8,6 +8,8 @@ import com.caixy.adminSystem.model.entity.Semesters;
 import com.caixy.adminSystem.model.vo.semesters.SemestersVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * 学期信息表服务
@@ -52,6 +54,8 @@ public interface SemestersService extends IService<Semesters> {
     Page<SemestersVO> getSemestersVOPage(Page<Semesters> semestersPage, HttpServletRequest request);
 
     Semesters getCurrentSemester();
+
+    Map<Long, SemestersVO> getSemestersVOListByIds(Collection<Long> semesterId);
 
     boolean setActiveSemester(Long semesterId);
 }

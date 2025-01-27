@@ -20,6 +20,11 @@ public class StudentInfoVO implements Serializable
     private Long id;
 
     /**
+     * 学号
+     */
+    private String stuId;
+
+    /**
      * 学生姓名
      */
     private String stuName;

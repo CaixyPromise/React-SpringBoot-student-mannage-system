@@ -2,27 +2,12 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** addStudentGrades POST /api/score/add */
-export async function addStudentGradesUsingPost1(
+/** addStudentElectiveGrades POST /api/score/add/elective */
+export async function addStudentElectiveGradesUsingPost1(
   body: API.StudentGradesAddRequest,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponseLong_>('/api/score/add', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** batchAddStudentGrades POST /api/score/add/batch */
-export async function batchAddStudentGradesUsingPost1(
-  body: API.StudentGradesAddRequest[],
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponseBoolean_>('/api/score/add/batch', {
+  return request<API.BaseResponseBoolean_>('/api/score/add/elective', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -62,13 +47,30 @@ export async function editStudentGradesUsingPost1(
   });
 }
 
-/** getStudentGradesVOByStuId GET /api/score/get/stu/grade */
+/** getStudentGradesVOByTaskSubject GET /api/score/get/stu/grade/${param0}/${param1} */
+export async function getStudentGradesVoByTaskSubjectUsingGet1(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getStudentGradesVOByTaskSubjectUsingGET1Params,
+  options?: { [key: string]: any },
+) {
+  const { courseTaskId: param0, subjectId: param1, ...queryParams } = params;
+  return request<API.BaseResponseListStudentsGradeForAdminVO_>(
+    `/api/score/get/stu/grade/${param0}/${param1}`,
+    {
+      method: 'GET',
+      params: { ...queryParams },
+      ...(options || {}),
+    },
+  );
+}
+
+/** getStudentGradesVOByStuId GET /api/score/get/stu/grade/byId */
 export async function getStudentGradesVoByStuIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getStudentGradesVOByStuIdUsingGET1Params,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponseStudentGradesVO_>('/api/score/get/stu/grade', {
+  return request<API.BaseResponseStudentGradesVO_>('/api/score/get/stu/grade/byId', {
     method: 'GET',
     params: {
       ...params,

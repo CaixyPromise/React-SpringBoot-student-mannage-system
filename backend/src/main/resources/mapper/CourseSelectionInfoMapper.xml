@@ -24,17 +24,15 @@
         updateTime,isDelete,isActive
     </sql>
 
-    <select id="getStudentTasks" resultType="com.caixy.adminSystem.model.vo.courseSelectionInfo.CourseSelectionInfoVO">
+    <select id="getStudentTasks" resultType="com.caixy.adminSystem.model.entity.CourseSelectionInfo">
         SELECT
             <include refid="Base_Column_List"/>
         FROM
             course_selection_info
         WHERE
             isActive = 1
-            AND
-                isDelete = 0
-            AND
-                semesterId = #{currentSemesterId}
+            AND isDelete = 0
+            AND semesterId = #{currentSemesterId}
             AND (
                     (
                         startDate &lt;= #{currentTime}

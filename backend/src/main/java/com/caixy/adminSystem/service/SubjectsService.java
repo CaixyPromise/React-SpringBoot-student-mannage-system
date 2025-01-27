@@ -9,7 +9,9 @@ import com.caixy.adminSystem.model.vo.Subjects.SubjectsVO;
 
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author CAIXYPROMISE
@@ -61,6 +63,8 @@ public interface SubjectsService extends IService<Subjects> {
     Page<SubjectsVO> getSubjectsVOPage(Page<Subjects> SubjectsPage, HttpServletRequest request);
 
     List<SubjectsVO> getAllSubjectsVO();
+
+    Map<Long, SubjectsVO> getSubjectsVOByIds(Collection<Long> ids);
 
     boolean checkGradeIsValid(Long grade, Subjects subjects);
 }

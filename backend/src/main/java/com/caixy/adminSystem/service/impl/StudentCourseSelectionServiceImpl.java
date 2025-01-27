@@ -8,12 +8,11 @@ import com.caixy.adminSystem.common.ErrorCode;
 import com.caixy.adminSystem.constant.CommonConstant;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.exception.ThrowUtils;
-import com.caixy.adminSystem.mapper.CourseSelectionInfoMapper;
-import com.caixy.adminSystem.mapper.CourseSelectionSubjectMapper;
-import com.caixy.adminSystem.mapper.StudentCourseSelectionMapper;
-import com.caixy.adminSystem.mapper.SubjectsMapper;
+import com.caixy.adminSystem.mapper.*;
+import com.caixy.adminSystem.model.dto.courseSelectionInfo.CreateCourseSelectionRequest;
 import com.caixy.adminSystem.model.dto.studentCourseSelection.StudentCourseSelectionQueryRequest;
 import com.caixy.adminSystem.model.dto.studentCourseSelection.StudentSelectCourseRequest;
+import com.caixy.adminSystem.model.dto.subject.SubjectClassTime;
 import com.caixy.adminSystem.model.entity.CourseSelectionInfo;
 import com.caixy.adminSystem.model.entity.CourseSelectionSubject;
 import com.caixy.adminSystem.model.entity.StudentCourseSelection;
@@ -21,7 +20,9 @@ import com.caixy.adminSystem.model.entity.StudentCourseSelection;
 import com.caixy.adminSystem.model.entity.Subjects;
 import com.caixy.adminSystem.model.vo.studentCourseSelection.StudentCourseSubjectVO;
 
+import com.caixy.adminSystem.model.vo.teacherInfo.TeacherInfoVO;
 import com.caixy.adminSystem.service.StudentCourseSelectionService;
+import com.caixy.adminSystem.utils.JsonUtils;
 import com.caixy.adminSystem.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -52,6 +53,9 @@ public class StudentCourseSelectionServiceImpl extends ServiceImpl<StudentCourse
 
     @Resource
     private SubjectsMapper subjectsMapper;
+
+    @Resource
+    private TeacherInfoMapper teacherInfoMapper;
 
     /**
      * 学生退选
@@ -271,11 +275,9 @@ public class StudentCourseSelectionServiceImpl extends ServiceImpl<StudentCourse
     @Override
     public List<StudentCourseSubjectVO> listSubjectsForStudent(Long studentId, Long courseSelectionId)
     {
-        // 1. 查询选课任务下所有可选科目
-        List<CourseSelectionSubject> cssList = courseSelectionSubjectMapper.getSubjectMappingBySelectionId(
-                courseSelectionId);
-        if (cssList == null || cssList.isEmpty())
-        {
+        // 1. 查询选课任务下所有可选科目映射信息
+        List<CourseSelectionSubject> cssList = courseSelectionSubjectMapper.getSubjectMappingBySelectionId(courseSelectionId);
+        if (cssList == null || cssList.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -295,12 +297,23 @@ public class StudentCourseSelectionServiceImpl extends ServiceImpl<StudentCourse
                 .getSelectedSubjectIdsByStudent(studentId, courseSelectionId);
         Set<Long> selectedSet = new HashSet<>(selectedSubjectIds);
 
-        // 5. 组装返回结果
+        // 5. 提取所有教师 ID 并查询教师信息
+        Set<Long> teacherIds = cssList.stream()
+                                      .map(CourseSelectionSubject::getTeacherId)
+                                      .filter(Objects::nonNull)
+                                      .collect(Collectors.toSet());
+        Map<Long, TeacherInfoVO> teacherMap;
+        if (!teacherIds.isEmpty()) {
+            List<TeacherInfoVO> teacherInfos = teacherInfoMapper.selectTeacherInfoByIds(new ArrayList<>(teacherIds));
+            teacherMap = teacherInfos.stream()
+                                     .collect(Collectors.toMap(TeacherInfoVO::getId, t -> t));
+        }
+        else {teacherMap = new HashMap<>();}
+
+        // 6. 组装返回结果
         return cssList.stream().map(css -> {
             Subjects sub = subjectMap.get(css.getSubjectId());
-            if (sub == null)
-            {
-                // 返回空流
+            if (sub == null) {
                 return null;
             }
             StudentCourseSubjectVO vo = new StudentCourseSubjectVO();
@@ -310,9 +323,29 @@ public class StudentCourseSelectionServiceImpl extends ServiceImpl<StudentCourse
             vo.setMaxStudents(css.getMaxStudents());
             vo.setEnrolledCount(css.getEnrolledCount());
             vo.setSelected(selectedSet.contains(sub.getId()));
-            vo.setFull(css.getEnrolledCount() >= css.getMaxStudents());
+            // 当最大人数为0时，表示不限制人数，不认为已满
+            vo.setFull(css.getMaxStudents() != null && css.getMaxStudents() > 0
+                       && css.getEnrolledCount() >= css.getMaxStudents());
+
+            // 设置教师信息
+            if (css.getTeacherId() != null) {
+                vo.setTeacherInfo(teacherMap.get(css.getTeacherId()));
+            }
+
+            // 设置上课地点
+            vo.setClassRoom(css.getClassRoom());
+
+            // 解析并设置上课时间
+            if (StringUtils.isNotBlank(css.getClassTimes())) {
+                List<SubjectClassTime> classTimes =
+                        JsonUtils.jsonToList(css.getClassTimes());
+                vo.setClassTimes(classTimes);
+            } else {
+                vo.setClassTimes(Collections.emptyList());
+            }
+
             return vo;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     /**

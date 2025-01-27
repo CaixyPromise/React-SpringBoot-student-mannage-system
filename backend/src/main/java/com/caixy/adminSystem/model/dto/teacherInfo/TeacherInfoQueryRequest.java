@@ -21,36 +21,29 @@ public class TeacherInfoQueryRequest extends PageRequest implements Serializable
      * id
      */
     private Long id;
+    /**
+     * 教师工号
+     */
+    private String teacherId;
+    /**
+    * 教师名字
+    */
+    private String teacherName;
 
     /**
-     * id
+     * 教师学院id
      */
-    private Long notId;
+    private Long teacherDeptId;
 
     /**
-     * 搜索词
+     * 教师专业id
      */
-    private String searchText;
+    private Long teacherMajorId;
 
     /**
-     * 标题
+     * 教师性别
      */
-    private String title;
-
-    /**
-     * 内容
-     */
-    private String content;
-
-    /**
-     * 标签列表
-     */
-    private List<String> tags;
-
-    /**
-     * 创建用户 id
-     */
-    private Long creatorId;
+    private Integer teacherSex;
 
     private static final long serialVersionUID = 1L;
 }

@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 学生操作控制器
@@ -129,6 +130,15 @@ public class StudentController
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         return ResultUtils.success(studentInfoService.getStudentInfoVO(post));
+    }
+
+    @GetMapping("/get/by-selection-lesson")
+    public BaseResponse<List<StudentInfoVO>> getStudentsByCourseSelectionAndSubject(
+            @RequestParam("courseSelectionId") Long courseSelectionId,
+            @RequestParam("subjectId") Long subjectId,
+            HttpServletRequest request)
+    {
+        return ResultUtils.success(studentInfoService.getStudentsByCourseSelectionAndSubject(courseSelectionId, subjectId));
     }
 
     /**

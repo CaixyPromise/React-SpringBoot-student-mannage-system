@@ -1,32 +1,39 @@
 package com.caixy.adminSystem.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.caixy.adminSystem.common.ErrorCode;
-import com.caixy.adminSystem.constant.CommonConstant;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.exception.ThrowUtils;
+import com.caixy.adminSystem.mapper.CourseSelectionInfoMapper;
+import com.caixy.adminSystem.mapper.CourseSelectionSubjectMapper;
+import com.caixy.adminSystem.mapper.SubjectsMapper;
+import com.caixy.adminSystem.model.dto.subject.SubjectClassTime;
 import com.caixy.adminSystem.model.dto.teacherInfo.TeacherInfoAddRequest;
 import com.caixy.adminSystem.model.dto.teacherInfo.TeacherInfoQueryRequest;
 import com.caixy.adminSystem.model.entity.*;
 import com.caixy.adminSystem.model.enums.UserRoleEnum;
 import com.caixy.adminSystem.model.enums.UserSexEnum;
+import com.caixy.adminSystem.model.vo.courseSelectionInfo.CourseSelectionInfoVO;
+import com.caixy.adminSystem.model.vo.teacherInfo.AssignedTeacherSelectionInfo;
 import com.caixy.adminSystem.model.vo.teacherInfo.TeacherInfoVO;
 import com.caixy.adminSystem.service.*;
 import com.caixy.adminSystem.mapper.TeacherInfoMapper;
-import com.caixy.adminSystem.utils.SqlUtils;
-import org.apache.commons.lang3.ObjectUtils;
+import com.caixy.adminSystem.utils.JsonUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +53,15 @@ public class TeacherInfoServiceImpl extends ServiceImpl<TeacherInfoMapper, Teach
     private DepartmentInfoService departmentInfoService;
     @Resource
     private UserService userService;
+    @Autowired
+    private TeacherInfoMapper teacherInfoMapper;
+
+    @Autowired
+    private CourseSelectionInfoMapper courseSelectionInfoMapper;
+    @Autowired
+    private SubjectsMapper subjectsMapper;
+    @Resource
+    private CourseSelectionSubjectMapper courseSelectionSubjectMapper;
 
     /**
      * 校验数据
@@ -110,54 +126,6 @@ public class TeacherInfoServiceImpl extends ServiceImpl<TeacherInfoMapper, Teach
     }
 
     /**
-     * 获取查询条件
-     *
-     * @param teacherInfoQueryRequest
-     * @return
-     */
-    @Override
-    public QueryWrapper<TeacherInfo> getQueryWrapper(TeacherInfoQueryRequest teacherInfoQueryRequest) {
-        QueryWrapper<TeacherInfo> queryWrapper = new QueryWrapper<>();
-        if (teacherInfoQueryRequest == null) {
-            return queryWrapper;
-        }
-        // todo 从对象中取值
-        Long id = teacherInfoQueryRequest.getId();
-        Long notId = teacherInfoQueryRequest.getNotId();
-        String title = teacherInfoQueryRequest.getTitle();
-        String content = teacherInfoQueryRequest.getContent();
-        String searchText = teacherInfoQueryRequest.getSearchText();
-        String sortField = teacherInfoQueryRequest.getSortField();
-        String sortOrder = teacherInfoQueryRequest.getSortOrder();
-        List<String> tagList = teacherInfoQueryRequest.getTags();
-        Long userId = teacherInfoQueryRequest.getCreatorId();
-        // todo 补充需要的查询条件
-        // 从多字段中搜索
-        if (StringUtils.isNotBlank(searchText)) {
-            // 需要拼接查询条件
-            queryWrapper.and(qw -> qw.like("title", searchText).or().like("content", searchText));
-        }
-        // 模糊查询
-        queryWrapper.like(StringUtils.isNotBlank(title), "title", title);
-        queryWrapper.like(StringUtils.isNotBlank(content), "content", content);
-        // JSON 数组查询
-        if (CollUtil.isNotEmpty(tagList)) {
-            for (String tag : tagList) {
-                queryWrapper.like("tags", "\"" + tag + "\"");
-            }
-        }
-        // 精确查询
-        queryWrapper.ne(ObjectUtils.isNotEmpty(notId), "id", notId);
-        queryWrapper.eq(ObjectUtils.isNotEmpty(id), "id", id);
-        queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
-        // 排序规则
-        queryWrapper.orderBy(SqlUtils.validSortField(sortField),
-                sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
-                sortField);
-        return queryWrapper;
-    }
-
-    /**
      * 获取教师信息封装
      *
      * @param teacherInfo
@@ -168,6 +136,39 @@ public class TeacherInfoServiceImpl extends ServiceImpl<TeacherInfoMapper, Teach
     public TeacherInfoVO getTeacherInfoVO(TeacherInfo teacherInfo, HttpServletRequest request) {
         // todo: 补充获取教师信息封装逻辑
         return null;
+    }
+
+    /**
+     * 获取教师信息
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/1/16 3:04
+     */
+    @Override
+    public TeacherInfoVO getTeacherVOWithCondition(TeacherInfoQueryRequest queryRequest) {
+        TeacherInfoVO teacherInfoVO = new TeacherInfoVO();
+        teacherInfoVO.setTeacherId(queryRequest.getTeacherId());
+        teacherInfoVO.setId(queryRequest.getId());
+        teacherInfoVO.setTeacherName(queryRequest.getTeacherName());
+        TeacherInfoVO resultInfo = teacherInfoMapper.selectTeacherInfoByConditions(teacherInfoVO);
+        if (resultInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        return resultInfo;
+    }
+    /**
+     * 获取教师信息
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/1/16 3:05
+     */
+    @Override
+    public TeacherInfoVO getTeacherVOById(Long id) {
+        TeacherInfoQueryRequest queryRequest = new TeacherInfoQueryRequest();
+        queryRequest.setId(id);
+        return getTeacherVOWithCondition(queryRequest);
     }
 
     /**
@@ -184,6 +185,90 @@ public class TeacherInfoServiceImpl extends ServiceImpl<TeacherInfoMapper, Teach
         postVOPage.setTotal(studentInfoVOS.size());
         return postVOPage;
     }
+
+    /**
+     * 获取教师信息选项
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/1/16 1:07
+     */
+    @Override
+    public IPage<TeacherInfoVO> getTeacherInfoOptionVO(TeacherInfoQueryRequest teacherInfoQueryRequest)
+    {
+        Page<TeacherInfo> teacherInfoPage = new Page<>(teacherInfoQueryRequest.getCurrent(), teacherInfoQueryRequest.getPageSize());
+        IPage<TeacherInfoVO> teacherInfoVOIPage = teacherInfoMapper.selectTeacherInfoPage(teacherInfoPage, teacherInfoQueryRequest);        List<TeacherInfoVO> records = teacherInfoVOIPage.getRecords();
+        if (records.isEmpty()) {
+            return new Page<>();
+        }
+        return teacherInfoVOIPage;
+    }
+
+    /**
+     * 获取教师负责的选修课程信息
+     *
+     */
+    @Override
+    public List<AssignedTeacherSelectionInfo> getAssignedTeacherSelectionInfoByTeacherId(Long teacherId) {
+        // 1. 查询该教师负责的所有选修课程记录
+        List<CourseSelectionSubject> records = courseSelectionSubjectMapper.selectList(
+                Wrappers.<CourseSelectionSubject>lambdaQuery()
+                        .eq(CourseSelectionSubject::getTeacherId, teacherId)
+                        .eq(CourseSelectionSubject::getIsDelete, 0)
+        );
+        if (CollectionUtils.isEmpty(records)) {
+            return Collections.emptyList();
+        }
+
+        // 2. 收集所有科目ID，查询相关科目信息
+        Set<Long> subjectIds = records.stream()
+                                      .map(CourseSelectionSubject::getSubjectId)
+                                      .collect(Collectors.toSet());
+        List<Subjects> subjects = subjectsMapper.selectBatchIds(subjectIds);
+        Map<Long, Subjects> subjectMap = subjects.stream()
+                                                 .collect(Collectors.toMap(Subjects::getId, Function.identity()));
+
+        // 3. 转换每条记录为 AssignedTeacherSelectionInfo 对象
+        // 收集所有选课任务ID以查询选课任务信息
+        Set<Long> selectionIds = records.stream()
+                                        .map(CourseSelectionSubject::getCourseSelectionId)
+                                        .collect(Collectors.toSet());
+        List<CourseSelectionInfo> selectionInfos = courseSelectionInfoMapper.selectBatchIds(selectionIds);
+        Map<Long, CourseSelectionInfo> selectionMap = selectionInfos.stream()
+                                                                    .collect(Collectors.toMap(CourseSelectionInfo::getId, Function.identity()));
+
+        List<AssignedTeacherSelectionInfo> result = new ArrayList<>();
+        for (CourseSelectionSubject record : records) {
+            Subjects subject = subjectMap.get(record.getSubjectId());
+            if (subject == null) {
+                continue;
+            }
+
+            AssignedTeacherSelectionInfo info = new AssignedTeacherSelectionInfo();
+            // 将科目基本信息复制到 info 中
+            BeanUtils.copyProperties(subject, info);
+
+            // 设置教师分配课程的附加信息
+            info.setClassRoom(record.getClassRoom());
+            info.setClassTimes(JsonUtils.jsonToList(record.getClassTimes()));
+            info.setMaxStudents(record.getMaxStudents());
+            info.setEnrolledCount(record.getEnrolledCount());
+            info.setCourseSelectionId(record.getCourseSelectionId());
+
+            // 设置选课任务详细信息
+            CourseSelectionInfo selection = selectionMap.get(record.getCourseSelectionId());
+            if (selection != null) {
+                CourseSelectionInfoVO selectionVO = new CourseSelectionInfoVO();
+                BeanUtils.copyProperties(selection, selectionVO);
+                info.setCourseSelectionInfoVO(selectionVO);
+            }
+
+            result.add(info);
+        }
+
+        return result;
+    }
+
 
     private List<TeacherInfoVO> getTeacherInfoVOList(List<TeacherInfo> teacherInfoList)
     {

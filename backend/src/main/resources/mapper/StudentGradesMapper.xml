@@ -8,7 +8,14 @@
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="stuId" column="stuId" jdbcType="BIGINT"/>
             <result property="subjectId" column="subjectId" jdbcType="BIGINT"/>
-            <result property="grade" column="grade" jdbcType="BIGINT"/>
+            <result property="semesterId" column="semesterId" jdbcType="BIGINT"/>
+            <result property="totalGrade" column="totalGrade" jdbcType="BIGINT"/>
+            <result property="usualGrade" column="usualGrade" jdbcType="INTEGER"/>
+            <result property="finalGrade" column="finalGrade" jdbcType="INTEGER"/>
+            <result property="usualPercentage" column="usualPercentage" jdbcType="TINYINT"/>
+            <result property="finalPercentage" column="finalPercentage" jdbcType="TINYINT"/>
+            <result property="courseGroupId" column="courseGroupId" jdbcType="BIGINT"/>
+            <result property="isElectives" column="isElectives" jdbcType="TINYINT"/>
             <result property="creatorId" column="creatorId" jdbcType="BIGINT"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
@@ -17,7 +24,9 @@
 
     <sql id="Base_Column_List">
         id,stuId,subjectId,
-        grade,creatorId,createTime,
-        updateTime,isDelete
+        semesterId,totalGrade,usualGrade,
+        finalGrade,usualPercentage,finalPercentage,
+        courseGroupId,isElectives,creatorId,
+        createTime,updateTime,isDelete
     </sql>
 </mapper>

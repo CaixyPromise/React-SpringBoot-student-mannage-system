@@ -1,4 +1,5 @@
 package com.caixy.adminSystem.controller;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.caixy.adminSystem.annotation.AuthCheck;
 import com.caixy.adminSystem.common.BaseResponse;
@@ -16,6 +17,7 @@ import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesUpdateRequest;
 import com.caixy.adminSystem.model.entity.StudentGrades;
 import com.caixy.adminSystem.model.entity.User;
 import com.caixy.adminSystem.model.vo.StudentGrades.StudentGradesVO;
+import com.caixy.adminSystem.model.vo.studentGrade.StudentsGradeForAdminVO;
 import com.caixy.adminSystem.service.StudentGradesService;
 import com.caixy.adminSystem.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -49,40 +52,12 @@ public class ScoreController
      * @param request
      * @return
      */
-    @PostMapping("/add")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Long> addStudentGrades(@RequestBody StudentGradesAddRequest postAddRequest, HttpServletRequest request)
+    @PostMapping("/add/elective")
+    @AuthCheck(mustRole = UserConstant.TEACHER_ROLE)
+    public BaseResponse<Boolean> addStudentElectiveGrades(@RequestBody @Valid StudentGradesAddRequest postAddRequest, HttpServletRequest request)
     {
-        if (postAddRequest == null)
-        {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        StudentGrades post = new StudentGrades();
-        BeanUtils.copyProperties(postAddRequest, post);
-
-        studentGradesService.validStudentGrades(post, true);
-        User loginUser = userService.getLoginUser(request);
-        post.setCreatorId(loginUser.getId());
-        boolean result = studentGradesService.save(post);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-        long newStudentGradesId = post.getId();
-        return ResultUtils.success(newStudentGradesId);
+        return ResultUtils.success(studentGradesService.addElectiveCourseGrade(postAddRequest, userService.getLoginUser(request).getId()));
     }
-
-    @PostMapping("/add/batch")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> batchAddStudentGrades(@RequestBody List<StudentGradesAddRequest> postAddRequest, HttpServletRequest request)
-    {
-        if (postAddRequest == null || postAddRequest.isEmpty())
-        {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数不能为空");
-        }
-        User loginUser = userService.getLoginUser(request);
-
-        return ResultUtils.success(studentGradesService.batchAddStudentGrade(postAddRequest, loginUser.getId()));
-    }
-
-
 
     /**
      * 删除
@@ -130,7 +105,7 @@ public class ScoreController
         BeanUtils.copyProperties(postUpdateRequest, post);
 
         // 参数校验
-        studentGradesService.validStudentGrades(post, false);
+//        studentGradesService.validStudentGrades(post, false);
         long id = postUpdateRequest.getId();
         // 判断是否存在
         StudentGrades oldStudentGrades = studentGradesService.getById(id);
@@ -167,10 +142,9 @@ public class ScoreController
      * @version 1.0
      * @since 2024/5/3 下午4:39
      */
-    @GetMapping("/get/stu/grade")
+    @GetMapping("/get/stu/grade/byId")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<StudentGradesVO> getStudentGradesVOByStuId(@RequestParam("stuId") long stuId,
-                                                                         HttpServletRequest request)
+    public BaseResponse<StudentGradesVO> getStudentGradesVOByStuId(@RequestParam("stuId") long stuId, HttpServletRequest request)
     {
         if (stuId <= 0)
         {
@@ -179,6 +153,16 @@ public class ScoreController
         StudentGradesVO studentGradesVOByStuId = studentGradesService.getStudentGradesVOByStuId(stuId);
         return ResultUtils.success(studentGradesVOByStuId);
     }
+
+    @GetMapping("/get/stu/grade/{courseTaskId}/{subjectId}")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<List<StudentsGradeForAdminVO>> getStudentGradesVOByTaskSubject(
+            @PathVariable("courseTaskId") Long courseTaskId,
+            @PathVariable("subjectId") Long subjectId)
+    {
+        return ResultUtils.success(studentGradesService.getStudentGradesByCourseTaskIdAndSubjectId(courseTaskId, subjectId));
+    }
+
 
     /**
      * 分页获取列表（仅管理员）
@@ -192,8 +176,7 @@ public class ScoreController
     {
         long current = postQueryRequest.getCurrent();
         long size = postQueryRequest.getPageSize();
-        Page<StudentGrades> postPage = studentGradesService.page(new Page<>(current, size),
-                studentGradesService.getQueryWrapper(postQueryRequest));
+        Page<StudentGrades> postPage = studentGradesService.page(new Page<>(current, size), studentGradesService.getQueryWrapper(postQueryRequest));
         return ResultUtils.success(postPage);
     }
 
@@ -205,15 +188,13 @@ public class ScoreController
      * @return
      */
     @PostMapping("/list/page/vo")
-    public BaseResponse<Page<StudentGradesVO>> listStudentGradesVOByPage(@RequestBody StudentGradesQueryRequest postQueryRequest,
-                                                       HttpServletRequest request)
+    public BaseResponse<Page<StudentGradesVO>> listStudentGradesVOByPage(@RequestBody StudentGradesQueryRequest postQueryRequest, HttpServletRequest request)
     {
         long current = postQueryRequest.getCurrent();
         long size = postQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<StudentGrades> postPage = studentGradesService.page(new Page<>(current, size),
-                studentGradesService.getQueryWrapper(postQueryRequest));
+        Page<StudentGrades> postPage = studentGradesService.page(new Page<>(current, size), studentGradesService.getQueryWrapper(postQueryRequest));
         return ResultUtils.success(studentGradesService.getStudentGradesVOPage(postPage, request));
     }
 
@@ -225,8 +206,7 @@ public class ScoreController
      * @return
      */
     @PostMapping("/my/list/page/vo")
-    public BaseResponse<Page<StudentGradesVO>> listMyStudentGradesVOByPage(@RequestBody StudentGradesQueryRequest postQueryRequest,
-                                                         HttpServletRequest request)
+    public BaseResponse<Page<StudentGradesVO>> listMyStudentGradesVOByPage(@RequestBody StudentGradesQueryRequest postQueryRequest, HttpServletRequest request)
     {
         if (postQueryRequest == null)
         {
@@ -238,8 +218,7 @@ public class ScoreController
         long size = postQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<StudentGrades> postPage = studentGradesService.page(new Page<>(current, size),
-                studentGradesService.getQueryWrapper(postQueryRequest));
+        Page<StudentGrades> postPage = studentGradesService.page(new Page<>(current, size), studentGradesService.getQueryWrapper(postQueryRequest));
         return ResultUtils.success(studentGradesService.getStudentGradesVOPage(postPage, request));
     }
 
@@ -253,8 +232,7 @@ public class ScoreController
      * @return
      */
     @PostMapping("/search/page/vo")
-    public BaseResponse<Page<StudentGradesVO>> searchStudentGradesVOByPage(@RequestBody StudentGradesQueryRequest postQueryRequest,
-                                                         HttpServletRequest request)
+    public BaseResponse<Page<StudentGradesVO>> searchStudentGradesVOByPage(@RequestBody StudentGradesQueryRequest postQueryRequest, HttpServletRequest request)
     {
         long size = postQueryRequest.getPageSize();
         // 限制爬虫
@@ -281,7 +259,7 @@ public class ScoreController
         BeanUtils.copyProperties(postEditRequest, post);
 
         // 参数校验
-        studentGradesService.validStudentGrades(post, false);
+//        studentGradesService.validStudentGrades(post, false);
         User loginUser = userService.getLoginUser(request);
         long id = postEditRequest.getId();
         // 判断是否存在

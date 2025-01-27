@@ -206,37 +206,38 @@ public class AnalysisServiceImpl implements AnalysisService
      */
     private SubjectAnalysis createSubjectAnalysis(Long subjectId, List<StudentGrades> grades, Map<Long, Subjects> subjectsMap, Map<Long, StudentInfoVO> studentInfoMap)
     {
-        Subjects subject = subjectsMap.get(subjectId);
-        double averageScore = grades.stream().mapToDouble(StudentGrades::getGrade).average().orElse(0.0);
-        Optional<StudentGrades> maxGradeEntry = grades.stream().max(Comparator.comparingLong(StudentGrades::getGrade));
-
-        // 计算优秀和不及格的学生人数
-        long excellentCount = grades.stream().filter(g -> g.getGrade() >= subject.getGradeExcellent()).count();
-        long failureCount = grades.stream().filter(g -> g.getGrade() < subject.getGradeFail()).count();
-
-        // 计算优秀率和不及格率
-        double totalStudents = grades.size();
-        double excellentRate = (totalStudents > 0) ? (double) excellentCount / totalStudents * 100 : 0.0;
-        double failureRate = (totalStudents > 0) ? (double) failureCount / totalStudents * 100 : 0.0;
-
-        SubjectAnalysis analysis = new SubjectAnalysis();
-        analysis.setSubjectId(subjectId);
-        analysis.setSubjectName(subject.getName());
-        analysis.setSubjectExcellentLevel(subject.getGradeExcellent());
-        analysis.setSubjectFailureLevel(subject.getGradeFail());
-        analysis.setAverageScore(averageScore);
-        analysis.setExcellentCount(excellentCount);
-        analysis.setFailureCount(failureCount);
-        analysis.setExcellentRate(excellentRate);
-        analysis.setFailureRate(failureRate);
-
-        maxGradeEntry.ifPresent(maxGrade -> {
-            analysis.setHighestScore(maxGrade.getGrade());
-            // 获取最高分学生信息
-            StudentInfoVO highestScoreStudent = studentInfoMap.get(maxGrade.getStuId());
-            analysis.setHighestScoreStudentName(highestScoreStudent);
-        });
-        return analysis;
+        return null;
+//        Subjects subject = subjectsMap.get(subjectId);
+//        double averageScore = grades.stream().mapToDouble(StudentGrades::getGrade).average().orElse(0.0);
+//        Optional<StudentGrades> maxGradeEntry = grades.stream().max(Comparator.comparingLong(StudentGrades::getGrade));
+//
+//        // 计算优秀和不及格的学生人数
+//        long excellentCount = grades.stream().filter(g -> g.getGrade() >= subject.getGradeExcellent()).count();
+//        long failureCount = grades.stream().filter(g -> g.getGrade() < subject.getGradeFail()).count();
+//
+//        // 计算优秀率和不及格率
+//        double totalStudents = grades.size();
+//        double excellentRate = (totalStudents > 0) ? (double) excellentCount / totalStudents * 100 : 0.0;
+//        double failureRate = (totalStudents > 0) ? (double) failureCount / totalStudents * 100 : 0.0;
+//
+//        SubjectAnalysis analysis = new SubjectAnalysis();
+//        analysis.setSubjectId(subjectId);
+//        analysis.setSubjectName(subject.getName());
+//        analysis.setSubjectExcellentLevel(subject.getGradeExcellent());
+//        analysis.setSubjectFailureLevel(subject.getGradeFail());
+//        analysis.setAverageScore(averageScore);
+//        analysis.setExcellentCount(excellentCount);
+//        analysis.setFailureCount(failureCount);
+//        analysis.setExcellentRate(excellentRate);
+//        analysis.setFailureRate(failureRate);
+//
+//        maxGradeEntry.ifPresent(maxGrade -> {
+//            analysis.setHighestScore(maxGrade.getGrade());
+//            // 获取最高分学生信息
+//            StudentInfoVO highestScoreStudent = studentInfoMap.get(maxGrade.getStuId());
+//            analysis.setHighestScoreStudentName(highestScoreStudent);
+//        });
+//        return analysis;
     }
 
 }

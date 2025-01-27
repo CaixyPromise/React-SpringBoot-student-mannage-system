@@ -62,19 +62,37 @@ export async function editCourseSelectionInfoUsingPost1(
   });
 }
 
-/** getSelectTaskCoursesByTaskId GET /api/selection/get/select-task/courses */
-export async function getSelectTaskCoursesByTaskIdUsingGet1(
+/** getCourseSelectionInfoBySemesterId GET /api/selection/get/bySemesterId */
+export async function getCourseSelectionInfoBySemesterIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getSelectTaskCoursesByTaskIdUsingGET1Params,
+  params: API.getCourseSelectionInfoBySemesterIdUsingGET1Params,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponseListSubjectsVO_>('/api/selection/get/select-task/courses', {
+  return request<API.BaseResponseListCourseSelectionInfoVO_>('/api/selection/get/bySemesterId', {
     method: 'GET',
     params: {
       ...params,
     },
     ...(options || {}),
   });
+}
+
+/** getSelectTaskCoursesByTaskId GET /api/selection/get/select-task/courses */
+export async function getSelectTaskCoursesByTaskIdUsingGet1(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getSelectTaskCoursesByTaskIdUsingGET1Params,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseListCourseSelectSubjectVO_>(
+    '/api/selection/get/select-task/courses',
+    {
+      method: 'GET',
+      params: {
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
 }
 
 /** getUserCourseSelectionInfo GET /api/selection/get/student/available-selection-task */
@@ -86,6 +104,21 @@ export async function getUserCourseSelectionInfoUsingGet1(options?: { [key: stri
       ...(options || {}),
     },
   );
+}
+
+/** getCourseSelectSubjectByTaskId GET /api/selection/get/subject/by-taskId */
+export async function getCourseSelectSubjectByTaskIdUsingGet1(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getCourseSelectSubjectByTaskIdUsingGET1Params,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseListSubjectsVO_>('/api/selection/get/subject/by-taskId', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
 }
 
 /** getCourseSelectionInfoVOById GET /api/selection/get/vo */

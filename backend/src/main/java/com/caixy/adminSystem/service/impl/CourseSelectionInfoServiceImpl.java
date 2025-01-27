@@ -15,12 +15,16 @@ import com.caixy.adminSystem.exception.ThrowUtils;
 import com.caixy.adminSystem.mapper.*;
 import com.caixy.adminSystem.model.dto.courseSelectionInfo.CourseSelectionInfoQueryRequest;
 import com.caixy.adminSystem.model.dto.courseSelectionInfo.CreateCourseSelectionRequest;
+import com.caixy.adminSystem.model.dto.subject.SubjectClassTime;
 import com.caixy.adminSystem.model.entity.*;
 
+import com.caixy.adminSystem.model.vo.Subjects.CourseSelectSubjectVO;
 import com.caixy.adminSystem.model.vo.Subjects.SubjectsVO;
 import com.caixy.adminSystem.model.vo.courseSelectionInfo.CourseSelectionInfoVO;
 
+import com.caixy.adminSystem.model.vo.teacherInfo.TeacherInfoVO;
 import com.caixy.adminSystem.service.*;
+import com.caixy.adminSystem.utils.JsonUtils;
 import com.caixy.adminSystem.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -36,6 +40,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -65,6 +70,8 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
     private CourseSelectionSubjectMapper courseSelectionSubjectMapper;
     @Resource
     private StudentInfoMapper studentInfoMapper;
+    @Resource
+    private TeacherInfoMapper teacherInfoMapper;
 
     private Date localDateTimeToDate(LocalDateTime localDateTime)
     {
@@ -265,6 +272,37 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "最小学分要求不能高于已选科目总学分 " + sumCredits);
         }
 
+        // 收集所有teacherId
+        Set<Long> allTeacherIds = request.getCourseSettings().stream()
+                                         .map(CreateCourseSelectionRequest.SelectCourseData::getClassTeacher)
+                                         .filter(Objects::nonNull)
+                                         .collect(Collectors.toSet());
+
+        // 如果有老师ID，就一次性查表做对比
+        if (!allTeacherIds.isEmpty())
+        {
+            Long count = teacherInfoMapper.selectCount(
+                    Wrappers.lambdaQuery(TeacherInfo.class).in(TeacherInfo::getId, allTeacherIds)
+            );
+            if (!count.equals((long) allTeacherIds.size()))
+            {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "存在无效的教师ID");
+            }
+        }
+        // 校验课程时间
+        request.getCourseSettings().stream()
+               .map(CreateCourseSelectionRequest.SelectCourseData::getClassTimes)
+               .forEach(this::validateClassTimes);
+        // 检查教室都不能为空且长度符合要求
+        request.getCourseSettings().stream()
+               .map(CreateCourseSelectionRequest.SelectCourseData::getClassRoom)
+               .forEach(classRoom ->
+               {
+                   if (classRoom == null || classRoom.isEmpty() || classRoom.length() > 20)
+                   {
+                       throw new BusinessException(ErrorCode.PARAMS_ERROR, "教室不能为空且长度不能大于20");
+                   }
+               });
         // 6. 插入选课信息表 (course_selection_info)，不设置subjectId字段
         CourseSelectionInfo entity = new CourseSelectionInfo();
         entity.setSemesterId(request.getSemesterId());
@@ -273,6 +311,7 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         entity.setStartDate(localDateTimeToDate(request.getStartDate()));
         entity.setEndDate(localDateTimeToDate(request.getEndDate()));
         entity.setCreatorId(currentUserId);
+
         this.save(entity);
         Long newCourseSelectionId = entity.getId();
         if (newCourseSelectionId == null)
@@ -295,13 +334,19 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         }
 
         // 8. 批量插入到“选课-科目”关系表 (course_selection_subject)
-        List<CourseSelectionSubject> subjectMappingList = requestedSubject.stream().map(selectSubject -> {
+        List<CourseSelectionSubject> subjectMappingList = requestedSubject.stream().map(selectSubject ->
+        {
             CourseSelectionSubject css = new CourseSelectionSubject();
             css.setCourseSelectionId(newCourseSelectionId);
             css.setSubjectId(selectSubject.getCourseId());
             css.setMaxStudents(selectSubject.getMaxStudents());
             css.setEnrolledCount(0);
             css.setIsDelete(0);
+
+            css.setTeacherId(selectSubject.getClassTeacher());
+            css.setClassRoom(selectSubject.getClassRoom());
+            css.setClassTimes(JsonUtils.toJsonString(selectSubject.getClassTimes()));
+
             Date now = new Date();
             css.setCreateTime(now);
             css.setUpdateTime(now);
@@ -316,18 +361,13 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         return newCourseSelectionId;
     }
 
-
     @Override
-    public Page<CourseSelectionInfoVO> pageCourseSelection(
-            int pageNum,
-            int pageSize,
-            Long semesterId,
-            String taskName)
+    public Page<CourseSelectionInfoVO> pageCourseSelection(int pageNum, int pageSize, Long semesterId, String taskName)
     {
-        // 1. 构建分页对象 (MyBatis-Plus)
+        // 构建分页对象
         Page<CourseSelectionInfo> page = new Page<>(pageNum, pageSize);
 
-        // 2. 构建查询条件
+        // 构建查询条件
         LambdaQueryWrapper<CourseSelectionInfo> wrapper = Wrappers.lambdaQuery(CourseSelectionInfo.class)
                                                                   .eq(CourseSelectionInfo::getIsDelete, 0)
                                                                   .orderByDesc(CourseSelectionInfo::getCreateTime);
@@ -340,48 +380,13 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
             wrapper.like(CourseSelectionInfo::getTaskName, taskName);
         }
 
-        // 3. 执行分页查询
+        // 查询分页数据
         IPage<CourseSelectionInfo> resultPage = courseSelectionInfoMapper.selectPage(page, wrapper);
-        List<CourseSelectionInfo> records = resultPage.getRecords();
-        if (CollectionUtils.isEmpty(records))
-        {
-            return new Page<>();
-        }
 
-        // 4. 收集所有学期ID用于查询学期名称
-        Set<Long> semesterIds = records.stream()
-                                       .map(CourseSelectionInfo::getSemesterId)
-                                       .collect(Collectors.toSet());
+        // 调用公共方法组装 VO
+        List<CourseSelectionInfoVO> voList = assembleCourseSelectionInfoVOs(resultPage.getRecords());
 
-        // 5. 查询所有相关学期信息并转换为 Map
-        Map<Long, Semesters> semesterMap;
-        if (!semesterIds.isEmpty())
-        {
-            List<Semesters> semesterList = semestersMapper.selectList(
-                    Wrappers.<Semesters>lambdaQuery()
-                            .in(Semesters::getId, semesterIds)
-                            .eq(Semesters::getIsDelete, 0)
-            );
-            semesterMap = semesterList.stream()
-                                      .collect(Collectors.toMap(Semesters::getId, e -> e));
-        }
-        else
-        {
-            semesterMap = new HashMap<>();
-        }
-
-        // 9. 组装返回给前端的 VO 列表
-        List<CourseSelectionInfoVO> voList = records.stream().map(csi ->
-        {
-            CourseSelectionInfoVO vo = new CourseSelectionInfoVO();
-            BeanUtils.copyProperties(csi, vo);
-            // 补充学期名
-            Semesters sem = semesterMap.get(csi.getSemesterId());
-            vo.setSemesterName(sem != null ? sem.getName() : null);
-            return vo;
-        }).collect(Collectors.toList());
-
-        // 10. 构建并返回新的分页结果
+        // 返回分页结果
         Page<CourseSelectionInfoVO> voPage = new Page<>(pageNum, pageSize);
         voPage.setRecords(voList);
         voPage.setTotal(resultPage.getTotal());
@@ -391,6 +396,7 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
 
         return voPage;
     }
+
 
     /**
      * 搁置任务
@@ -429,12 +435,101 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         return updateById(courseSelectionInfoById);
     }
 
+    /**
+     * 根据id批量查询选课任务
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/1/26 23:53
+     */
     @Override
-    public List<SubjectsVO> getSelectTaskCourses(Long taskId)
+    public List<CourseSelectionInfoVO> getCourseTaskByIds(Collection<Long> courseSelectionIds) {
+        LambdaQueryWrapper<CourseSelectionInfo> wrapper = Wrappers.lambdaQuery(CourseSelectionInfo.class);
+        wrapper.in(CourseSelectionInfo::getId, courseSelectionIds);
+        List<CourseSelectionInfo> courseSelectionInfos = courseSelectionInfoMapper.selectList(wrapper);
+        return assembleCourseSelectionInfoVOs(courseSelectionInfos);
+    }
+
+    @Override
+    public List<CourseSelectSubjectVO> getSelectTaskCourses(Long taskId)
     {
-        getCourseSelectionInfoById(taskId);
-        return courseSelectionSubjectMapper.getSubjectsByCourseSelectionId(
-                taskId);
+        // Step 1: 根据选课任务 ID 查询科目基本信息列表
+        List<SubjectsVO> subjects = courseSelectionSubjectMapper.getSubjectsByCourseSelectionId(taskId);
+        if (CollectionUtils.isEmpty(subjects))
+        {
+            return Collections.emptyList();
+        }
+
+        // Step 2: 查询 course_selection_subject 表的映射记录
+        List<CourseSelectionSubject> mappings = courseSelectionSubjectMapper.selectList(
+                Wrappers.<CourseSelectionSubject>lambdaQuery()
+                        .eq(CourseSelectionSubject::getCourseSelectionId, taskId)
+                        .eq(CourseSelectionSubject::getIsDelete, 0)
+        );
+        if (CollectionUtils.isEmpty(mappings))
+        {
+            return Collections.emptyList();
+        }
+
+        // Step 3: 将映射按 subjectId 索引，方便后续查找
+        Map<Long, CourseSelectionSubject> mappingBySubject = mappings.stream()
+                                                                     .collect(Collectors.toMap(
+                                                                             CourseSelectionSubject::getSubjectId,
+                                                                             Function.identity()));
+
+        // Step 4: 收集所有教师 ID 并查询教师信息
+        Set<Long> teacherIds = mappings.stream()
+                                       .map(CourseSelectionSubject::getTeacherId)
+                                       .filter(Objects::nonNull)
+                                       .collect(Collectors.toSet());
+        Map<Long, TeacherInfoVO> teacherMap = new HashMap<>();
+        if (!teacherIds.isEmpty())
+        {
+            List<TeacherInfoVO> teacherInfos = teacherInfoMapper.selectTeacherInfoByIds(teacherIds);
+            teacherMap = teacherInfos.stream()
+                                     .collect(Collectors.toMap(TeacherInfoVO::getId, Function.identity()));
+        }
+
+        // Step 5: 遍历科目列表，组装 CourseSelectSubjectVO 对象
+        List<CourseSelectSubjectVO> result = new ArrayList<>();
+        for (SubjectsVO subject : subjects)
+        {
+            CourseSelectionSubject mapping = mappingBySubject.get(subject.getId());
+            if (mapping == null)
+            {
+                continue; // 若未找到对应的映射，可跳过或根据业务逻辑处理
+            }
+
+            // 创建 VO 并拷贝科目基本信息
+            CourseSelectSubjectVO vo = new CourseSelectSubjectVO();
+            BeanUtils.copyProperties(subject, vo);
+
+            // 设置上课地点
+            vo.setClassRoom(mapping.getClassRoom());
+
+            // 设置教师信息
+            if (mapping.getTeacherId() != null)
+            {
+                vo.setTeacherInfo(teacherMap.get(mapping.getTeacherId()));
+            }
+
+            // 解析并设置上课时间列表（假设存储为 JSON 字符串）
+            String classTimesJson = mapping.getClassTimes();
+            if (StringUtils.isNotBlank(classTimesJson))
+            {
+                List<SubjectClassTime> classTimes =
+                        JsonUtils.jsonToList(classTimesJson);
+                vo.setClassTimes(classTimes);
+            }
+            else
+            {
+                vo.setClassTimes(Collections.emptyList());
+            }
+
+            result.add(vo);
+        }
+
+        return result;
     }
 
     /**
@@ -458,11 +553,15 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         StudentInfo student = studentInfoMapper.selectById(studentId);
         if (student == null || student.getStuClassId() == null)
         {
-            throw new RuntimeException("学生不存在或未分配班级");
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "学生不存在或未分配班级");
         }
         Long studentClassId = student.getStuClassId();
-        // 调用 Mapper 方法查询符合条件的任务
-        return courseSelectionInfoMapper.getStudentTasks(currentSemesterId, currentTime, studentClassId);
+        // 查询符合条件的课程
+        List<CourseSelectionInfo> courseSelectionInfos = courseSelectionInfoMapper.getStudentTasks(currentSemesterId,
+                currentTime, studentClassId);
+
+        // 调用公共方法组装 VO
+        return assembleCourseSelectionInfoVOs(courseSelectionInfos);
     }
 
     private CourseSelectionInfo getCourseSelectionInfoById(Long taskId)
@@ -473,6 +572,119 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "选课任务不存在");
         }
         return byId;
+    }
+
+    /**
+     * 校验上课时间是否存在冲突
+     *
+     * @param classTimes 上课时间列表
+     */
+    private void validateClassTimes(List<SubjectClassTime> classTimes)
+    {
+        if (classTimes == null || classTimes.isEmpty())
+        {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "至少需要设置一个上课时间");
+        }
+
+        Set<String> timeSlots = new HashSet<>();
+        for (SubjectClassTime classTime : classTimes)
+        {
+            Integer dayOfWeek = classTime.getDayOfWeek();
+            String period = classTime.getPeriod();
+
+            if (dayOfWeek == null || period == null || period.isEmpty())
+            {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "上课时间的星期几和节次不能为空");
+            }
+
+            String timeKey = dayOfWeek + "-" + period;
+            if (timeSlots.contains(timeKey))
+            {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR,
+                        "上课时间存在冲突：" + getDayOfWeekLabel(dayOfWeek) + " " + period);
+            }
+            timeSlots.add(timeKey);
+        }
+    }
+
+    /**
+     * 获取星期几的中文表示（辅助方法）
+     *
+     * @param dayOfWeek 星期几
+     * @return 中文表示
+     */
+    private static String getDayOfWeekLabel(Integer dayOfWeek)
+    {
+        switch (dayOfWeek)
+        {
+            case 1:
+                return "星期一";
+            case 2:
+                return "星期二";
+            case 3:
+                return "星期三";
+            case 4:
+                return "星期四";
+            case 5:
+                return "星期五";
+            case 6:
+                return "星期六";
+            case 7:
+                return "星期日";
+            default:
+                return "未知";
+        }
+    }
+
+    private List<CourseSelectionInfoVO> assembleCourseSelectionInfoVOs(List<CourseSelectionInfo> courseSelectionInfos)
+    {
+        if (CollectionUtils.isEmpty(courseSelectionInfos))
+        {
+            return Collections.emptyList();
+        }
+
+        // 收集学期ID和教师ID
+        Set<Long> semesterIds = new HashSet<>();
+        courseSelectionInfos.forEach(item ->
+        {
+            semesterIds.add(item.getSemesterId());
+        });
+
+        // 查询学期信息
+        Map<Long, Semesters> semesterMap;
+        if (!semesterIds.isEmpty())
+        {
+            List<Semesters> semesterList = semestersMapper.selectList(
+                    Wrappers.<Semesters>lambdaQuery()
+                            .in(Semesters::getId, semesterIds)
+                            .eq(Semesters::getIsDelete, 0)
+            );
+            semesterMap = semesterList.stream()
+                                      .collect(Collectors.toMap(Semesters::getId, e -> e));
+        }
+        else {semesterMap = new HashMap<>();}
+
+        // 组装 VO 列表
+        return courseSelectionInfos.stream().map(csi ->
+        {
+            CourseSelectionInfoVO vo = new CourseSelectionInfoVO();
+            BeanUtils.copyProperties(csi, vo);
+
+            // 补充学期信息
+            Semesters semester = semesterMap.get(csi.getSemesterId());
+            vo.setSemesterName(semester != null ? semester.getName() : null);
+
+            return vo;
+        }).collect(Collectors.toList());
+    }
+    @Override
+    public List<CourseSelectionInfoVO> getCourseSelectionInfoBySemesterId(Long semesterId) {
+        List<CourseSelectionInfo> courseSelectionInfos = courseSelectionInfoMapper.selectList(
+                Wrappers.<CourseSelectionInfo>lambdaQuery()
+                        .eq(CourseSelectionInfo::getSemesterId, semesterId)
+                        .eq(CourseSelectionInfo::getIsDelete, 0)
+        );
+        return assembleCourseSelectionInfoVOs(courseSelectionInfos);
     }
 
 }

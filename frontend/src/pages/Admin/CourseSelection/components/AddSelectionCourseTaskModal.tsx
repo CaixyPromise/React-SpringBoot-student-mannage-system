@@ -1,8 +1,11 @@
 // PostCourseSelection.tsx
 import React, { useRef } from "react";
 import {  message, Modal, Button } from "antd";
-import SelectCourseTaskForm, {SelectCourseFormProps, SelectCourseTaskFormRef} from "@/components/SelectCourseTaskForm";
 import {addCourseSelectionInfoUsingPost1} from "@/services/backend/courseSelectionInfoController";
+import SelectCourseTaskForm, {
+  SelectCourseFormProps,
+  SelectCourseTaskFormRef
+} from "@/pages/Admin/CourseSelection/components/SelectCourseTaskForm";
 
 interface PostCourseSelectionProps {
   visible: boolean;
@@ -14,6 +17,7 @@ const PostCourseSelection: React.FC<PostCourseSelectionProps> = ({ visible, setV
 
   /** 提交表单 */
   const handleSubmit = async (values: SelectCourseFormProps) => {
+    console.log("values: ", values)
     try {
       console.log("提交的表单数据: ", values);
       if (!values) {

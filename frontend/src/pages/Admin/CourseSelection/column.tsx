@@ -8,6 +8,7 @@ import {
 } from "@/services/backend/courseSelectionInfoController";
 import React, {MutableRefObject} from "react";
 import {ActionType} from "@ant-design/pro-components";
+import ClassTimesDisplay from "@/components/ClassTimesDisplay";
 
 export const RenderDateStatus = (startDate: string, endDate: string) => {
   const now = dayjs();
@@ -34,7 +35,8 @@ export const RenderDateStatus = (startDate: string, endDate: string) => {
         status={status}
         text={
           <Tooltip title={`开始时间：${start.format("YYYY-MM-DD HH:mm")}, 结束时间：${end.format("YYYY-MM-DD HH:mm")}`}>
-            <span style={{ color }}>{`选课任务时间: ${start.format("YYYY-MM-DD HH:mm")} ~ ${end.format("YYYY-MM-DD HH:mm")}`}</span>
+            <span
+              style={{color}}>{`选课任务时间: ${start.format("YYYY-MM-DD HH:mm")} ~ ${end.format("YYYY-MM-DD HH:mm")}`}</span>
           </Tooltip>
         }
       />
@@ -106,6 +108,42 @@ export const SelectionCourseColumnConfig = (actionRef: React.RefObject<ActionTyp
     width: 450,
     render: (_: any, record: API.CourseSelectionInfoVO) => RenderDateStatus(record.startDate, record.endDate),
   },
+  // {
+  //   title: "授课教师",
+  //   render: (text: string, record: API.CourseSelectionInfoVO) => {
+  //     const {teacherName, teacherId, teacherMajor, teacherDepart} = record?.teacherInfo;
+  //
+  //     return (
+  //       <Tooltip
+  //         title={
+  //           <div style={{
+  //             marginBottom: "4px"
+  //           }}>
+  //             <div>教师编号: {teacherId}</div>
+  //             <div>教师专业: {teacherMajor}</div>
+  //             <div>教师部门: {teacherDepart}</div>
+  //           </div>
+  //         }
+  //       >
+  //         <span>{teacherName}</span>
+  //       </Tooltip>
+  //     )
+  //   }
+  // },
+  //
+  // {
+  //   title: "上课地点",
+  //   render: (text: string, record: API.CourseSelectionInfoVO) => {
+  //     return <>
+  //       <span>{record.classRoom}</span>
+  //     </>
+  //   }
+  // },
+  // {
+  //   title: "上课时间",
+  //   dataIndex: "classTimes",
+  //   render: (classTimes: API.ClassTime[]) => <ClassTimesDisplay classTimes={classTimes} />,
+  // },
   {
     title: "最小选课学分",
     dataIndex: "minCredit",
@@ -154,7 +192,7 @@ export const SelectionCourseColumnConfig = (actionRef: React.RefObject<ActionTyp
                 </Button>
                 <Button
                   type="link"
-                  onClick={()=>handleHoldTask(record.id, actionRef)}
+                  onClick={() => handleHoldTask(record.id, actionRef)}
                 >
                   搁置任务
                 </Button>

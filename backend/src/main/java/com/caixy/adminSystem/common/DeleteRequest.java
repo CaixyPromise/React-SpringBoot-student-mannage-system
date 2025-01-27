@@ -1,6 +1,8 @@
 package com.caixy.adminSystem.common;
 
 import java.io.Serializable;
+
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -9,6 +11,7 @@ import lombok.Data;
  
  */
 @Data
+@Builder
 public class DeleteRequest implements Serializable {
 
     /**

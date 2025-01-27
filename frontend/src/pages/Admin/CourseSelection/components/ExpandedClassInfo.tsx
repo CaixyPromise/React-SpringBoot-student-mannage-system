@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Badge, Button, Card, Empty, Table} from 'antd';
+import {Badge, Button, Card, Empty, Table, Tooltip} from 'antd';
 import {useCourseSelection} from '../contexts/CourseSelectionContext';
 import CourseSelectionTree from './CourseSelectionTree';
 import {Bar, Pie} from '@ant-design/charts';
@@ -8,6 +8,7 @@ import {
   getSelectTaskCoursesByTaskIdUsingGet1,
   getSelectTaskCoursesUsingGet1
 } from "@/services/backend/courseSelectionInfoController";
+import ClassTimesDisplay from "@/components/ClassTimesDisplay";
 
 interface ExpandedClassInfoProps {
   taskItem: API.CourseSelectionInfoVO;
@@ -164,6 +165,41 @@ const ExpandedClassInfo: React.FC<ExpandedClassInfoProps> = ({taskItem}) => {
       dataIndex: 'courseType',
       key: 'courseType',
       render: (type: number) => (type === 1 ? '必修' : '选修'),
+    },
+    {
+      title: "上课地点",
+      render: (text: string, record: API.CourseSelectionInfoVO) => {
+        return <>
+          <span>{record.classRoom}</span>
+        </>
+      }
+    },
+    {
+      title: "上课时间",
+      dataIndex: "classTimes",
+      render: (classTimes: API.ClassTime[]) => <ClassTimesDisplay classTimes={classTimes} />,
+    },
+    {
+      title: "授课教师",
+      render: (text: string, record: API.CourseSelectionInfoVO) => {
+        const {teacherName, teacherId, teacherMajor, teacherDepart} = record?.teacherInfo;
+
+        return (
+          <Tooltip
+            title={
+              <div style={{
+                marginBottom: "4px"
+              }}>
+                <div>教师编号: {teacherId}</div>
+                <div>教师专业: {teacherMajor}</div>
+                <div>教师部门: {teacherDepart}</div>
+              </div>
+            }
+          >
+            <span>{teacherName}</span>
+          </Tooltip>
+        )
+      }
     },
     // tips: 为了避免出现数据冲突。保证数据一致性。此处不做选课任务的科目增加删除操作，因为选课学分要求是固定的。
   ];

@@ -1,7 +1,9 @@
 package com.caixy.adminSystem.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.caixy.adminSystem.model.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -11,16 +13,11 @@ import java.util.Date;
  *
  * @TableName student_grades
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "student_grades")
 @Data
-public  class StudentGrades implements Serializable
+public class StudentGrades extends BaseEntity
 {
-    /**
-     * 主键id
-     */
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
-
     /**
      * 学生ID，引用自student_score表
      */
@@ -32,31 +29,47 @@ public  class StudentGrades implements Serializable
     private Long subjectId;
 
     /**
+     * 学期id
+     */
+    private Long semesterId;
+
+    /**
      * 成绩
      */
-    private Long grade;
+    private Long totalGrade;
+
+    /**
+     * 平时成绩
+     */
+    private Integer usualGrade;
+
+    /**
+     * 期末成绩
+     */
+    private Integer finalGrade;
+
+    /**
+     * 平时分比例
+     */
+    private Integer usualPercentage;
+
+    /**
+     * 期末分比例
+     */
+    private Integer finalPercentage;
+
+    /**
+     * 课程组id
+     */
+    private Long courseGroupId;
+
+    /**
+     * 是否是选修课
+     */
+    private Integer isElectives;
 
     /**
      * 创建人id
      */
     private Long creatorId;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 是否删除逻辑
-     */
-    @TableLogic
-    private Integer isDelete;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

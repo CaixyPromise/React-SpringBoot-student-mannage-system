@@ -17,6 +17,17 @@ export async function addTeacherInfoUsingPost1(
   });
 }
 
+/** getAssignedTeacherSelectionInfo GET /api/teacher/assigned/selection */
+export async function getAssignedTeacherSelectionInfoUsingGet1(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListAssignedTeacherSelectionInfo_>(
+    '/api/teacher/assigned/selection',
+    {
+      method: 'GET',
+      ...(options || {}),
+    },
+  );
+}
+
 /** deleteTeacherInfo POST /api/teacher/delete */
 export async function deleteTeacherInfoUsingPost1(
   body: API.DeleteRequest,
@@ -47,6 +58,21 @@ export async function editTeacherInfoUsingPost1(
   });
 }
 
+/** getTeacherInfoOptionVO POST /api/teacher/get/option */
+export async function getTeacherInfoOptionVoUsingPost1(
+  body: API.TeacherInfoQueryRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseIPageTeacherInfoVO_>('/api/teacher/get/option', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** getTeacherInfoVOById GET /api/teacher/get/vo */
 export async function getTeacherInfoVoByIdUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -68,21 +94,6 @@ export async function listTeacherInfoByPageUsingPost1(
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponsePageTeacherInfoVO_>('/api/teacher/list/page', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** listMyTeacherInfoVOByPage POST /api/teacher/my/list/page/vo */
-export async function listMyTeacherInfoVoByPageUsingPost1(
-  body: API.TeacherInfoQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageTeacherInfoVO_>('/api/teacher/my/list/page/vo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

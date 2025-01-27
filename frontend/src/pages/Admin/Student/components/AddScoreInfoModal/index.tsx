@@ -1,9 +1,9 @@
 import {Button, Card, Descriptions, Form, FormListFieldData, InputNumber, message, Modal, Select, Spin} from "antd";
 import React, {useEffect, useState} from "react";
 import {CloseOutlined, PlusOutlined} from "@ant-design/icons";
-import {
-    batchAddStudentGradesUsingPost1,
-} from "@/services/backend/scoreController";
+// import {
+//     batchAddStudentGradesUsingPost1,
+// } from "@/services/backend/scoreController";
 import {fetchStudentInfo} from "@/pages/Admin/Student/server";
 import StudentSex from "@/pages/Admin/Student/components/StudentSex";
 import {validateScore} from "@/pages/Admin/Student/components/AddScoreInfoModal/utils";
@@ -102,12 +102,12 @@ const Index: React.FC<Student.AddScoreModalProps> = (props: Student.AddScoreModa
                 }
             })
             console.log("formData is: ", formData)
-            const { data, code } = await batchAddStudentGradesUsingPost1(formData);
-            if (code === 0 && data)
-            {
-                message.success("成绩添加成功");
-                setScoreModalVisible(false);
-            }
+            // const { data, code } = await batchAddStudentGradesUsingPost1(formData);
+            // if (code === 0 && data)
+            // {
+            //     message.success("成绩添加成功");
+            //     setScoreModalVisible(false);
+            // }
         }
         catch (error: any)
         {

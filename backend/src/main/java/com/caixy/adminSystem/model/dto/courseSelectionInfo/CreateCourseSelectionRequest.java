@@ -1,5 +1,6 @@
 package com.caixy.adminSystem.model.dto.courseSelectionInfo;
 
+import com.caixy.adminSystem.model.dto.subject.SubjectClassTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -15,52 +16,70 @@ import java.util.List;
 public class CreateCourseSelectionRequest
 {
     /**
-    * 科目ID
-    */
+     * 科目ID
+     */
     private List<SelectCourseData> courseSettings;
 
     /**
-    * 学期ID
-    */
+     * 学期ID
+     */
     private Long semesterId;
 
     /**
-    * 选课开始时间
-    */
+     * 选课开始时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime startDate;
 
 
     /**
-    * 选课结束时间
-    */
+     * 选课结束时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime endDate;
 
     /**
-    * 适用的班级ID列表
-    */
+     * 适用的班级ID列表
+     */
     private List<Long> classIds;
 
     /**
-    * 任务名称
-    */
+     * 任务名称
+     */
     private String taskName;
 
     /**
-    * 最小学分要求
-    */
+     * 最小学分要求
+     */
     private BigDecimal minCredit;
 
+
     @Data
-    public static class SelectCourseData {
+    public static class SelectCourseData
+    {
         /**
-        * 课程id
-        */
+         * 课程id
+         */
         private Long courseId;
         /**
-        * 最大选课人数，0 表示不限制
-        */
+         * 最大选课人数，0 表示不限制
+         */
         private Integer maxStudents;
+
+        /**
+         * 上课时间
+         */
+        private List<SubjectClassTime> classTimes;
+
+        /**
+         * 上课地点
+         */
+        private String classRoom;
+
+        /**
+         * 上课老师
+         */
+        private Long classTeacher;
     }
+
 }

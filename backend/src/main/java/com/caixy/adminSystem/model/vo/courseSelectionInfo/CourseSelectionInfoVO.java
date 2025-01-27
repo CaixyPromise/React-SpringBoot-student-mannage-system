@@ -1,8 +1,11 @@
 package com.caixy.adminSystem.model.vo.courseSelectionInfo;
 
+import com.caixy.adminSystem.model.dto.courseSelectionInfo.CreateCourseSelectionRequest;
 import com.caixy.adminSystem.model.entity.CourseSelectionInfo;
+import com.caixy.adminSystem.model.entity.TeacherInfo;
 import com.caixy.adminSystem.model.vo.Subjects.SubjectsVO;
 import com.caixy.adminSystem.model.vo.UserVO;
+import com.caixy.adminSystem.model.vo.teacherInfo.TeacherInfoVO;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 

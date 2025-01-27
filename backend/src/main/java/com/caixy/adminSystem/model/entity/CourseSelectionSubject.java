@@ -39,4 +39,19 @@ public class CourseSelectionSubject extends BaseEntity
      * 当前选课人数
      */
     private Integer enrolledCount;
+
+    /**
+     * 上课老师
+     */
+    private Long teacherId;
+
+    /**
+     * 上课时间
+     */
+    private String classTimes;
+
+    /**
+     * 上课教室
+     */
+    private String classRoom;
 }

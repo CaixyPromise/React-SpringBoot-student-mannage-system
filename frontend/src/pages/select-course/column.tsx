@@ -1,8 +1,9 @@
-import {Badge, Tag} from "antd";
+import {Badge, Tag, Tooltip} from "antd";
 import React from "react";
 import {ProColumns} from "@ant-design/pro-components";
 import dayjs from "dayjs";
 import {RenderDateStatus} from "@/pages/Admin/CourseSelection/column";
+import ClassTimesDisplay from "@/components/ClassTimesDisplay";
 
 export const selectCourseTaskColumn: ProColumns[] = [
   {
@@ -17,10 +18,11 @@ export const selectCourseTaskColumn: ProColumns[] = [
     width: 450,
     render: (_: any, record: API.CourseSelectionInfoVO) => RenderDateStatus(record.startDate, record.endDate),
   },
+
   {
     title: "最小选课学分",
     dataIndex: "minCredit",
     key: "minCredit",
     render: (credit: number) => <Tag color="blue">{credit.toFixed(2)}</Tag>,
-  },
+  }
 ];

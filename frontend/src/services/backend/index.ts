@@ -9,6 +9,8 @@ import * as courseSelectionInfoController from './courseSelectionInfoController'
 import * as departmentController from './departmentController';
 import * as fileController from './fileController';
 import * as majorInfoController from './majorInfoController';
+import * as registrationTaskController from './registrationTaskController';
+import * as registrationTaskLessonController from './registrationTaskLessonController';
 import * as scoreController from './scoreController';
 import * as semestersController from './semestersController';
 import * as studentController from './studentController';
@@ -25,6 +27,8 @@ export default {
   departmentController,
   fileController,
   majorInfoController,
+  registrationTaskController,
+  registrationTaskLessonController,
   scoreController,
   courseSelectionInfoController,
   semestersController,

@@ -56,6 +56,19 @@ export default [
     name: "选课任务",
     access: "isStudent",
     component: "./select-course"
+  }, {
+    icon: 'AppstoreAddOutlined',
+    path: '/teacher/assigned/selection',
+    name: '已分配选课任务',
+    access: 'isTeacher',
+    component: './Teacher/AssignedSelection'
+  },
+  {
+    icon: 'FieldTimeOutlined',
+    path: '/admin/registration-score',
+    name: '登记成绩任务管理',
+    access: 'canAdmin',
+    component: './Admin/RegistrationScore'
   },
   {path: '/', redirect: '/analysis'},
   {path: '*', layout: false, component: './404'},

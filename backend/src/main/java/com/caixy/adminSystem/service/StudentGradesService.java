@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesAddRequest;
 import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesQueryRequest;
 import com.caixy.adminSystem.model.entity.StudentGrades;
+import com.caixy.adminSystem.model.entity.StudentInfo;
 import com.caixy.adminSystem.model.vo.StudentGrades.StudentGradesVO;
+import com.caixy.adminSystem.model.vo.studentGrade.StudentsGradeForAdminVO;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -25,8 +27,14 @@ public interface StudentGradesService extends IService<StudentGrades> {
      *
      * @param post
      * @param add
+     * @param userId
+     * @param studentInfoList
      */
-    void validStudentGrades(StudentGrades post, boolean add);
+    void validStudentGrades(StudentGradesAddRequest request, boolean isElectives, Long userId, List<StudentInfo> studentInfoList);
+
+    Boolean addElectiveCourseGrade(StudentGradesAddRequest request, Long userId);
+
+    List<StudentsGradeForAdminVO> getStudentGradesByCourseTaskIdAndSubjectId(Long courseTaskId, Long subjectId);
 
     /**
      * 获取查询条件
@@ -61,8 +69,6 @@ public interface StudentGradesService extends IService<StudentGrades> {
      * @return
      */
     Page<StudentGradesVO> getStudentGradesVOPage(Page<StudentGrades> postPage, HttpServletRequest request);
-
-    Boolean batchAddStudentGrade(List<StudentGradesAddRequest> postAddRequest, Long creatorId);
 
     List<StudentGrades> listBySubjectId(Long subjectId);
 }

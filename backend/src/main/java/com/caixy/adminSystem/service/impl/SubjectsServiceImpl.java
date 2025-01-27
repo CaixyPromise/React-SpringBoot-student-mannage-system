@@ -14,7 +14,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -79,6 +80,22 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
     {
         List<Subjects> subjectsList = list();
         return subjectsList.stream().map(this::getSubjectsVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 批量获取学科信息
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/1/26 23:49
+     */
+    @Override
+    public Map<Long, SubjectsVO> getSubjectsVOByIds(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new HashMap<>();
+        }
+        List<Subjects> subjectsList = listByIds(ids);
+        return subjectsList.stream().map(this::getSubjectsVO).collect(Collectors.toMap(SubjectsVO::getId, Function.identity()));
     }
 
     private SubjectsVO getSubjectsVO(Subjects Subjects)

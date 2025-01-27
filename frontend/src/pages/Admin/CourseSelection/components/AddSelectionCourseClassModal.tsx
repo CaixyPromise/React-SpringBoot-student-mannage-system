@@ -2,8 +2,8 @@ import React, {useEffect, useState} from "react";
 import {Descriptions, Divider, Form, Modal, Spin} from "antd";
 import {getCourseSelectionInfoVoByIdUsingGet1} from "@/services/backend/courseSelectionInfoController";
 import dayjs from "dayjs";
-import SelectCourseTaskForm, {SelectCourseFormProps} from "@/components/SelectCourseTaskForm";
 import {useCourseSelection} from "@/pages/Admin/CourseSelection/contexts/CourseSelectionContext";
+import SelectCourseTaskForm, {SelectCourseFormProps} from "@/pages/Admin/CourseSelection/components/SelectCourseTaskForm";
 
 interface AddSelectionCourseClassModalProps {
   visible: boolean;

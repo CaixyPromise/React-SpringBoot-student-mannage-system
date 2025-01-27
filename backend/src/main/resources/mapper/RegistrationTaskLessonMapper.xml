@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caixy.adminSystem.mapper.RegistrationTaskLessonMapper">
+
+    <resultMap id="BaseResultMap" type="com.caixy.adminSystem.model.entity.RegistrationTaskLesson">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="taskId" column="taskId" jdbcType="BIGINT"/>
+        <result property="lessonId" column="lessonId" jdbcType="BIGINT"/>
+        <result property="courseTaskId" column="courseTaskId" jdbcType="BIGINT"/>
+        <result property="isFinished" column="isFinished" jdbcType="TINYINT"/>
+        <result property="isPublish" column="isPublish" jdbcType="TINYINT"/>
+        <result property="finishedTime" column="finishedTime" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,taskId,lessonId,courseTaskId,
+        isFinished,isPublish,finishedTime,
+        createTime,updateTime,isDelete
+    </sql>
+
+    <!-- 查询课程任务是否有对应的登分任务，并且返回任务的相关信息 -->
+    <select id="selectHasRegistrationTaskBySubjectAndCourseTaskIds" resultType="com.caixy.adminSystem.model.vo.registrationTaskLesson.HasRegistrationTaskVO">
+        SELECT
+            rt.semesterId,
+            rt.id,
+            rt.name,
+            rtl.courseTaskId,
+            rtl.taskId,
+            rtl.isFinished,
+            rtl.isPublish,
+            rtl.finishedTime,
+            rt.startDate,
+            rt.endDate,
+            rt.isActive
+        FROM
+            registration_task_lesson rtl
+        LEFT JOIN
+                registration_task rt ON rtl.taskId = rt.id
+        WHERE
+            rtl.lessonId = #{subjectId}
+        AND
+            rtl.courseTaskId IN
+        <foreach collection="courseTaskIds" item="taskId" open="(" separator="," close=")">
+            #{taskId}
+        </foreach>
+        AND rtl.isDelete = 0
+        AND rt.isDelete = 0
+        AND rt.isActive = 1
+    </select>
+
+</mapper>

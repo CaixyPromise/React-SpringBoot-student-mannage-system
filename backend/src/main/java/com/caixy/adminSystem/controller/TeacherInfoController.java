@@ -1,11 +1,9 @@
 package com.caixy.adminSystem.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.caixy.adminSystem.annotation.AuthCheck;
-import com.caixy.adminSystem.common.BaseResponse;
-import com.caixy.adminSystem.common.DeleteRequest;
-import com.caixy.adminSystem.common.ErrorCode;
-import com.caixy.adminSystem.common.ResultUtils;
+import com.caixy.adminSystem.common.*;
 import com.caixy.adminSystem.constant.UserConstant;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.exception.ThrowUtils;
@@ -15,6 +13,9 @@ import com.caixy.adminSystem.model.dto.teacherInfo.TeacherInfoQueryRequest;
 import com.caixy.adminSystem.model.dto.teacherInfo.TeacherInfoUpdateRequest;
 import com.caixy.adminSystem.model.entity.TeacherInfo;
 import com.caixy.adminSystem.model.entity.User;
+import com.caixy.adminSystem.model.enums.UserRoleEnum;
+import com.caixy.adminSystem.model.vo.teacherInfo.AssignedTeacherLessonInfo;
+import com.caixy.adminSystem.model.vo.teacherInfo.AssignedTeacherSelectionInfo;
 import com.caixy.adminSystem.model.vo.teacherInfo.TeacherInfoVO;
 import com.caixy.adminSystem.service.TeacherInfoService;
 import com.caixy.adminSystem.service.UserService;
@@ -24,6 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 教师信息接口控制器
@@ -67,6 +69,18 @@ public class TeacherInfoController
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         // 返回新写入的数据 id
         long newTeacherInfoId = teacherInfo.getId();
+        User newUser = User.builder()
+                           .userAccount(teacherInfo.getTeacherId())
+                           .userPassword(teacherInfo.getTeacherId())
+                           .id(newTeacherInfoId)
+                           .userDepartment(teacherInfo.getTeacherDeptId())
+                           .userMajor(teacherInfo.getTeacherMajorId())
+                           .userRoleLevel(0)
+                           .userRole(UserRoleEnum.TEACHER.getValue())
+                           .userName(teacherInfo.getTeacherName())
+                           .userSex(teacherInfo.getTeacherSex())
+                           .build();
+        userService.makeRegister(newUser);
         return ResultUtils.success(newTeacherInfoId);
     }
 
@@ -143,6 +157,12 @@ public class TeacherInfoController
         return ResultUtils.success(teacherInfoService.getTeacherInfoVO(teacherInfo, request));
     }
 
+    @PostMapping("/get/option")
+    public BaseResponse<IPage<TeacherInfoVO>> getTeacherInfoOptionVO(@RequestBody TeacherInfoQueryRequest pageRequest)
+    {
+        return ResultUtils.success(teacherInfoService.getTeacherInfoOptionVO(pageRequest));
+    }
+
     /**
      * 分页获取教师信息列表（仅管理员可用）
      *
@@ -158,34 +178,6 @@ public class TeacherInfoController
         long size = teacherInfoQueryRequest.getPageSize();
         // 查询数据库
         Page<TeacherInfo> teacherInfoPage = teacherInfoService.page(new Page<>(current, size));
-        return ResultUtils.success(teacherInfoService.getTeacherInfoVOPage(teacherInfoPage));
-    }
-
-
-    /**
-     * 分页获取当前登录用户创建的教师信息列表
-     *
-     * @param teacherInfoQueryRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/my/list/page/vo")
-    public BaseResponse<Page<TeacherInfoVO>> listMyTeacherInfoVOByPage(
-            @RequestBody TeacherInfoQueryRequest teacherInfoQueryRequest,
-            HttpServletRequest request)
-    {
-        ThrowUtils.throwIf(teacherInfoQueryRequest == null, ErrorCode.PARAMS_ERROR);
-        // 补充查询条件，只查询当前登录用户的数据
-        User loginUser = userService.getLoginUser(request);
-        teacherInfoQueryRequest.setCreatorId(loginUser.getId());
-        long current = teacherInfoQueryRequest.getCurrent();
-        long size = teacherInfoQueryRequest.getPageSize();
-        // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        // 查询数据库
-        Page<TeacherInfo> teacherInfoPage = teacherInfoService.page(new Page<>(current, size),
-                teacherInfoService.getQueryWrapper(teacherInfoQueryRequest));
-        // 获取封装类
         return ResultUtils.success(teacherInfoService.getTeacherInfoVOPage(teacherInfoPage));
     }
 
@@ -220,6 +212,12 @@ public class TeacherInfoController
         boolean result = teacherInfoService.updateById(teacherInfo);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
+    }
+
+    @GetMapping("/assigned/selection")
+    public BaseResponse<List<AssignedTeacherSelectionInfo>> getAssignedTeacherSelectionInfo(HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        return ResultUtils.success(teacherInfoService.getAssignedTeacherSelectionInfoByTeacherId(loginUser.getId()));
     }
 
     // endregion

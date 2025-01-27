@@ -73,6 +73,7 @@ public class StudentCourseSelectionController {
     }
 
     @GetMapping("/availableSubjects")
+    @AuthCheck(mustRole = UserConstant.STUDENT_ROLE)
     public BaseResponse<List<StudentCourseSubjectVO>> listAvailableSubjects(
             @RequestParam("courseSelectionId") Long courseSelectionId,
             HttpServletRequest request

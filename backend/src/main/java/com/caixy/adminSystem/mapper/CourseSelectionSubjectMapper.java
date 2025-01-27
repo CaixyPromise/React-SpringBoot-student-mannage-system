@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.caixy.adminSystem.model.vo.Subjects.SubjectsVO;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -56,6 +58,7 @@ public interface CourseSelectionSubjectMapper extends BaseMapper<CourseSelection
     );
 
     int decrementEnrolledCountBatch(@Param("ids") List<Long> cssIdList);
+
 }
 
 

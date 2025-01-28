@@ -106,6 +106,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListGradeForStudentVO_ = {
+    code?: number;
+    data?: GradeForStudentVO[];
+    message?: string;
+  };
+
   type BaseResponseListHasRegistrationTaskVO_ = {
     code?: number;
     data?: HasRegistrationTaskVO[];
@@ -641,6 +647,11 @@ declare namespace API {
     id?: number;
   };
 
+  type getStudentGradesUsingGET1Params = {
+    /** semesterId */
+    semesterId?: number;
+  };
+
   type getStudentGradesVOByIdUsingGET1Params = {
     /** id */
     id?: number;
@@ -701,12 +712,21 @@ declare namespace API {
   type GradeForAdminVO = {
     finalGrade?: number;
     finalPercentage?: number;
+    gradeFail?: number;
     gradeId?: number;
     subjectId?: number;
     subjectName?: string;
     totalGrade?: number;
     usualGrade?: number;
     usualPercentage?: number;
+  };
+
+  type GradeForStudentVO = {
+    gradeFail?: number;
+    gradeId?: number;
+    subjectId?: number;
+    subjectName?: string;
+    totalGrade?: number;
   };
 
   type GradeItem = {

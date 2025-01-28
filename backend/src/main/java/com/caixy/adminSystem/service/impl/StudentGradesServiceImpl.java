@@ -15,6 +15,7 @@ import com.caixy.adminSystem.model.vo.StudentGrades.StudentGradesVO;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
 import com.caixy.adminSystem.model.vo.registrationTaskLesson.HasRegistrationTaskVO;
 import com.caixy.adminSystem.model.vo.studentGrade.GradeForAdminVO;
+import com.caixy.adminSystem.model.vo.studentGrade.GradeForStudentVO;
 import com.caixy.adminSystem.model.vo.studentGrade.StudentsGradeForAdminVO;
 import com.caixy.adminSystem.service.*;
 import org.springframework.beans.BeanUtils;
@@ -149,11 +150,13 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
     {
         List<StudentGradesAddRequest.StudentGradeInfo> studentGradeInfos = request.getStudentGradeInfos();
         Set<String> stuIds = studentGradeInfos.stream().map(StudentGradesAddRequest.StudentGradeInfo::getStuId).collect(Collectors.toSet());
-        if (stuIds.isEmpty()) {
+        if (stuIds.isEmpty())
+        {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "学生不存在");
         }
         List<StudentInfo> studentInfos = studentInfoMapper.selectList(new LambdaQueryWrapper<StudentInfo>().in(StudentInfo::getStuId, stuIds));
-        if (studentInfos.isEmpty()) {
+        if (studentInfos.isEmpty())
+        {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "学生不存在");
         }
         validStudentGrades(request, true, userId, studentInfos);
@@ -193,12 +196,14 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
      * @version 2025/1/27 1:19
      */
     @Override
-    public List<StudentsGradeForAdminVO> getStudentGradesByCourseTaskIdAndSubjectId(Long courseTaskId, Long subjectId) {
+    public List<StudentsGradeForAdminVO> getStudentGradesByCourseTaskIdAndSubjectId(Long courseTaskId, Long subjectId)
+    {
         LambdaQueryWrapper<StudentGrades> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(StudentGrades::getCourseGroupId, courseTaskId);
         queryWrapper.eq(StudentGrades::getSubjectId, subjectId);
         List<StudentGrades> studentGradesList = list(queryWrapper);
-        if (studentGradesList.isEmpty()) {
+        if (studentGradesList.isEmpty())
+        {
             return Collections.emptyList();
         }
         Set<Long> studentIds = studentGradesList.stream().map(StudentGrades::getStuId).collect(Collectors.toSet());
@@ -255,14 +260,16 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
         return this.list(queryWrapper);
     }
 
+    @Override
+    public List<GradeForStudentVO> getStudentGrades(Long userId, Long semesterId)
+    {
+        return baseMapper.selectStudentGrades(userId, semesterId);
+    }
+
     private void checkElectiveCourseInfo(List<StudentInfo> studentInfoList, Long userId, Long subjectId, Long courseGroupId, Long registrationTaskId, List<StudentGradesAddRequest.StudentGradeInfo> studentGradeInfos)
     {
         // 查询课程选课教师合法性
-        CourseSelectionSubject isTeacher = courseSelectionSubjectMapper.selectOne(
-                new LambdaQueryWrapper<CourseSelectionSubject>()
-                        .eq(CourseSelectionSubject::getSubjectId, subjectId)
-                        .eq(CourseSelectionSubject::getCourseSelectionId, courseGroupId)
-                        .eq(CourseSelectionSubject::getTeacherId, userId));
+        CourseSelectionSubject isTeacher = courseSelectionSubjectMapper.selectOne(new LambdaQueryWrapper<CourseSelectionSubject>().eq(CourseSelectionSubject::getSubjectId, subjectId).eq(CourseSelectionSubject::getCourseSelectionId, courseGroupId).eq(CourseSelectionSubject::getTeacherId, userId));
         if (isTeacher == null)
         {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有权限");
@@ -317,8 +324,8 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "科目不存在");
         }
 
-        Long gradeMax = subjectInfo.getGradeMax();
-        Long gradeMin = subjectInfo.getGradeMin();
+        Integer gradeMax = subjectInfo.getGradeMax();
+        Integer gradeMin = subjectInfo.getGradeMin();
 
         // 处理每个学生的成绩信息
         studentGradeInfos.forEach(item -> {

@@ -2,6 +2,10 @@ package com.caixy.adminSystem.mapper;
 
 import com.caixy.adminSystem.model.entity.StudentGrades;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.caixy.adminSystem.model.vo.studentGrade.GradeForStudentVO;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author CAIXYPROMISE
@@ -10,6 +14,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity com.caixy.adminSystem.model.entity.StudentGrades
 */
 public interface StudentGradesMapper extends BaseMapper<StudentGrades> {
-
+    List<GradeForStudentVO> selectStudentGrades(@Param("userId") Long userId, @Param("semesterId") Long semesterId);
 }
 

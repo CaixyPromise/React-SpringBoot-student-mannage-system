@@ -17,6 +17,7 @@ import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesUpdateRequest;
 import com.caixy.adminSystem.model.entity.StudentGrades;
 import com.caixy.adminSystem.model.entity.User;
 import com.caixy.adminSystem.model.vo.StudentGrades.StudentGradesVO;
+import com.caixy.adminSystem.model.vo.studentGrade.GradeForStudentVO;
 import com.caixy.adminSystem.model.vo.studentGrade.StudentsGradeForAdminVO;
 import com.caixy.adminSystem.service.StudentGradesService;
 import com.caixy.adminSystem.service.UserService;
@@ -57,6 +58,14 @@ public class ScoreController
     public BaseResponse<Boolean> addStudentElectiveGrades(@RequestBody @Valid StudentGradesAddRequest postAddRequest, HttpServletRequest request)
     {
         return ResultUtils.success(studentGradesService.addElectiveCourseGrade(postAddRequest, userService.getLoginUser(request).getId()));
+    }
+
+    @GetMapping("/get/grades/me")
+    @AuthCheck(mustRole = UserConstant.STUDENT_ROLE)
+    public BaseResponse<List<GradeForStudentVO>> getStudentGrades(HttpServletRequest request,
+                                                                  @RequestParam(name = "semesterId", required = false) Long semesterId) {
+        User loginUser = userService.getLoginUser(request);
+        return ResultUtils.success(studentGradesService.getStudentGrades(loginUser.getId(), semesterId));
     }
 
     /**
@@ -156,9 +165,7 @@ public class ScoreController
 
     @GetMapping("/get/stu/grade/{courseTaskId}/{subjectId}")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<List<StudentsGradeForAdminVO>> getStudentGradesVOByTaskSubject(
-            @PathVariable("courseTaskId") Long courseTaskId,
-            @PathVariable("subjectId") Long subjectId)
+    public BaseResponse<List<StudentsGradeForAdminVO>> getStudentGradesVOByTaskSubject(@PathVariable("courseTaskId") Long courseTaskId, @PathVariable("subjectId") Long subjectId)
     {
         return ResultUtils.success(studentGradesService.getStudentGradesByCourseTaskIdAndSubjectId(courseTaskId, subjectId));
     }

@@ -55,8 +55,16 @@ export default [
     path: "/select-course-task",
     name: "选课任务",
     access: "isStudent",
-    component: "./select-course"
-  }, {
+    component: "./Student/select-course"
+  },
+  {
+    icon: 'AppstoreAddOutlined',
+    path: "/my-grades",
+    name: "我的成绩信息",
+    access: "isStudent",
+    component: "./Student/my-grades"
+  },
+  {
     icon: 'AppstoreAddOutlined',
     path: '/teacher/assigned/selection',
     name: '已分配选课任务',

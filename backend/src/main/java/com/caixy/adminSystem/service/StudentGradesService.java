@@ -8,6 +8,7 @@ import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesQueryRequest;
 import com.caixy.adminSystem.model.entity.StudentGrades;
 import com.caixy.adminSystem.model.entity.StudentInfo;
 import com.caixy.adminSystem.model.vo.StudentGrades.StudentGradesVO;
+import com.caixy.adminSystem.model.vo.studentGrade.GradeForStudentVO;
 import com.caixy.adminSystem.model.vo.studentGrade.StudentsGradeForAdminVO;
 
 import javax.servlet.http.HttpServletRequest;
@@ -71,4 +72,6 @@ public interface StudentGradesService extends IService<StudentGrades> {
     Page<StudentGradesVO> getStudentGradesVOPage(Page<StudentGrades> postPage, HttpServletRequest request);
 
     List<StudentGrades> listBySubjectId(Long subjectId);
+
+    List<GradeForStudentVO> getStudentGrades(Long userId, Long semesterId);
 }

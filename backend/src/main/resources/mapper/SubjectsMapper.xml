@@ -8,10 +8,10 @@
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
             <result property="courseType" column="courseType" jdbcType="INTEGER" />
-            <result property="gradeMax" column="gradeMax" jdbcType="BIGINT"/>
-            <result property="gradeMin" column="gradeMin" jdbcType="BIGINT"/>
-            <result property="gradeFail" column="gradeFail" jdbcType="BIGINT"/>
-            <result property="gradeExcellent" column="gradeExcellent" jdbcType="BIGINT"/>
+            <result property="gradeMax" column="gradeMax" jdbcType="INTEGER"/>
+            <result property="gradeMin" column="gradeMin" jdbcType="INTEGER"/>
+            <result property="gradeFail" column="gradeFail" jdbcType="INTEGER"/>
+            <result property="gradeExcellent" column="gradeExcellent" jdbcType="INTEGER"/>
             <result property="gradeCredit" column="gradeCredit" jdbcType="DOUBLE"/>
             <result property="creatorId" column="creatorId" jdbcType="BIGINT"/>
             <result property="creditHours" column="creditHours" jdbcType="INTEGER"/>

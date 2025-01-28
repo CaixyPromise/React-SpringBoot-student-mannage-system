@@ -122,8 +122,8 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
     private static void validScoreAndLine(Subjects subjects)
     {
         // 判断数值是否在安全区间内
-        Long scoreMax = subjects.getGradeMax();
-        Long scoreMin = subjects.getGradeMin();
+        Integer scoreMax = subjects.getGradeMax();
+        Integer scoreMin = subjects.getGradeMin();
 
         // 检查分数是否为null
         if (scoreMin == null || scoreMax == null)
@@ -162,8 +162,8 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
         }
 
         // 检查分数线是否在合理范围内
-        Long excellentLine = subjects.getGradeExcellent();
-        Long failLine = subjects.getGradeFail();
+        Integer excellentLine = subjects.getGradeExcellent();
+        Integer failLine = subjects.getGradeFail();
 
         if (excellentLine == null || failLine == null)
         {

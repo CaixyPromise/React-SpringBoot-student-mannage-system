@@ -29,5 +29,10 @@ public class GradeForStudentVO implements Serializable
      * 科目成绩
      */
     private Long totalGrade;
+
+    /**
+    * 不及格分数线
+    */
+    private Integer gradeFail;
     private static final long serialVersionUID = 1L;
 }

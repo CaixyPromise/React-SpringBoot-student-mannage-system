@@ -29,4 +29,37 @@
         courseGroupId,isElectives,creatorId,
         createTime,updateTime,isDelete
     </sql>
+    
+    <select id="selectStudentGrades" resultType="com.caixy.adminSystem.model.vo.studentGrade.GradeForStudentVO">
+        SELECT
+            sg.id AS gradeId,
+            sg.subjectId,
+            s.name AS subjectName,
+            sg.totalGrade,
+            s.gradeFail
+        FROM
+            student_grades sg
+        INNER JOIN
+                subjects s ON sg.subjectId = s.id
+        WHERE
+            sg.stuId = #{userId}  -- 根据学生ID过滤
+        AND
+            sg.courseGroupId IN (
+                SELECT
+                    rtl.courseTaskId
+                FROM
+                    registration_task_lesson rtl
+                WHERE
+                    rtl.isPublish = 1
+                AND
+                    rtl.isFinished = 1
+                AND
+                    rtl.isDelete = 0
+                )
+        AND
+            s.isDelete = 0  -- 确保科目没有被删除
+            <if test="semesterId != null">
+                AND sg.semesterId = #{semesterId}  -- 如果 semesterId 不为 null，则加上过滤条件
+            </if>
+    </select>
 </mapper>

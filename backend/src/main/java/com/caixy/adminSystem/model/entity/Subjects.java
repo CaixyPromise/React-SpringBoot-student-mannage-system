@@ -29,22 +29,22 @@ public class Subjects extends BaseEntity
     /**
      * 最高分
      */
-    private Long gradeMax;
+    private Integer gradeMax;
 
     /**
      * 最低分
      */
-    private Long gradeMin;
+    private Integer gradeMin;
 
     /**
      * 不及格分数线
      */
-    private Long gradeFail;
+    private Integer gradeFail;
 
     /**
      * 优秀分数线
      */
-    private Long gradeExcellent;
+    private Integer gradeExcellent;
 
     /**
     * 课程学分

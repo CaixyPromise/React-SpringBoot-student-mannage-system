@@ -1,9 +1,9 @@
 import {PageContainer, ProTable} from "@ant-design/pro-components";
-import {selectCourseTaskColumn} from "@/pages/select-course/column";
+import {selectCourseTaskColumn} from "@/pages/Student/select-course/column";
 import React, {useEffect, useState} from "react";
 import {getUserCourseSelectionInfoUsingGet1} from "@/services/backend/courseSelectionInfoController";
 import {Empty, message} from "antd";
-import SelectTaskSubjectTable from "@/pages/select-course/components/SelectTaskSubjectTable";
+import SelectTaskSubjectTable from "@/pages/Student/select-course/components/SelectTaskSubjectTable";
 import useDebounce from "@/hooks/useDebounce";
 
 const SelectCoursePage = () => {

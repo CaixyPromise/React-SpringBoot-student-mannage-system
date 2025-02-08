@@ -48,7 +48,7 @@ public class StudentGradesVO implements Serializable
         /**
          * 科目成绩
          */
-        private Long grade;
+        private Integer grade;
         private static final long serialVersionUID = 1L;
     }
 

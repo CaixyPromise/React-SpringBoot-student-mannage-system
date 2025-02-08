@@ -17,6 +17,7 @@ import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoUpdateRequest;
 import com.caixy.adminSystem.model.entity.StudentInfo;
 import com.caixy.adminSystem.model.entity.User;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
+import com.caixy.adminSystem.model.vo.studentCourseSelection.CourseStudentInfoVO;
 import com.caixy.adminSystem.service.StudentInfoService;
 import com.caixy.adminSystem.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -132,11 +133,11 @@ public class StudentController
         return ResultUtils.success(studentInfoService.getStudentInfoVO(post));
     }
 
-    @GetMapping("/get/by-selection-lesson")
-    public BaseResponse<List<StudentInfoVO>> getStudentsByCourseSelectionAndSubject(
+    @GetMapping("/get/student/by-selection-lesson")
+    @AuthCheck(mustRoles = {UserConstant.ADMIN_ROLE, UserConstant.TEACHER_ROLE})
+    public BaseResponse<List<CourseStudentInfoVO>> getStudentsByCourseSelectionAndSubject(
             @RequestParam("courseSelectionId") Long courseSelectionId,
-            @RequestParam("subjectId") Long subjectId,
-            HttpServletRequest request)
+            @RequestParam("subjectId") Long subjectId)
     {
         return ResultUtils.success(studentInfoService.getStudentsByCourseSelectionAndSubject(courseSelectionId, subjectId));
     }

@@ -1,6 +1,6 @@
 import {ProColumns} from "@ant-design/pro-components";
 import dayjs from "dayjs";
-import {Button, message, Space} from "antd";
+import {Button, message, Space, Tooltip} from "antd";
 import {
   activeRegistrationTaskUsingPostUsingPost1,
   deleteRegistrationTaskUsingPost1
@@ -178,10 +178,16 @@ export const ExpandRegistrationLessonColumn: ProColumns<API.RegistrationTaskLess
         <Space size="middle">
           {
             record?.isPublish === 0 ? (
-              record?.isFinished === 1 && (
+              record?.isFinished === 1 ? (
                 <Button type='link' onClick={() => setPublicationScoreState([record?.id], 1, action)}>
                   发布成绩
                 </Button>
+              ) : (
+                <Tooltip title="需要等待所有登记完成才能发布">
+                  <Button type='link' disabled style={{ color: 'gray', cursor: 'not-allowed' }}>
+                    发布成绩
+                  </Button>
+                </Tooltip>
               )
             ) : (
               <Button danger type='link' onClick={() => setPublicationScoreState([record?.id], 0, action)}>
@@ -232,11 +238,44 @@ export const ExpandStudentGradeInfoColumn: ProColumns<API.StudentsGradeForAdminV
       return <span>{stuDepart ?? ""}-{stuMajor ?? ""}-{stuClass ?? ""}</span>;
     }
   },
+  {
+    title: '科目满分',
+    dataIndex: 'maxGrade',
+    key: 'maxGrade',
+    render: (_, record) => {
+      return record?.gradeItem?.gradeMax
+    }
+  },
+  {
+     title: '科目限定最低分',
+    dataIndex: 'minGrade',
+    key: 'minGrade',
+    render: (_, record) => {
+      return record?.gradeItem?.gradeMin
+    }
+  },
+  {
+    title: '科目优秀分数线',
+    dataIndex: 'gradeExcellent',
+    key: 'gradeExcellent',
+    render: (_, record) => {
+      return record?.gradeItem?.gradeExcellent
+    }
+  },
+  {
+    title: '科目不及格分数线',
+    dataIndex: 'gradeFail',
+    key: 'gradeFail',
+    render: (_, record) => {
+      return record?.gradeItem?.gradeFail
+    }
+  },
 
   {
-    title: '平时成绩',
+    title: '平时分总成绩',
     dataIndex: 'score',
     key: 'score',
+    tooltip: '平时成绩 = 平时成绩 * 平时成绩占比',
     render: (_, record) => {
       if (!record?.gradeItem) {
         return "未设置";
@@ -251,8 +290,9 @@ export const ExpandStudentGradeInfoColumn: ProColumns<API.StudentsGradeForAdminV
     }
   },
   {
-    title: '期末成绩',
+    title: '期末分总成绩',
     dataIndex: 'score',
+    tooltip: '期末成绩 = 期末成绩 * 期末成绩占比',
     key: 'score',
     render: (_, record) => {
       if (!record?.gradeItem) {
@@ -268,9 +308,10 @@ export const ExpandStudentGradeInfoColumn: ProColumns<API.StudentsGradeForAdminV
     }
   },
   {
-    title: '总成绩',
+    title: '最终总成绩',
     dataIndex: 'score',
     key: 'score',
+    tooltip: '平时分总成绩 + 期末分总成绩 = 最终总成绩',
     render: (_, record) => {
       if (!record?.gradeItem) {
         return "未设置"

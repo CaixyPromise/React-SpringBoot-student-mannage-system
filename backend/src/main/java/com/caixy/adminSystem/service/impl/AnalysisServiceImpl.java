@@ -183,7 +183,7 @@ public class AnalysisServiceImpl implements AnalysisService
 
         // 批量查询所有相关学生信息VO
         Map<Long, StudentInfoVO> studentInfoMap = studentInfoService.getStudentInfoVoByIds(studentIds).stream()
-                .collect(Collectors.toMap(StudentInfoVO::getId, Function.identity()));
+                .collect(Collectors.toMap(StudentInfoVO::getStudentId, Function.identity()));
 
         // 进行成绩分析
         List<SubjectAnalysis> subjectAnalysisList = new ArrayList<>();

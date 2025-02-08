@@ -40,27 +40,32 @@ public class SubjectsVO implements Serializable
     /**
      * 科目最大值
      */
-    private Long gradeMax;
+    private Integer gradeMax;
 
     /**
      * 科目最小值
      */
-    private Long gradeMin;
+    private Integer gradeMin;
 
     /**
      * 优秀分数线
      */
-    private Long gradeExcellent;
+    private Integer gradeExcellent;
 
     /**
      * 不及格分数线
      */
-    private Long gradeFail;
+    private Integer gradeFail;
 
     /**
      * 课程学时
      */
     private Integer creditHours;
+
+    /**
+    * 最大学生人数
+    */
+    private Integer maxStudent;
 
     private static final long serialVersionUID = 1L;
 }

@@ -32,6 +32,8 @@ interface CourseSelectionContextType {
   setCourseId: (state: number) => void;
   selectedClassIds: Array<number>;
   setSelectedClassIds: (state: Array<string>) => void;
+  subjectInfoMap: Record<number, API.CourseSelectSubjectVO>;
+  setSubjectInfoMap: (data: API.CourseSelectSubjectVO) => void;
 }
 
 const CourseSelectionContext = createContext<CourseSelectionContextType>({
@@ -48,6 +50,8 @@ const CourseSelectionContext = createContext<CourseSelectionContextType>({
   setCourseId: (state) => {},
   selectedClassIds: [],
   setSelectedClassIds: (state) => {},
+  subjectInfoMap: {},
+  setSubjectInfoMap: (data) => {},
 });
 
 export const CourseSelectionProvider: React.FC<{
@@ -62,6 +66,7 @@ export const CourseSelectionProvider: React.FC<{
   const [courseModalVisible, setCourseModalVisible] = useState<boolean>(false);
   const [courseId, setCourseId] = useState<number>(0);
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
+  const [subjectInfoMap, setSubjectInfoMap] = useState<Record<number, API.CourseSelectSubjectVO>>({});
 
   const treeData = useMemo(() => {
     return departments.map(dept => ({
@@ -99,6 +104,8 @@ export const CourseSelectionProvider: React.FC<{
         selectedClassIds,
         setSelectedClassIds,
         tableDataDict,
+        subjectInfoMap,
+        setSubjectInfoMap
       }}
     >
       {children}
@@ -107,4 +114,3 @@ export const CourseSelectionProvider: React.FC<{
 };
 
 export const useCourseSelection = () => useContext(CourseSelectionContext);
-

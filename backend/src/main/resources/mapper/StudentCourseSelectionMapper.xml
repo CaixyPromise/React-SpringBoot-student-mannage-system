@@ -10,12 +10,13 @@
             <result property="courseSelectionId" column="courseSelectionId" jdbcType="BIGINT"/>
             <result property="subjectId" column="subjectId" jdbcType="BIGINT"/>
             <result property="selectTime" column="selectTime" jdbcType="TIMESTAMP"/>
+            <result property="byRandom" column="byRandom" jdbcType="INTEGER"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,studentId,courseSelectionId,subjectId,
-        selectTime,updateTime,isDelete
+        selectTime,byRandom,updateTime,isDelete
     </sql>
 
     <select id="getSelectedSubjectIdsByStudent" resultType="java.lang.Long">
@@ -65,6 +66,28 @@
         AND subjectId IN
         <foreach collection="subjectIds" item="sid" open="(" separator="," close=")">
             #{sid}
+        </foreach>
+    </update>
+
+    <!-- 查询所有记录（包含已逻辑删除的） -->
+    <select id="listAllByStudentAndSubjects" resultType="com.caixy.adminSystem.model.entity.StudentCourseSelection">
+        SELECT *
+        FROM student_course_selection
+        WHERE student_id = #{studentId}
+        AND course_selection_id = #{courseSelectionId}
+        AND subject_id IN
+        <foreach collection="subjectIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+    </select>
+
+    <!-- 恢复逻辑删除的记录 -->
+    <update id="recoverStudentSelections">
+        UPDATE student_course_selection
+        SET is_delete = 0, select_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
         </foreach>
     </update>
 </mapper>

@@ -8,6 +8,7 @@ import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoQueryRequest;
 import com.caixy.adminSystem.model.entity.StudentInfo;
 import com.caixy.adminSystem.model.entity.User;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
+import com.caixy.adminSystem.model.vo.studentCourseSelection.CourseStudentInfoVO;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -60,7 +61,9 @@ public interface StudentInfoService extends IService<StudentInfo>
 
     StudentInfoVO getStudentInfoVOById(Long id);
 
-    List<StudentInfoVO> getStudentsByCourseSelectionAndSubject(Long courseSelectionId, Long subjectId);
+    List<StudentInfoVO> getStudentByClassesIds(List<Long> classesIds);
+
+    List<CourseStudentInfoVO> getStudentsByCourseSelectionAndSubject(Long courseSelectionId, Long subjectId);
 
     /**
      * 分页获取帖子封装

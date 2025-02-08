@@ -36,7 +36,7 @@ public class StudentGrades extends BaseEntity
     /**
      * 成绩
      */
-    private Long totalGrade;
+    private Integer totalGrade;
 
     /**
      * 平时成绩

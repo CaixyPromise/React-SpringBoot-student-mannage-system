@@ -73,5 +73,5 @@ public class CourseSelectionInfoVO implements Serializable {
     /**
      * 选课学分最小值
      */
-    private BigDecimal minCredit;
+    private Double minCredit;
 }

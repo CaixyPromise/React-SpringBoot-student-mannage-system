@@ -51,7 +51,7 @@ public class CreateCourseSelectionRequest
     /**
      * 最小学分要求
      */
-    private BigDecimal minCredit;
+    private Double minCredit;
 
 
     @Data

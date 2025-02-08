@@ -24,8 +24,13 @@ declare namespace API {
     gradeMax?: number;
     gradeMin?: number;
     id?: number;
+    maxStudent?: number;
     maxStudents?: number;
     name?: string;
+  };
+
+  type AutoAssignRequest = {
+    courseSelectionId?: number;
   };
 
   type BaseResponseBoolean_ = {
@@ -55,6 +60,12 @@ declare namespace API {
   type BaseResponseDepartmentWithMajorsVO_ = {
     code?: number;
     data?: DepartmentWithMajorsVO;
+    message?: string;
+  };
+
+  type BaseResponseInt_ = {
+    code?: number;
+    data?: number;
     message?: string;
   };
 
@@ -91,6 +102,12 @@ declare namespace API {
   type BaseResponseListCourseSelectSubjectVO_ = {
     code?: number;
     data?: CourseSelectSubjectVO[];
+    message?: string;
+  };
+
+  type BaseResponseListCourseStudentInfoVO_ = {
+    code?: number;
+    data?: CourseStudentInfoVO[];
     message?: string;
   };
 
@@ -136,15 +153,15 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponseListStudentInfoVO_ = {
-    code?: number;
-    data?: StudentInfoVO[];
-    message?: string;
-  };
-
   type BaseResponseListStudentsGradeForAdminVO_ = {
     code?: number;
     data?: StudentsGradeForAdminVO[];
+    message?: string;
+  };
+
+  type BaseResponseListStudentWithCourseSelectionVO_ = {
+    code?: number;
+    data?: StudentWithCourseSelectionVO[];
     message?: string;
   };
 
@@ -511,14 +528,30 @@ declare namespace API {
     classTimes?: SubjectClassTime[];
     courseType?: number;
     creditHours?: number;
+    enrollCount?: number;
     gradeCredit?: number;
     gradeExcellent?: number;
     gradeFail?: number;
     gradeMax?: number;
     gradeMin?: number;
     id?: number;
+    maxStudent?: number;
     name?: string;
     teacherInfo?: TeacherInfoVO;
+  };
+
+  type CourseStudentInfoVO = {
+    selectTime?: string;
+    stuClass?: string;
+    stuClassId?: number;
+    stuDepart?: string;
+    stuDeptId?: number;
+    stuId?: string;
+    stuMajor?: string;
+    stuMajorId?: number;
+    stuName?: string;
+    stuSex?: number;
+    studentId?: number;
   };
 
   type CreateCourseSelectionRequest = {
@@ -583,6 +616,11 @@ declare namespace API {
   };
 
   type getAllSelectionClassesTreeUsingGET1Params = {
+    /** courseSelectionId */
+    courseSelectionId: number;
+  };
+
+  type getAllSelectionsUsingGET1Params = {
     /** courseSelectionId */
     courseSelectionId: number;
   };
@@ -691,6 +729,11 @@ declare namespace API {
     id?: number;
   };
 
+  type getUnqualifiedStudentsUsingGET1Params = {
+    /** courseSelectionId */
+    courseSelectionId: number;
+  };
+
   type getUserByIdUsingGET1Params = {
     /** id */
     id?: number;
@@ -712,8 +755,11 @@ declare namespace API {
   type GradeForAdminVO = {
     finalGrade?: number;
     finalPercentage?: number;
+    gradeExcellent?: number;
     gradeFail?: number;
     gradeId?: number;
+    gradeMax?: number;
+    gradeMin?: number;
     subjectId?: number;
     subjectName?: string;
     totalGrade?: number;
@@ -1271,6 +1317,7 @@ declare namespace API {
   };
 
   type StudentCourseSelection = {
+    byRandom?: number;
     courseSelectionId?: number;
     id?: number;
     isDelete?: number;
@@ -1437,7 +1484,6 @@ declare namespace API {
   };
 
   type StudentInfoVO = {
-    id?: number;
     stuClass?: string;
     stuClassId?: number;
     stuDepart?: string;
@@ -1447,6 +1493,7 @@ declare namespace API {
     stuMajorId?: number;
     stuName?: string;
     stuSex?: number;
+    studentId?: number;
   };
 
   type StudentSelectCourseRequest = {
@@ -1458,6 +1505,22 @@ declare namespace API {
     gradeItem?: GradeForAdminVO;
     stuId?: number;
     studentInfo?: StudentInfoVO;
+  };
+
+  type StudentWithCourseSelectionVO = {
+    requiredCredit?: number;
+    selectedSubjects?: SubjectsVO[];
+    stuClass?: string;
+    stuClassId?: number;
+    stuDepart?: string;
+    stuDeptId?: number;
+    stuId?: string;
+    stuMajor?: string;
+    stuMajorId?: number;
+    stuName?: string;
+    stuSex?: number;
+    studentId?: number;
+    totalCredit?: number;
   };
 
   type SubjectAnalysis = {
@@ -1549,6 +1612,7 @@ declare namespace API {
     gradeMax?: number;
     gradeMin?: number;
     id?: number;
+    maxStudent?: number;
     name?: string;
   };
 

@@ -146,7 +146,7 @@ public class RegistrationTaskLessonServiceImpl extends ServiceImpl<RegistrationT
             lessonId.add(item.getLessonId());
             courseTaskId.add(item.getCourseTaskId());
         });
-        Map<Long, SubjectsVO> subjectsVOMap = subjectsService.getSubjectsVOByIds(lessonId);
+        Map<Long, SubjectsVO> subjectsVOMap = subjectsService.getSubjectsVOMapByIds(lessonId);
         List<CourseSelectionInfoVO> courseTaskByIds = courseSelectionInfoService.getCourseTaskByIds(courseTaskId);
         Map<Long, CourseSelectionInfoVO> courseSelectionInfoVOMap = courseTaskByIds.stream().collect(Collectors.toMap(CourseSelectionInfoVO::getId, Function.identity()));
         return registrationTaskLessons.stream().map(item -> {

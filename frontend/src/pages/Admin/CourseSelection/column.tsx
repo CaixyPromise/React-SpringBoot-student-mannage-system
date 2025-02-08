@@ -1,6 +1,6 @@
 import {ProColumns} from "@ant-design/pro-table/es/typing";
 import dayjs from "dayjs";
-import {Badge, Button, message, Tag, Tooltip} from "antd";
+import {Badge, Button, message, Modal, Tag, Tooltip} from "antd";
 import {
   activateTaskByIdUsingGet1,
   deleteCourseSelectionInfoUsingPost1,
@@ -8,7 +8,6 @@ import {
 } from "@/services/backend/courseSelectionInfoController";
 import React, {MutableRefObject} from "react";
 import {ActionType} from "@ant-design/pro-components";
-import ClassTimesDisplay from "@/components/ClassTimesDisplay";
 
 export const RenderDateStatus = (startDate: string, endDate: string) => {
   const now = dayjs();
@@ -90,7 +89,10 @@ const handleHoldTask = async (taskId: number | undefined, actionRef: MutableRefO
 }
 
 
-export const SelectionCourseColumnConfig = (actionRef: React.RefObject<ActionType>): ProColumns<any>[] => [
+export const SelectionCourseColumnConfig = (
+  actionRef: React.RefObject<ActionType>,
+  openDetailsModal: (taskId: API.CourseSelectionInfoVO | undefined) => void
+): ProColumns<any>[] => [
   {
     title: "选课任务名称",
     dataIndex: "taskName",
@@ -108,42 +110,6 @@ export const SelectionCourseColumnConfig = (actionRef: React.RefObject<ActionTyp
     width: 450,
     render: (_: any, record: API.CourseSelectionInfoVO) => RenderDateStatus(record.startDate, record.endDate),
   },
-  // {
-  //   title: "授课教师",
-  //   render: (text: string, record: API.CourseSelectionInfoVO) => {
-  //     const {teacherName, teacherId, teacherMajor, teacherDepart} = record?.teacherInfo;
-  //
-  //     return (
-  //       <Tooltip
-  //         title={
-  //           <div style={{
-  //             marginBottom: "4px"
-  //           }}>
-  //             <div>教师编号: {teacherId}</div>
-  //             <div>教师专业: {teacherMajor}</div>
-  //             <div>教师部门: {teacherDepart}</div>
-  //           </div>
-  //         }
-  //       >
-  //         <span>{teacherName}</span>
-  //       </Tooltip>
-  //     )
-  //   }
-  // },
-  //
-  // {
-  //   title: "上课地点",
-  //   render: (text: string, record: API.CourseSelectionInfoVO) => {
-  //     return <>
-  //       <span>{record.classRoom}</span>
-  //     </>
-  //   }
-  // },
-  // {
-  //   title: "上课时间",
-  //   dataIndex: "classTimes",
-  //   render: (classTimes: API.ClassTime[]) => <ClassTimesDisplay classTimes={classTimes} />,
-  // },
   {
     title: "最小选课学分",
     dataIndex: "minCredit",
@@ -166,11 +132,14 @@ export const SelectionCourseColumnConfig = (actionRef: React.RefObject<ActionTyp
     title: "任务状态",
     key: "taskStatus",
     render: (_: any, record: API.CourseSelectionInfoVO) => {
+      if (dayjs(record?.endDate) < dayjs()) {
+        return <Tag color="default">已结束</Tag>;
+      }
       if (record.isActive === 0) {
         return <Tag color="warning">搁置</Tag>;
       }
       if (record.isDelete === 1) {
-        return <Tag color="red">已删除</Tag>;
+        return <Tag color="grey">已删除</Tag>;
       }
       return <Tag color="green">正常</Tag>;
     },
@@ -182,13 +151,20 @@ export const SelectionCourseColumnConfig = (actionRef: React.RefObject<ActionTyp
       return (
         <>
           {
+            (dayjs(record?.endDate) < dayjs() && record?.isActive) && (
+              <Button type="link" onClick={() => {
+                openDetailsModal(record)
+              }}>查看学生选课详情</Button>
+            )
+          }
+          {
             record?.isActive ?
               <>
                 <Button
                   type="link"
                   danger
                   onClick={() => handleDeleteTask(record.id, actionRef)}>
-                  删除任务
+                  {dayjs(record.endDate) < dayjs() ? '归档' : '删除'}任务
                 </Button>
                 <Button
                   type="link"
@@ -206,6 +182,51 @@ export const SelectionCourseColumnConfig = (actionRef: React.RefObject<ActionTyp
           }
         </>
       )
+    }
+  }
+]
+
+
+export const expandStudentInfo: ProColumns<API.CourseStudentInfoVO>[] = [
+  {
+    title: '学号',
+    dataIndex: 'stuId',
+    key: 'stuId',
+  },
+  {
+    title: '姓名',
+    dataIndex: 'stuName',
+    key: 'stuName',
+  },
+  {
+    title: '学生学院',
+    dataIndex: 'stuDepart',
+    key: 'stuDepart',
+  },
+  {
+    title: '学生专业',
+    dataIndex: 'stuMajor',
+    key: 'stuMajor',
+  },
+  {
+    title: '学生班级',
+    dataIndex: 'stuClass',
+    key: 'stuClass',
+  },
+  {
+    title: '选课时间',
+    dataIndex: 'selectTime',
+    key: 'selectTime',
+    render: (text: string) => {
+      return <span>{dayjs(text)?.format('YYYY-MM-DD HH:mm:ss')}</span>;
+    }
+  },
+  {
+    title: '选课方式',
+    dataIndex: 'byRandom',
+    key: 'byRandom',
+    render: (text: number) => {
+      return <span>{text ? '超时系统随机' : '学生自主选择'}</span>;
     }
   }
 ]

@@ -28,7 +28,7 @@ public class GradeForStudentVO implements Serializable
     /**
      * 科目成绩
      */
-    private Long totalGrade;
+    private Integer totalGrade;
 
     /**
     * 不及格分数线

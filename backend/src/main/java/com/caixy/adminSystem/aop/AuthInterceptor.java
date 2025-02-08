@@ -40,10 +40,19 @@ public class AuthInterceptor
     public Object doInterceptor(ProceedingJoinPoint joinPoint, AuthCheck authCheck) throws Throwable
     {
         String mustRole = authCheck.mustRole();
+        String[] mustRoles = authCheck.mustRoles();
+
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         // 当前登录用户
         User loginUser = userService.getLoginUser(request);
+        if (mustRoles != null && mustRoles.length > 0) {
+            for (String role : mustRoles) {
+                if (role.equals(loginUser.getUserRole())) {
+                    return joinPoint.proceed();
+                }
+            }
+        }
         // 必须有该权限才通过
         if (StringUtils.isNotBlank(mustRole))
         {

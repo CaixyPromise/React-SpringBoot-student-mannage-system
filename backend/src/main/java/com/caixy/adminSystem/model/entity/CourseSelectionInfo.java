@@ -32,9 +32,7 @@ public class CourseSelectionInfo extends BaseEntity {
     /**
      * 选课学分最小值
      */
-    private BigDecimal minCredit;
-
-
+    private Double minCredit;
 
     /**
      * 选课开始时间

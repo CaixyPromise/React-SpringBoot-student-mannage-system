@@ -35,5 +35,25 @@ public class GradeForAdminVO extends GradeForStudentVO implements Serializable
      */
     private Integer finalPercentage;
 
+    /**
+     * 科目满分
+     */
+    private Integer gradeMax;
+
+    /**
+     * 科目最低限度分
+     */
+    private Integer gradeMin;
+
+    /**
+     * 不及格分数线
+     */
+    private Integer gradeFail;
+
+    /**
+     * 优秀分数线
+     */
+    private Integer gradeExcellent;
+
     private static final long serialVersionUID = 1L;
 }

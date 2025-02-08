@@ -1,5 +1,6 @@
 package com.caixy.adminSystem.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.caixy.adminSystem.common.ErrorCode;
@@ -109,13 +110,22 @@ public class CourseSelectionClassesServiceImpl extends ServiceImpl<CourseSelecti
         }
     }
 
+    /**
+     * 获取选课任务下的班级信息
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/2/6 20:42
+     */
     @Override
     public List<Long> getClassesByCourseSelectionId(Long courseSelectionId)
     {
-        return Collections.emptyList();
+        LambdaQueryWrapper<CourseSelectionClasses> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CourseSelectionClasses::getCourseSelectionId, courseSelectionId);
+        return this.baseMapper.selectList(queryWrapper).stream()
+                .map(CourseSelectionClasses::getClassId)
+                .collect(Collectors.toList());
     }
-
-
 }
 
 

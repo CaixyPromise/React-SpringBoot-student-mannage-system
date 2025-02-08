@@ -83,6 +83,23 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
     }
 
     /**
+     * 根据学科id获取学科信息
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/2/6 21:02
+     */
+    @Override
+    public List<SubjectsVO> getSubjectVOByIds(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Subjects> subjectsList = listByIds(ids);
+        return subjectsList.stream().map(this::getSubjectsVO).collect(Collectors.toList());
+    }
+
+
+    /**
      * 批量获取学科信息
      *
      * @author CAIXYPROMISE
@@ -90,7 +107,7 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
      * @version 2025/1/26 23:49
      */
     @Override
-    public Map<Long, SubjectsVO> getSubjectsVOByIds(Collection<Long> ids) {
+    public Map<Long, SubjectsVO> getSubjectsVOMapByIds(Collection<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return new HashMap<>();
         }

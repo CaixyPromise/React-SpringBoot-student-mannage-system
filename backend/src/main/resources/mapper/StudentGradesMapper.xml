@@ -9,7 +9,7 @@
             <result property="stuId" column="stuId" jdbcType="BIGINT"/>
             <result property="subjectId" column="subjectId" jdbcType="BIGINT"/>
             <result property="semesterId" column="semesterId" jdbcType="BIGINT"/>
-            <result property="totalGrade" column="totalGrade" jdbcType="BIGINT"/>
+            <result property="totalGrade" column="totalGrade" jdbcType="INTEGER"/>
             <result property="usualGrade" column="usualGrade" jdbcType="INTEGER"/>
             <result property="finalGrade" column="finalGrade" jdbcType="INTEGER"/>
             <result property="usualPercentage" column="usualPercentage" jdbcType="TINYINT"/>

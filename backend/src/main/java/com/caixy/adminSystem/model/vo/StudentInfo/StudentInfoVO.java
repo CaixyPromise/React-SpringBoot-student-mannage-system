@@ -17,7 +17,7 @@ public class StudentInfoVO implements Serializable
     /**
      * 学生id
      */
-    private Long id;
+    private Long studentId;
 
     /**
      * 学号

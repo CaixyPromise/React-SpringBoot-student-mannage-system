@@ -15,6 +15,7 @@ import com.caixy.adminSystem.model.entity.*;
 import com.caixy.adminSystem.model.enums.UserRoleEnum;
 import com.caixy.adminSystem.model.enums.UserSexEnum;
 import com.caixy.adminSystem.model.vo.StudentInfo.StudentInfoVO;
+import com.caixy.adminSystem.model.vo.studentCourseSelection.CourseStudentInfoVO;
 import com.caixy.adminSystem.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -168,6 +170,9 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
     @Override
     public List<StudentInfoVO> getStudentInfoVoByIds(Collection<Long> studentIds)
     {
+        if (studentIds == null || studentIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         List<StudentInfo> studentInfoList = this.listByIds(studentIds);
         return this.getStudentInfoVOList(studentInfoList);
     }
@@ -187,6 +192,24 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
     }
 
     /**
+     * 查询指定班级下的所有学生。
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/2/6 20:54
+     */
+    @Override
+    public List<StudentInfoVO> getStudentByClassesIds(List<Long> classesIds) {
+        if (classesIds == null || classesIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<StudentInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(StudentInfo::getStuClassId, classesIds);
+        List<StudentInfo> studentInfos = this.list(queryWrapper);
+        return this.getStudentInfoVOList(studentInfos);
+    }
+
+    /**
      * 根据选课任务ID和科目ID查询选了该科目的所有学生信息VO
      *
      * @param courseSelectionId 选课任务ID
@@ -194,7 +217,7 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
      * @return 学生信息VO列表
      */
     @Override
-    public List<StudentInfoVO> getStudentsByCourseSelectionAndSubject(Long courseSelectionId, Long subjectId) {
+    public List<CourseStudentInfoVO> getStudentsByCourseSelectionAndSubject(Long courseSelectionId, Long subjectId) {
         // 构建查询条件，查找符合条件的学生选课记录
         LambdaQueryWrapper<StudentCourseSelection> query = new LambdaQueryWrapper<>();
         query.eq(StudentCourseSelection::getCourseSelectionId, courseSelectionId)
@@ -206,14 +229,24 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         if (selections == null || selections.isEmpty()) {
             return Collections.emptyList();
         }
-
+        Map<Long, StudentCourseSelection> studentIdToSelectInfoMap = new HashMap<>();
+        Set<Long> studentIds = new HashSet<>();
         // 提取所有学生ID
-        Set<Long> studentIds = selections.stream()
-                                         .map(StudentCourseSelection::getStudentId)
-                                         .collect(Collectors.toSet());
-
+        selections.forEach(item -> {
+            studentIdToSelectInfoMap.put(item.getStudentId(), item);
+            studentIds.add(item.getStudentId());
+        });
         // 使用 studentInfoService 批量获取学生信息VO
-        return getStudentInfoVoByIds(studentIds);
+        List<StudentInfoVO> studentInfoVoByIds = getStudentInfoVoByIds(studentIds);
+        Map<Long, StudentInfoVO> collect = studentInfoVoByIds.stream().collect(Collectors.toMap(StudentInfoVO::getStudentId, Function.identity()));
+        return studentInfoVoByIds.stream().map(item -> {
+            CourseStudentInfoVO vo = new CourseStudentInfoVO();
+            // 拷贝学生信息
+            BeanUtils.copyProperties(collect.get(item.getStudentId()), vo);
+            // 拷贝选课信息
+            BeanUtils.copyProperties(studentIdToSelectInfoMap.get(item.getStudentId()), vo);
+            return vo;
+        }).collect(Collectors.toList());
     }
 
 
@@ -243,6 +276,9 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
 
     private List<StudentInfoVO> getStudentInfoVOList(List<StudentInfo> studentInfoList)
     {
+        if (studentInfoList == null || studentInfoList.isEmpty()) {
+            return Collections.emptyList();
+        }
         Set<Long> departIds = new HashSet<>();
         Set<Long> majorIds = new HashSet<>();
         Set<Long> classIds = new HashSet<>();
@@ -266,6 +302,7 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         {
             StudentInfoVO studentInfoVO = new StudentInfoVO();
             BeanUtils.copyProperties(item, studentInfoVO);
+            studentInfoVO.setStudentId(item.getId());
             studentInfoVO.setStuDepart(departMap.get(item.getStuDeptId()));
             studentInfoVO.setStuMajor(majorMap.get(item.getStuMajorId()));
             studentInfoVO.setStuClass(classMap.get(item.getStuClassId()));

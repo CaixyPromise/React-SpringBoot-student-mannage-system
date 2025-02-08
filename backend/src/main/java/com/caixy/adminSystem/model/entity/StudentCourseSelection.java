@@ -40,6 +40,11 @@ public class StudentCourseSelection implements Serializable {
     private Date selectTime;
 
     /**
+    * 是否是系统自动随机(0-否, 1-是)
+    */
+    private Integer byRandom;
+
+    /**
      * 是否删除
      */
     @TableLogic

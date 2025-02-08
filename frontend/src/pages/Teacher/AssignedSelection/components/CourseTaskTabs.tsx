@@ -131,7 +131,6 @@ const CourseTaskTabs: React.FC<{
                     </div>
                   </Card>
                 </Col>
-
               </Row>
             </TabPane>
           )

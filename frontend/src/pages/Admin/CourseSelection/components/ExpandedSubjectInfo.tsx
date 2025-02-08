@@ -6,18 +6,22 @@ import {Bar, Pie} from '@ant-design/charts';
 import {getAllSelectionClassesTreeUsingGet1} from "@/services/backend/classesController";
 import {
   getSelectTaskCoursesByTaskIdUsingGet1,
-  getSelectTaskCoursesUsingGet1
 } from "@/services/backend/courseSelectionInfoController";
 import ClassTimesDisplay from "@/components/ClassTimesDisplay";
+import ExpandedStudentInfo from "@/pages/Admin/CourseSelection/components/ExpandedStudentInfo";
+import {ProTable} from "@ant-design/pro-components";
+import ExpandStudentSelectionInfo from "@/pages/Admin/CourseSelection/components/ExpandStudentSelectionInfo";
 
 interface ExpandedClassInfoProps {
   taskItem: API.CourseSelectionInfoVO;
 }
 
-const ExpandedClassInfo: React.FC<ExpandedClassInfoProps> = ({taskItem}) => {
-  const {setDepartments, setLoading} = useCourseSelection();
+const ExpandedSubjectInfo: React.FC<ExpandedClassInfoProps> = ({taskItem}) => {
+  const {setDepartments, setLoading, setSubjectInfoMap} = useCourseSelection();
   const [subjectData, setSubjectData] = useState<Array<API.SubjectsVO>>([]);
   const taskId = taskItem.id;
+  const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
+  const [detailModalVisible, setDetailModalVisible] = useState<boolean>(false);
 
   const fetchData = async () => {
     try {
@@ -31,13 +35,18 @@ const ExpandedClassInfo: React.FC<ExpandedClassInfoProps> = ({taskItem}) => {
       console.error('Failed to fetch class data:', error);
     }
   };
-  const fetchSubject = async () => {
+  const fetchSubjectList = async () => {
     try {
       const {code, data} = await getSelectTaskCoursesByTaskIdUsingGet1({
         taskId: taskId
       });
       if (code === 0) {
         setSubjectData(data);
+        const result: Record<number, API.CourseSelectSubjectVO> = {};
+        data?.forEach(item => {
+          result[item?.id as number] = item;
+        })
+        setSubjectInfoMap(result);
       }
     } catch (e) {
       console.error('请求科目信息出错', e);
@@ -51,7 +60,7 @@ const ExpandedClassInfo: React.FC<ExpandedClassInfoProps> = ({taskItem}) => {
     setLoading(true);
     Promise.all([
       fetchData(),
-      fetchSubject()
+      fetchSubjectList()
     ]).finally(() => setLoading(false))
   }, [taskItem, setDepartments, setLoading]);
 
@@ -66,45 +75,6 @@ const ExpandedClassInfo: React.FC<ExpandedClassInfoProps> = ({taskItem}) => {
     {category: '已选人数', value: enrolledCount},
     {category: '剩余名额', value: maxStudents - enrolledCount},
   ];
-
-  const pieConfig = {
-    data: pieData,
-    angleField: 'value',
-    colorField: 'type',
-    radius: 0.8,
-    label: {
-      type: 'outer',
-      content: '{name} {percentage}',
-    },
-    legend: {
-      position: 'bottom',
-    },
-    interactions: [
-      {
-        type: 'element-active',
-      },
-    ],
-    animation: {
-      appear: {
-        animation: 'wave-in',
-        duration: 1000,
-      },
-    },
-  };
-
-  const barConfig = {
-    data: barData,
-    xField: 'category',
-    yField: 'value',
-    seriesField: 'category',
-    legend: false,
-    animation: {
-      appear: {
-        animation: 'fade-in',
-        duration: 800,
-      },
-    },
-  };
 
   const subjectColumns = [
     {
@@ -122,8 +92,17 @@ const ExpandedClassInfo: React.FC<ExpandedClassInfoProps> = ({taskItem}) => {
     {
       title: '学分',
       dataIndex: 'gradeCredit',
-
       key: 'gradeCredit',
+    },
+    {
+      title: '已选学生人数',
+      dataIndex: 'enrollCount',
+      key: 'enrollCount',
+    },
+    {
+      title: '最大选课人数',
+      dataIndex: 'maxStudent',
+      key: 'maxStudent',
     },
     {
       title: "科目最高分阈值",
@@ -208,40 +187,55 @@ const ExpandedClassInfo: React.FC<ExpandedClassInfoProps> = ({taskItem}) => {
     <> {
       taskId ? <>
           <Table
-            title={() => <h2>参与选课科目列表</h2>}
+            search={false}
+            toolBarRender={false}
+            title={() => (
+              <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                <h2>参与选课科目列表</h2>
+              </div>
+            )}
+            rowKey="id"
             dataSource={subjectData}
             columns={subjectColumns}
-            rowKey="id"
             pagination={false}
-            bordered
             style={{marginBottom: '16px'}}
+            expandable={{
+              expandedRowKeys,
+              onExpandedRowsChange: (keys) => setExpandedRowKeys(keys as string[]),
+              expandedRowRender: (record) => (
+                <>
+                  <ExpandedStudentInfo  courseSelectionId={taskId} subjectId={record?.id}/>
+                </>
+              ),
+            }}
           />
-          <div style={{display: 'flex', gap: '8px'}}>
-            {/* Tree Section */}
-            <Card title="班级列表" style={{flex: 2, marginRight: '16px'}}>
-              <CourseSelectionTree taskId={taskItem.id}/>
-            </Card>
+          {/*<div style={{display: 'flex', gap: '8px'}}>*/}
+          {/*  /!* Tree Section *!/*/}
+          {/*  <Card title="班级列表" style={{flex: 2, marginRight: '16px'}}>*/}
+          {/*    <CourseSelectionTree taskId={taskItem.id}/>*/}
+          {/*  </Card>*/}
 
-            {/* Chart Section */}
-            <Card title="统计图表" style={{flex: 3}}>
-              <div style={{display: 'flex', gap: '16px'}}>
-                <div style={{flex: 1}}>
-                  <Pie {...pieConfig} />
-                </div>
-                <div style={{flex: 1}}>
-                  <Bar {...barConfig} />
-                </div>
-              </div>
-            </Card>
-          </div>
+          {/*  /!* Chart Section *!/*/}
+          {/*  <Card title="统计图表" style={{flex: 3}}>*/}
+          {/*    <div style={{display: 'flex', gap: '16px'}}>*/}
+          {/*      <div style={{flex: 1}}>*/}
+          {/*        <Pie {...pieConfig} />*/}
+          {/*      </div>*/}
+          {/*      <div style={{flex: 1}}>*/}
+          {/*        <Bar {...barConfig} />*/}
+          {/*      </div>*/}
+          {/*    </div>*/}
+          {/*  </Card>*/}
+          {/*</div>*/}
         </> :
         <Empty>
           <span>请求选课任务信息出错 :(</span>
           <span style={{color: "red"}}>错误信息：选课任务信息Id为空</span>
         </Empty>
     }
+
     </>
   );
 };
 
-export default ExpandedClassInfo;
+export default ExpandedSubjectInfo;

@@ -17,6 +17,38 @@ export async function addStudentCourseSelectionUsingPost1(
   });
 }
 
+/** getAllSelections GET /api/studentCourseSelection/allCourseSelections/${param0} */
+export async function getAllSelectionsUsingGet1(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getAllSelectionsUsingGET1Params,
+  options?: { [key: string]: any },
+) {
+  const { courseSelectionId: param0, ...queryParams } = params;
+  return request<API.BaseResponseListStudentWithCourseSelectionVO_>(
+    `/api/studentCourseSelection/allCourseSelections/${param0}`,
+    {
+      method: 'GET',
+      params: { ...queryParams },
+      ...(options || {}),
+    },
+  );
+}
+
+/** assignRandomCoursesToUnqualifiedStudents POST /api/studentCourseSelection/autoAssign */
+export async function assignRandomCoursesToUnqualifiedStudentsUsingPost1(
+  body: API.AutoAssignRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseInt_>('/api/studentCourseSelection/autoAssign', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** listAvailableSubjects GET /api/studentCourseSelection/availableSubjects */
 export async function listAvailableSubjectsUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -162,6 +194,23 @@ export async function selectCourseUsingPost1(
     data: body,
     ...(options || {}),
   });
+}
+
+/** getUnqualifiedStudents GET /api/studentCourseSelection/unqualified/${param0} */
+export async function getUnqualifiedStudentsUsingGet1(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getUnqualifiedStudentsUsingGET1Params,
+  options?: { [key: string]: any },
+) {
+  const { courseSelectionId: param0, ...queryParams } = params;
+  return request<API.BaseResponseListStudentWithCourseSelectionVO_>(
+    `/api/studentCourseSelection/unqualified/${param0}`,
+    {
+      method: 'GET',
+      params: { ...queryParams },
+      ...(options || {}),
+    },
+  );
 }
 
 /** updateStudentCourseSelection POST /api/studentCourseSelection/update */

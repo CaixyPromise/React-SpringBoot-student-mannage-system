@@ -47,19 +47,22 @@ export async function editStudentInfoUsingPost1(
   });
 }
 
-/** getStudentsByCourseSelectionAndSubject GET /api/student/get/by-selection-lesson */
+/** getStudentsByCourseSelectionAndSubject GET /api/student/get/student/by-selection-lesson */
 export async function getStudentsByCourseSelectionAndSubjectUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getStudentsByCourseSelectionAndSubjectUsingGET1Params,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponseListStudentInfoVO_>('/api/student/get/by-selection-lesson', {
-    method: 'GET',
-    params: {
-      ...params,
+  return request<API.BaseResponseListCourseStudentInfoVO_>(
+    '/api/student/get/student/by-selection-lesson',
+    {
+      method: 'GET',
+      params: {
+        ...params,
+      },
+      ...(options || {}),
     },
-    ...(options || {}),
-  });
+  );
 }
 
 /** getStudentInfoVOById GET /api/student/get/vo */

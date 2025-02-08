@@ -345,7 +345,7 @@ public class CourseSelectionInfoController
     public BaseResponse<List<SubjectsVO>> getCourseSelectSubjectByTaskId(
             @RequestParam Long taskId
     ) {
-        List<SubjectsVO> courseSelectSubjectVO = courseSelectionSubjectService.getSelectSubjectByTaskId(taskId);
+        List<SubjectsVO> courseSelectSubjectVO = courseSelectionSubjectService.getSubjectVOByTaskId(taskId);
         return ResultUtils.success(courseSelectSubjectVO);
     }
 

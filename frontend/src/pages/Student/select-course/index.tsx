@@ -46,7 +46,7 @@ const SelectCoursePage = () => {
           onExpandedRowsChange: (keys) => setExpandedRowKeys(keys as string[]),
           expandedRowRender: (record) => (
             <SelectTaskSubjectTable taskItem={record} />
-            // <ExpandedClassInfo taskItem={record}/>
+            // <ExpandedSubjectInfo taskItem={record}/>
           ),
         }}
       />

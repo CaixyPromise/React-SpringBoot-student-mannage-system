@@ -51,7 +51,7 @@
     </select>
 
     <!-- 2. 查询可选科目映射信息 -->
-    <select id="getSubjectMappingBySelectionId" resultType="com.caixy.adminSystem.model.entity.CourseSelectionSubject">
+    <select id="getSubjectListBySelectionId" resultType="com.caixy.adminSystem.model.entity.CourseSelectionSubject">
         SELECT
             id,
             courseSelectionId,
@@ -82,6 +82,16 @@
             #{sid}
         </foreach>
     </select>
+    <select id="findCourseSelectionSubjectByCourseSelectionId"
+            resultType="com.caixy.adminSystem.model.entity.CourseSelectionSubject">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM course_selection_subject
+            WHERE
+                isDelete = 0
+            AND
+                courseSelectionId = #{courseSelectionId};
+    </select>
 
     <!-- 批量更新已选人数 (自增1) -->
     <update id="incrementEnrolledCountBatch">
@@ -103,5 +113,13 @@
         </foreach>
     </update>
 
+    <update id="batchUpdateEnrolledCount">
+        <foreach collection="updates" item="item" separator=";">
+            UPDATE course_selection_subject
+            SET enrolledCount = enrolledCount + #{item.enrolledCount}
+            WHERE courseSelectionId = #{item.courseSelectionId} AND subjectId = #{item.subjectId}
+            AND (maxStudents = 0 OR enrolledCount + #{item.enrolledCount} &lt;= maxStudents)
+        </foreach>
+    </update>
 
 </mapper>

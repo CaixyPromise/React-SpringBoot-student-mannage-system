@@ -3,7 +3,7 @@ import {ActionType, PageContainer} from '@ant-design/pro-components';
 import {ProTable} from '@ant-design/pro-components';
 import {Button, message} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
-import ExpandedClassInfo from './components/ExpandedClassInfo';
+import ExpandedSubjectInfo from './components/ExpandedSubjectInfo';
 import {CourseSelectionProvider} from './contexts/CourseSelectionContext';
 import {
   pageCourseSelectionUsingGet1,
@@ -11,12 +11,35 @@ import {
 import AddSelectionCourseClassModal from "@/pages/Admin/CourseSelection/components/AddSelectionCourseClassModal";
 import {SelectionCourseColumnConfig} from "@/pages/Admin/CourseSelection/column";
 import AddSelectionCourseTaskModal from "@/pages/Admin/CourseSelection/components/AddSelectionCourseTaskModal";
+import ExpandStudentSelectionInfo from "@/pages/Admin/CourseSelection/components/ExpandStudentSelectionInfo";
 
 const CourseSelectionTaskList: React.FC = () => {
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
   const [tableDataDict, setTableDataDict] = useState<Record<number, API.CourseSelectionInfoVO>>({});
   const [addTaskModalVisible, setAddTaskModalVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
+  const [detailsExpandInfo, setDetailsExpandInfo] = useState<{
+    taskItem: API.CourseSelectionInfoVO;
+    visible: boolean
+  }>({visible: false, taskItem: {}});
+
+  const openDetailsModal = (taskItem: API.CourseSelectionInfoVO | undefined) => {
+    if (!taskItem) {
+      return;
+    }
+    setDetailsExpandInfo({
+      taskItem: taskItem,
+      visible: true,
+    })
+  }
+
+  const onCloseDetailsModal = () => {
+    setDetailsExpandInfo({
+      taskItem: {},
+      visible: false,
+    })
+  }
+
 
   return (
     <PageContainer>
@@ -27,7 +50,7 @@ const CourseSelectionTaskList: React.FC = () => {
           actionRef={actionRef}
           headerTitle="选课任务管理"
           rowKey="id"
-          columns={SelectionCourseColumnConfig(actionRef)}
+          columns={SelectionCourseColumnConfig(actionRef, openDetailsModal)}
           search={{
             labelWidth: 120,
           }}
@@ -73,7 +96,7 @@ const CourseSelectionTaskList: React.FC = () => {
             expandedRowKeys,
             onExpandedRowsChange: (keys) => setExpandedRowKeys(keys as string[]),
             expandedRowRender: (record) => (
-              <ExpandedClassInfo taskItem={record}/>
+              <ExpandedSubjectInfo taskItem={record}/>
             ),
           }}
           className="mb-0"
@@ -82,6 +105,11 @@ const CourseSelectionTaskList: React.FC = () => {
         <AddSelectionCourseTaskModal
           visible={addTaskModalVisible}
           setVisible={setAddTaskModalVisible}
+        />
+        <ExpandStudentSelectionInfo
+          courseSelectionItem={detailsExpandInfo?.taskItem}
+          visible={detailsExpandInfo.visible}
+          onClose={onCloseDetailsModal}
         />
       </CourseSelectionProvider>
     </PageContainer>

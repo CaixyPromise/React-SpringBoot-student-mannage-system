@@ -64,7 +64,9 @@ public interface SubjectsService extends IService<Subjects> {
 
     List<SubjectsVO> getAllSubjectsVO();
 
-    Map<Long, SubjectsVO> getSubjectsVOByIds(Collection<Long> ids);
+    List<SubjectsVO> getSubjectVOByIds(Collection<Long> ids);
+
+    Map<Long, SubjectsVO> getSubjectsVOMapByIds(Collection<Long> ids);
 
     boolean checkGradeIsValid(Long grade, Subjects subjects);
 }

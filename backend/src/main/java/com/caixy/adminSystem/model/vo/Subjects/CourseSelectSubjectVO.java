@@ -33,4 +33,9 @@ public class CourseSelectSubjectVO extends SubjectsVO
      * 上课地点
      */
     private String classRoom;
+
+    /**
+    * 已选人数
+    */
+    private Integer enrollCount;
 }

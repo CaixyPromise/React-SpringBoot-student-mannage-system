@@ -13,11 +13,11 @@ import com.caixy.adminSystem.model.dto.studentCourseSelection.*;
 import com.caixy.adminSystem.model.entity.StudentCourseSelection;
 import com.caixy.adminSystem.model.entity.User;
 import com.caixy.adminSystem.model.vo.studentCourseSelection.StudentCourseSubjectVO;
+import com.caixy.adminSystem.model.vo.studentCourseSelection.StudentWithCourseSelectionVO;
 import com.caixy.adminSystem.service.StudentCourseSelectionService;
 import com.caixy.adminSystem.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -43,6 +43,38 @@ public class StudentCourseSelectionController {
 
     @Resource
     private StudentCourseSelectionService studentCourseSubjectService;
+
+    /**
+     * 获取学生选课信息列表
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/2/7 18:30
+     */
+    @GetMapping("/allCourseSelections/{courseSelectionId}")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<List<StudentWithCourseSelectionVO>> getAllSelections(@PathVariable Long courseSelectionId) {
+        return ResultUtils.success(studentCourseSelectionService.getStudentCourseSelections(courseSelectionId));
+    }
+
+    /**
+     * 获取选课未满的学生
+     *
+     * @author CAIXYPROMISE
+     * @version 1.0
+     * @version 2025/2/7 18:30
+     */
+    @GetMapping("/unqualified/{courseSelectionId}")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<List<StudentWithCourseSelectionVO>> getUnqualifiedStudents(@PathVariable Long courseSelectionId) {
+        return ResultUtils.success(studentCourseSelectionService.getUnqualifiedStudents(courseSelectionId));
+    }
+
+    @PostMapping("/autoAssign")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Integer> assignRandomCoursesToUnqualifiedStudents(@RequestBody AutoAssignRequest autoAssignRequest) {
+        return ResultUtils.success(studentCourseSelectionService.assignRandomCoursesToUnqualifiedStudents(autoAssignRequest.getCourseSelectionId()));
+    }
 
     /**
      * 学生选课

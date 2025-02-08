@@ -5,8 +5,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.caixy.adminSystem.model.vo.Subjects.SubjectsVO;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,9 +33,8 @@ public interface CourseSelectionSubjectMapper extends BaseMapper<CourseSelection
 
     /**
      * 根据 选课任务ID 查询所有可选科目的基础信息（包含已选人数、最大人数等）
-     * 这里使用非 join, 只查询 course_selection_subject
      */
-    List<CourseSelectionSubject> getSubjectMappingBySelectionId(
+    List<CourseSelectionSubject> getSubjectListBySelectionId(
             @Param("courseSelectionId") Long courseSelectionId
     );
 
@@ -59,6 +56,9 @@ public interface CourseSelectionSubjectMapper extends BaseMapper<CourseSelection
 
     int decrementEnrolledCountBatch(@Param("ids") List<Long> cssIdList);
 
+    List<CourseSelectionSubject> findCourseSelectionSubjectByCourseSelectionId(Long courseSelectionId);
+
+    int batchUpdateEnrolledCount(List<CourseSelectionSubject> updates);
 }
 
 

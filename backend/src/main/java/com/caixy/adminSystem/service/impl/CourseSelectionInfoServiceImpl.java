@@ -187,7 +187,7 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
     {
         // 1. 基本非空校验
         if (request == null || request.getCourseSettings() == null || request.getCourseSettings().isEmpty()
-            || request.getSemesterId() == null)
+                || request.getSemesterId() == null)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误：subjectId或semesterId不能为空");
         }
@@ -203,11 +203,13 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "结束时间不能早于开始时间");
         }
-        BigDecimal minCredit = request.getMinCredit();
-        if (minCredit == null || minCredit.compareTo(BigDecimal.ZERO) < 0)
+
+        Double minCredit = request.getMinCredit();
+        if (minCredit == null || minCredit < 0)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "最小学分必须 >= 0");
         }
+
         String taskName = request.getTaskName();
         if (StringUtils.isBlank(taskName) || taskName.length() > 20)
         {
@@ -217,17 +219,17 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         // 2. 验证科目列表是否存在，并返回不存在的科目ID
         List<CreateCourseSelectionRequest.SelectCourseData> requestedSubject = request.getCourseSettings();
         Set<Long> requestedSubjectIds = requestedSubject.stream()
-                                                        .map(CreateCourseSelectionRequest.SelectCourseData::getCourseId)
-                                                        .collect(Collectors.toSet());
+                .map(CreateCourseSelectionRequest.SelectCourseData::getCourseId)
+                .collect(Collectors.toSet());
         List<Subjects> subjects = subjectService.listByIds(requestedSubjectIds);
         if (subjects == null || subjects.size() != requestedSubjectIds.size())
         {
             Set<Long> foundIds = subjects == null
-                                 ? new HashSet<>()
-                                 : subjects.stream().map(Subjects::getId).collect(Collectors.toSet());
+                    ? new HashSet<>()
+                    : subjects.stream().map(Subjects::getId).collect(Collectors.toSet());
             List<Long> missingIds = requestedSubjectIds.stream()
-                                                       .filter(id -> !foundIds.contains(id))
-                                                       .collect(Collectors.toList());
+                    .filter(id -> !foundIds.contains(id))
+                    .collect(Collectors.toList());
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "科目不存在, id=" + missingIds);
         }
 
@@ -249,34 +251,42 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "部分班级ID无效或已被删除");
         }
+        // 验证所有班级人数是否超过所有科目的最大选课人数（避免班级人数大于选课任务科目总人数，部分学生无法选课的问题）
+        long totalMaxSelectionCount = requestedSubject.stream()
+                .map(CreateCourseSelectionRequest.SelectCourseData::getMaxStudents)
+                .reduce(0, Integer::sum);
+        long totalClassCount = studentInfoMapper.selectCount(
+                Wrappers.<StudentInfo>lambdaQuery()
+                        .in(StudentInfo::getStuClassId, classIds));
+        if (totalClassCount > totalMaxSelectionCount) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "班级总人数超过所有科目的最大选课人数: " + totalMaxSelectionCount);
+        }
 
         // 5. 验证最小学分要求是否符合已选科目的学分范围
-        BigDecimal sumCredits = subjects.stream()
-                                        .map(s -> s.getGradeCredit() == null ? BigDecimal.ZERO : new BigDecimal(
-                                                s.getGradeCredit().toString()))
-                                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        Double sumCredits = subjects.stream()
+                .map(s -> s.getGradeCredit() == null ? 0.0 : s.getGradeCredit())
+                .reduce(0.0, Double::sum);
 
-        BigDecimal minSubjectCredit = subjects.stream()
-                                              .map(s -> s.getGradeCredit() == null ? BigDecimal.valueOf(
-                                                      Double.MAX_VALUE) : new BigDecimal(s.getGradeCredit().toString()))
-                                              .min(Comparator.naturalOrder())
-                                              .orElse(BigDecimal.ZERO);
+        Double minSubjectCredit = subjects.stream()
+                .map(s -> s.getGradeCredit() == null ? Double.MAX_VALUE : s.getGradeCredit())
+                .min(Comparator.naturalOrder())
+                .orElse(0.0);
 
-        if (minCredit.compareTo(minSubjectCredit) < 0)
+        if (minCredit < minSubjectCredit)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,
                     "最小学分要求不能低于已选科目中的最小学分 " + minSubjectCredit);
         }
-        if (minCredit.compareTo(sumCredits) > 0)
+        if (minCredit > sumCredits)
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "最小学分要求不能高于已选科目总学分 " + sumCredits);
         }
 
         // 收集所有teacherId
         Set<Long> allTeacherIds = request.getCourseSettings().stream()
-                                         .map(CreateCourseSelectionRequest.SelectCourseData::getClassTeacher)
-                                         .filter(Objects::nonNull)
-                                         .collect(Collectors.toSet());
+                .map(CreateCourseSelectionRequest.SelectCourseData::getClassTeacher)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         // 如果有老师ID，就一次性查表做对比
         if (!allTeacherIds.isEmpty())
@@ -291,18 +301,18 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         }
         // 校验课程时间
         request.getCourseSettings().stream()
-               .map(CreateCourseSelectionRequest.SelectCourseData::getClassTimes)
-               .forEach(this::validateClassTimes);
+                .map(CreateCourseSelectionRequest.SelectCourseData::getClassTimes)
+                .forEach(this::validateClassTimes);
         // 检查教室都不能为空且长度符合要求
         request.getCourseSettings().stream()
-               .map(CreateCourseSelectionRequest.SelectCourseData::getClassRoom)
-               .forEach(classRoom ->
-               {
-                   if (classRoom == null || classRoom.isEmpty() || classRoom.length() > 20)
-                   {
-                       throw new BusinessException(ErrorCode.PARAMS_ERROR, "教室不能为空且长度不能大于20");
-                   }
-               });
+                .map(CreateCourseSelectionRequest.SelectCourseData::getClassRoom)
+                .forEach(classRoom ->
+                {
+                    if (classRoom == null || classRoom.isEmpty() || classRoom.length() > 20)
+                    {
+                        throw new BusinessException(ErrorCode.PARAMS_ERROR, "教室不能为空且长度不能大于20");
+                    }
+                });
         // 6. 插入选课信息表 (course_selection_info)，不设置subjectId字段
         CourseSelectionInfo entity = new CourseSelectionInfo();
         entity.setSemesterId(request.getSemesterId());
@@ -360,6 +370,7 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         // 9. 返回新创建的选课任务ID
         return newCourseSelectionId;
     }
+
 
     @Override
     public Page<CourseSelectionInfoVO> pageCourseSelection(int pageNum, int pageSize, Long semesterId, String taskName)
@@ -472,7 +483,7 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         }
 
         // Step 3: 将映射按 subjectId 索引，方便后续查找
-        Map<Long, CourseSelectionSubject> mappingBySubject = mappings.stream()
+        Map<Long, CourseSelectionSubject> mappingByCourseSubject = mappings.stream()
                                                                      .collect(Collectors.toMap(
                                                                              CourseSelectionSubject::getSubjectId,
                                                                              Function.identity()));
@@ -494,7 +505,7 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         List<CourseSelectSubjectVO> result = new ArrayList<>();
         for (SubjectsVO subject : subjects)
         {
-            CourseSelectionSubject mapping = mappingBySubject.get(subject.getId());
+            CourseSelectionSubject mapping = mappingByCourseSubject.get(subject.getId());
             if (mapping == null)
             {
                 continue; // 若未找到对应的映射，可跳过或根据业务逻辑处理
@@ -503,7 +514,12 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
             // 创建 VO 并拷贝科目基本信息
             CourseSelectSubjectVO vo = new CourseSelectSubjectVO();
             BeanUtils.copyProperties(subject, vo);
-
+            // 设置已选人数
+            vo.setEnrollCount(mapping.getEnrolledCount());
+            // 设置学时
+            vo.setCreditHours(subject.getCreditHours());
+            // 设置最大学生人数
+            vo.setMaxStudent(mapping.getMaxStudents());
             // 设置上课地点
             vo.setClassRoom(mapping.getClassRoom());
 
@@ -513,7 +529,7 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
                 vo.setTeacherInfo(teacherMap.get(mapping.getTeacherId()));
             }
 
-            // 解析并设置上课时间列表（假设存储为 JSON 字符串）
+            // 解析并设置上课时间列表（存储为 JSON 字符串）
             String classTimesJson = mapping.getClassTimes();
             if (StringUtils.isNotBlank(classTimesJson))
             {

@@ -14,6 +14,13 @@ import java.util.List;
 */
 public interface StudentCourseSelectionMapper extends BaseMapper<StudentCourseSelection> {
 
+    List<StudentCourseSelection> listAllByStudentAndSubjects(
+            @Param("studentId") Long studentId,
+            @Param("courseSelectionId") Long courseSelectionId,
+            @Param("subjectIds") List<Long> subjectIds);
+
+    int recoverStudentSelections(@Param("ids") List<Long> ids);
+
     /**
      * 查询学生已选科目的 subjectId 列表
      */

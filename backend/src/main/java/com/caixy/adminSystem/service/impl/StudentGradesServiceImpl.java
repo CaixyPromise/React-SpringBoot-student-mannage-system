@@ -202,19 +202,24 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
         queryWrapper.eq(StudentGrades::getCourseGroupId, courseTaskId);
         queryWrapper.eq(StudentGrades::getSubjectId, subjectId);
         List<StudentGrades> studentGradesList = list(queryWrapper);
-        if (studentGradesList.isEmpty())
+        Subjects subjectInfo = subjectsService.getById(subjectId);
+        if (studentGradesList.isEmpty() || subjectInfo == null)
         {
             return Collections.emptyList();
         }
         Set<Long> studentIds = studentGradesList.stream().map(StudentGrades::getStuId).collect(Collectors.toSet());
         List<StudentInfoVO> studentInfoList = studentInfoService.getStudentInfoVoByIds(studentIds);
-        Map<Long, StudentInfoVO> studentInfoMap = studentInfoList.stream().collect(Collectors.toMap(StudentInfoVO::getId, Function.identity()));
+        Map<Long, StudentInfoVO> studentInfoMap = studentInfoList.stream().collect(Collectors.toMap(StudentInfoVO::getStudentId, Function.identity()));
         return studentGradesList.stream().map(item -> {
             StudentsGradeForAdminVO studentsGradeForAdminVO = new StudentsGradeForAdminVO();
             studentsGradeForAdminVO.setStuId(item.getStuId());
             studentsGradeForAdminVO.setStudentInfo(studentInfoMap.get(item.getStuId()));
             GradeForAdminVO gradeForAdminVO = new GradeForAdminVO();
             BeanUtils.copyProperties(item, gradeForAdminVO);
+            BeanUtils.copyProperties(subjectInfo, gradeForAdminVO);
+            gradeForAdminVO.setGradeId(item.getId());
+            gradeForAdminVO.setGradeFail(subjectInfo.getGradeFail());
+            gradeForAdminVO.setSubjectName(subjectInfo.getName());
             studentsGradeForAdminVO.setGradeItem(gradeForAdminVO);
             return studentsGradeForAdminVO;
         }).collect(Collectors.toList());

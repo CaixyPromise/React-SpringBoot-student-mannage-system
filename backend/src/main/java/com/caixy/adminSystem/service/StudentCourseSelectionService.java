@@ -7,6 +7,7 @@ import com.caixy.adminSystem.model.dto.studentCourseSelection.StudentCourseSelec
 import com.caixy.adminSystem.model.dto.studentCourseSelection.StudentSelectCourseRequest;
 import com.caixy.adminSystem.model.entity.StudentCourseSelection;
 import com.caixy.adminSystem.model.vo.studentCourseSelection.StudentCourseSubjectVO;
+import com.caixy.adminSystem.model.vo.studentCourseSelection.StudentWithCourseSelectionVO;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,12 @@ public interface StudentCourseSelectionService extends IService<StudentCourseSel
 
     @Transactional(rollbackFor = Exception.class)
     void selectCoursesForStudent(StudentSelectCourseRequest request, Long studentId);
+
+    List<StudentWithCourseSelectionVO> getStudentCourseSelections(Long courseSelectionId);
+
+    List<StudentWithCourseSelectionVO> getUnqualifiedStudents(Long courseSelectionId);
+
+    Integer assignRandomCoursesToUnqualifiedStudents(Long courseSelectionId);
 
     /**
      * 校验数据

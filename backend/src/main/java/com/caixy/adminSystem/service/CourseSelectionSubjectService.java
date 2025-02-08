@@ -3,9 +3,10 @@ package com.caixy.adminSystem.service;
 import com.caixy.adminSystem.model.entity.CourseSelectionSubject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.caixy.adminSystem.model.vo.Subjects.SubjectsVO;
-import com.caixy.adminSystem.model.vo.courseSelectionSubject.CourseSelectionSubjectVO;
+import com.caixy.adminSystem.model.vo.studentCourseSelection.SelectionSubjectVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author CAIXYPROMISE
@@ -14,5 +15,9 @@ import java.util.List;
 */
 public interface CourseSelectionSubjectService extends IService<CourseSelectionSubject> {
 
-    List<SubjectsVO> getSelectSubjectByTaskId(Long taskId);
+    List<SubjectsVO> getSubjectVOByTaskId(Long taskId);
+
+    List<SelectionSubjectVO> getSelectSubjectVOByTaskId(Long taskId);
+
+    void batchUpdateEnrolledCount(Long courseSelectionId, Map<Long, Integer> additionalCountMap);
 }

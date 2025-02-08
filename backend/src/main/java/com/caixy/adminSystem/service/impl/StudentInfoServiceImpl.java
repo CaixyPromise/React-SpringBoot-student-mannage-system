@@ -1,7 +1,6 @@
 package com.caixy.adminSystem.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.caixy.adminSystem.common.ErrorCode;
@@ -132,9 +131,23 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
     }
 
     @Override
-    public QueryWrapper<StudentInfo> getQueryWrapper(StudentInfoQueryRequest postQueryRequest)
+    public LambdaQueryWrapper<StudentInfo> getQueryWrapper(StudentInfoQueryRequest request)
     {
-        return null;
+        LambdaQueryWrapper<StudentInfo> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(request.getId() != null, StudentInfo::getId, request.getId());
+        queryWrapper.eq(StringUtils.isNotBlank(request.getStudentId()), StudentInfo::getStuId, request.getStudentId());
+        queryWrapper.like(StringUtils.isNotBlank(request.getStuName()), StudentInfo::getStuName, request.getStuName());
+        queryWrapper.eq(request.getStuSex() != null, StudentInfo::getStuSex, request.getStuSex());
+
+        // 处理  相关查询
+        if (request.getStuDepart() != null) {
+            queryWrapper.eq(request.getStuDepart().getDepartId() != null, StudentInfo::getStuDeptId, request.getStuDepart().getDepartId());
+            queryWrapper.eq(request.getStuDepart().getMajorId() != null, StudentInfo::getStuMajorId, request.getStuDepart().getMajorId());
+            queryWrapper.eq(request.getStuDepart().getClassId() != null, StudentInfo::getStuClassId, request.getStuDepart().getClassId());
+        }
+
+        return queryWrapper;
     }
 
     @Override

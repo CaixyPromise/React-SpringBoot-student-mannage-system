@@ -3,8 +3,10 @@ package com.caixy.adminSystem.model.dto.courseSelectionInfo;
 import com.caixy.adminSystem.common.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,41 +18,32 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class CourseSelectionInfoQueryRequest extends PageRequest implements Serializable {
-
     /**
-     * id
+     * 任务ID
      */
     private Long id;
 
     /**
-     * id
+     * 任务名称
      */
-    private Long notId;
+    private String name;
 
     /**
-     * 搜索词
+     * 学期名称
      */
-    private String searchText;
+    private Long semesterName;
 
     /**
-     * 标题
+     * 开始日期
      */
-    private String title;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startDate;
 
     /**
-     * 内容
+     * 结束日期
      */
-    private String content;
-
-    /**
-     * 标签列表
-     */
-    private List<String> tags;
-
-    /**
-     * 创建用户 id
-     */
-    private Long userId;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endDate;
 
     private static final long serialVersionUID = 1L;
 }

@@ -95,21 +95,6 @@ export async function listStudentInfoByPageUsingPost1(
   });
 }
 
-/** listMyStudentInfoVOByPage POST /api/student/my/list/page/vo */
-export async function listMyStudentInfoVoByPageUsingPost1(
-  body: API.StudentInfoQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageStudentInfoVO_>('/api/student/my/list/page/vo', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
 /** searchStudentInfoVOByPage POST /api/student/search/page/vo */
 export async function searchStudentInfoVoByPageUsingPost1(
   body: API.StudentInfoQueryRequest,

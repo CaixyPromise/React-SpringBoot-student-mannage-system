@@ -32,7 +32,8 @@ export const SubjectColumns = ({
     dataIndex: "gradeCredit",
     valueType: "digit",
     align: "center",
-    render: (item) => <span>{item} 学分</span>
+    render: (item) => <span>{item} 学分</span>,
+    hideInSearch: true,
   },
   {
     title: "课程类型",
@@ -47,13 +48,15 @@ export const SubjectColumns = ({
       1: {
         text: "选修",
       }
-    }
+    },
+    hideInSearch: true,
   },
   {
     title: "科目最高分阈值",
     width: 120,
     dataIndex: "gradeMax",
     valueType: "digit",
+    hideInSearch: true,
     render: (_, record) => (
       <><Badge status="processing" text={`${record.gradeMax} 分`}/> </>
     )
@@ -62,6 +65,7 @@ export const SubjectColumns = ({
   {
     title: "科目最低分阈值",
     width: 120,
+    hideInSearch: true,
     dataIndex: "gradeMin",
     valueType: "digit",
     render: (_, record) => (
@@ -72,6 +76,7 @@ export const SubjectColumns = ({
   {
     title: "优秀分数线",
     width: 120,
+    hideInSearch: true,
     dataIndex: "gradeExcellent",
     valueType: "digit",
     render: (_, record) => (
@@ -81,6 +86,7 @@ export const SubjectColumns = ({
   {
     title: "不及格分数线",
     width: 120,
+    hideInSearch: true,
     dataIndex: "gradeFail",
     valueType: "digit",
     render: (_, record) => (
@@ -90,12 +96,14 @@ export const SubjectColumns = ({
   {
     title: "课程学时",
     width: 120,
+    hideInSearch: true,
     dataIndex: "creditHours",
     valueType: "digit",
   },
   {
     title: '创建人id',
     width: 120,
+    hideInSearch: true,
     dataIndex: 'creatorId',
   },
   {

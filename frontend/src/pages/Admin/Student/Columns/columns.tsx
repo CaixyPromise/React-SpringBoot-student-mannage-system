@@ -4,6 +4,7 @@ import React from "react";
 import {UserOutline} from "antd-mobile-icons";
 import StudentSex from "@/pages/Admin/Student/components/StudentSex";
 import {ProCoreActionType} from "@ant-design/pro-utils/es/typing";
+import DepartmentSelect from "@/components/DepartmentSelect";
 
 export const StudentColumns = ({
                                  setCurrentRow,
@@ -22,7 +23,19 @@ export const StudentColumns = ({
     title: 'id',
     width: 120,
     dataIndex: 'studentId',
-    render: (_) => <a>{_}</a>,
+    formItemProps: {
+      name: 'id'
+    },
+    render: (text) => <a>{text}</a>,
+  },
+  {
+    title: '学号',
+    width: 120,
+    dataIndex: 'stuId',
+    formItemProps: {
+      name: 'studentId'
+    },
+    render: (text) => <span>{text}</span>,
   },
   {
     title: '学生姓名',
@@ -32,6 +45,11 @@ export const StudentColumns = ({
   {
     title: '学生性别',
     width: 120,
+    valueEnum: {
+      0: {text: '未知'},
+      1: {text: '男'},
+      2: {text: '女'},
+    },
     dataIndex: 'stuSex',
     render: (_, record) => (
       <StudentSex useSex={record.stuSex}/>
@@ -41,22 +59,36 @@ export const StudentColumns = ({
     title: '所属学院',
     width: 120,
     dataIndex: 'stuDepart',
+    formItemProps: {
+      label: '院系信息',
+      name: 'stuDepart'
+    },
+    renderFormItem: (_, {...rest}) => {
+      return (
+        <DepartmentSelect
+          {...rest}
+        />
+      );
+    },
   },
   {
     title: '学生专业',
     width: 120,
     dataIndex: 'stuMajor',
+    hideInSearch: true,
   },
   {
     title: '学生班级',
     width: 120,
     dataIndex: 'stuClass',
+    hideInSearch: true,
   },
 
   {
     title: '操作',
     dataIndex: 'option',
     valueType: 'option',
+    hideInSearch: true,
     width: 100,
     render: (_, record) => (
       <Space size="middle" direction="horizontal" wrap={true}>

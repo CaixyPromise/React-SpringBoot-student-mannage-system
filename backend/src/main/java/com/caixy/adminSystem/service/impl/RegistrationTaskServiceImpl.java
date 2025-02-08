@@ -17,6 +17,7 @@ import com.caixy.adminSystem.model.vo.registrationTask.RegistrationTaskVO;
 import com.caixy.adminSystem.model.vo.semesters.SemestersVO;
 import com.caixy.adminSystem.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,15 +129,22 @@ public class RegistrationTaskServiceImpl extends ServiceImpl<RegistrationTaskMap
     /**
      * 获取查询条件
      *
-     * @param registrationTaskQueryRequest
+     * @param request
      * @return
      */
     @Override
-    public LambdaQueryWrapper<RegistrationTask> getQueryWrapper(RegistrationTaskQueryRequest registrationTaskQueryRequest)
-    {
+    public LambdaQueryWrapper<RegistrationTask> getQueryWrapper(RegistrationTaskQueryRequest request) {
         LambdaQueryWrapper<RegistrationTask> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(registrationTaskQueryRequest.getId() != null, RegistrationTask::getId, registrationTaskQueryRequest.getId());
-        queryWrapper.eq(registrationTaskQueryRequest.getSemesterId() != null, RegistrationTask::getSemesterId, registrationTaskQueryRequest.getSemesterId());
+
+        queryWrapper.eq(request.getId() != null, RegistrationTask::getId, request.getId());
+        queryWrapper.eq(request.getIsActive() != null, RegistrationTask::getIsActive, request.getIsActive());
+        queryWrapper.like(StringUtils.isNotBlank(request.getName()), RegistrationTask::getName, request.getName());
+        queryWrapper.eq(request.getSemesterName() != null, RegistrationTask::getSemesterId, request.getSemesterName());
+
+        // 时间区间查询
+        queryWrapper.ge(request.getStartDate() != null, RegistrationTask::getStartDate, request.getStartDate());
+        queryWrapper.le(request.getEndDate() != null, RegistrationTask::getEndDate, request.getEndDate());
+
         return queryWrapper;
     }
 

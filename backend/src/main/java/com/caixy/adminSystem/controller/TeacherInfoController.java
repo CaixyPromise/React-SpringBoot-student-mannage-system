@@ -177,7 +177,7 @@ public class TeacherInfoController
         long current = teacherInfoQueryRequest.getCurrent();
         long size = teacherInfoQueryRequest.getPageSize();
         // 查询数据库
-        Page<TeacherInfo> teacherInfoPage = teacherInfoService.page(new Page<>(current, size));
+        Page<TeacherInfo> teacherInfoPage = teacherInfoService.page(new Page<>(current, size), teacherInfoService.getQueryWrapper(teacherInfoQueryRequest));
         return ResultUtils.success(teacherInfoService.getTeacherInfoVOPage(teacherInfoPage));
     }
 

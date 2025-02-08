@@ -49,7 +49,7 @@ const ExpandRegistrationLesson: React.FC<{
           onExpandedRowsChange: (keys) => setExpandedRowKeys(keys),
           expandedRowRender: (record) => (
             <>
-              <ExpandStudentGradeInfo courseTaskId={record?.courseSelectionInfo?.id} subjectId={record?.subjectsInfo?.id} />
+              <ExpandStudentGradeInfo courseTaskId={record?.courseSelectionInfo?.id} subjectInfo={record?.subjectsInfo} />
             </>
           ),
         }}

@@ -207,12 +207,6 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponsePageCourseSelectionInfo_ = {
-    code?: number;
-    data?: PageCourseSelectionInfo_;
-    message?: string;
-  };
-
   type BaseResponsePageCourseSelectionInfoVO_ = {
     code?: number;
     data?: PageCourseSelectionInfoVO_;
@@ -466,20 +460,6 @@ declare namespace API {
     className?: string;
   };
 
-  type CourseSelectionInfo = {
-    createTime?: string;
-    creatorId?: number;
-    endDate?: string;
-    id?: number;
-    isActive?: number;
-    isDelete?: number;
-    minCredit?: number;
-    semesterId?: number;
-    startDate?: string;
-    taskName?: string;
-    updateTime?: string;
-  };
-
   type CourseSelectionInfoEditRequest = {
     content?: string;
     id?: number;
@@ -488,17 +468,15 @@ declare namespace API {
   };
 
   type CourseSelectionInfoQueryRequest = {
-    content?: string;
     current?: number;
+    endDate?: string;
     id?: number;
-    notId?: number;
+    name?: string;
     pageSize?: number;
-    searchText?: string;
+    semesterName?: number;
     sortField?: string;
     sortOrder?: string;
-    tags?: string[];
-    title?: string;
-    userId?: number;
+    startDate?: string;
   };
 
   type CourseSelectionInfoUpdateRequest = {
@@ -541,6 +519,7 @@ declare namespace API {
   };
 
   type CourseStudentInfoVO = {
+    byRandom?: number;
     selectTime?: string;
     stuClass?: string;
     stuClassId?: number;
@@ -758,8 +737,6 @@ declare namespace API {
     gradeExcellent?: number;
     gradeFail?: number;
     gradeId?: number;
-    gradeMax?: number;
-    gradeMin?: number;
     subjectId?: number;
     subjectName?: string;
     totalGrade?: number;
@@ -910,19 +887,6 @@ declare namespace API {
     total?: number;
   };
 
-  type PageCourseSelectionInfo_ = {
-    countId?: string;
-    current?: number;
-    maxLimit?: number;
-    optimizeCountSql?: boolean;
-    orders?: OrderItem[];
-    pages?: number;
-    records?: CourseSelectionInfo[];
-    searchCount?: boolean;
-    size?: number;
-    total?: number;
-  };
-
   type PageCourseSelectionInfoVO_ = {
     countId?: string;
     current?: number;
@@ -934,17 +898,6 @@ declare namespace API {
     searchCount?: boolean;
     size?: number;
     total?: number;
-  };
-
-  type pageCourseSelectionUsingGET1Params = {
-    /** pageNum */
-    pageNum?: number;
-    /** pageSize */
-    pageSize?: number;
-    /** semesterId */
-    semesterId?: number;
-    /** taskName */
-    taskName?: string;
   };
 
   type PageDepartmentInfo_ = {
@@ -1239,11 +1192,15 @@ declare namespace API {
 
   type RegistrationTaskQueryRequest = {
     current?: number;
+    endDate?: string;
     id?: number;
+    isActive?: number;
+    name?: string;
     pageSize?: number;
-    semesterId?: number;
+    semesterName?: number;
     sortField?: string;
     sortOrder?: string;
+    startDate?: string;
   };
 
   type RegistrationTaskUpdateRequest = {
@@ -1459,19 +1416,15 @@ declare namespace API {
   };
 
   type StudentInfoQueryRequest = {
-    content?: string;
     current?: number;
-    favourUserId?: number;
     id?: number;
-    notId?: number;
-    orTags?: string[];
     pageSize?: number;
-    searchText?: string;
     sortField?: string;
     sortOrder?: string;
-    tags?: string[];
-    title?: string;
-    userId?: number;
+    stuDepart?: StuDepart;
+    stuName?: string;
+    stuSex?: number;
+    studentId?: string;
   };
 
   type StudentInfoUpdateRequest = {
@@ -1521,6 +1474,12 @@ declare namespace API {
     stuSex?: number;
     studentId?: number;
     totalCredit?: number;
+  };
+
+  type StuDepart = {
+    classId?: number;
+    departId?: number;
+    majorId?: number;
   };
 
   type SubjectAnalysis = {
@@ -1576,19 +1535,12 @@ declare namespace API {
   };
 
   type SubjectsQueryRequest = {
-    content?: string;
     current?: number;
-    favourUserId?: number;
     id?: number;
-    notId?: number;
-    orTags?: string[];
+    name?: string;
     pageSize?: number;
-    searchText?: string;
     sortField?: string;
     sortOrder?: string;
-    tags?: string[];
-    title?: string;
-    userId?: number;
   };
 
   type SubjectsUpdateRequest = {
@@ -1616,6 +1568,12 @@ declare namespace API {
     name?: string;
   };
 
+  type TeacherDepart = {
+    classId?: number;
+    departId?: number;
+    majorId?: number;
+  };
+
   type TeacherInfoAddRequest = {
     teacherDeptId?: number;
     teacherId?: string;
@@ -1637,9 +1595,8 @@ declare namespace API {
     pageSize?: number;
     sortField?: string;
     sortOrder?: string;
-    teacherDeptId?: number;
+    teacherDepart?: TeacherDepart;
     teacherId?: string;
-    teacherMajorId?: number;
     teacherName?: string;
     teacherSex?: number;
   };

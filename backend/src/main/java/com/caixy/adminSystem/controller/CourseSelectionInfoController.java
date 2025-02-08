@@ -144,76 +144,6 @@ public class CourseSelectionInfoController
         return ResultUtils.success(courseSelectionInfoService.getCourseSelectionInfoVO(courseSelectionInfo, request));
     }
 
-    /**
-     * 分页获取选课信息表列表（仅管理员可用）
-     *
-     * @param courseSelectionInfoQueryRequest
-     * @return
-     */
-    @PostMapping("/list/page")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Page<CourseSelectionInfo>> listCourseSelectionInfoByPage(
-            @RequestBody CourseSelectionInfoQueryRequest courseSelectionInfoQueryRequest)
-    {
-        long current = courseSelectionInfoQueryRequest.getCurrent();
-        long size = courseSelectionInfoQueryRequest.getPageSize();
-        // 查询数据库
-        Page<CourseSelectionInfo> courseSelectionInfoPage = courseSelectionInfoService.page(new Page<>(current, size),
-                courseSelectionInfoService.getQueryWrapper(courseSelectionInfoQueryRequest));
-        return ResultUtils.success(courseSelectionInfoPage);
-    }
-
-    /**
-     * 分页获取选课信息表列表（封装类）
-     *
-     * @param courseSelectionInfoQueryRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/list/page/vo")
-    public BaseResponse<Page<CourseSelectionInfoVO>> listCourseSelectionInfoVOByPage(
-            @RequestBody CourseSelectionInfoQueryRequest courseSelectionInfoQueryRequest,
-            HttpServletRequest request)
-    {
-        long current = courseSelectionInfoQueryRequest.getCurrent();
-        long size = courseSelectionInfoQueryRequest.getPageSize();
-        // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        // 查询数据库
-        Page<CourseSelectionInfo> courseSelectionInfoPage = courseSelectionInfoService.page(new Page<>(current, size),
-                courseSelectionInfoService.getQueryWrapper(courseSelectionInfoQueryRequest));
-        // 获取封装类
-        return ResultUtils.success(
-                courseSelectionInfoService.getCourseSelectionInfoVOPage(courseSelectionInfoPage, request));
-    }
-
-    /**
-     * 分页获取当前登录用户创建的选课信息表列表
-     *
-     * @param courseSelectionInfoQueryRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/my/list/page/vo")
-    public BaseResponse<Page<CourseSelectionInfoVO>> listMyCourseSelectionInfoVOByPage(
-            @RequestBody CourseSelectionInfoQueryRequest courseSelectionInfoQueryRequest,
-            HttpServletRequest request)
-    {
-        ThrowUtils.throwIf(courseSelectionInfoQueryRequest == null, ErrorCode.PARAMS_ERROR);
-        // 补充查询条件，只查询当前登录用户的数据
-        User loginUser = userService.getLoginUser(request);
-        courseSelectionInfoQueryRequest.setUserId(loginUser.getId());
-        long current = courseSelectionInfoQueryRequest.getCurrent();
-        long size = courseSelectionInfoQueryRequest.getPageSize();
-        // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        // 查询数据库
-        Page<CourseSelectionInfo> courseSelectionInfoPage = courseSelectionInfoService.page(new Page<>(current, size),
-                courseSelectionInfoService.getQueryWrapper(courseSelectionInfoQueryRequest));
-        // 获取封装类
-        return ResultUtils.success(
-                courseSelectionInfoService.getCourseSelectionInfoVOPage(courseSelectionInfoPage, request));
-    }
 
     /**
      * 编辑选课信息表（给用户使用）
@@ -255,17 +185,11 @@ public class CourseSelectionInfoController
      * @version 1.0
      * @version 2025/1/3 14:28
      */
-    @GetMapping("/page/selection-task-admin")
+    @PostMapping("/page/selection-task-admin")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Page<CourseSelectionInfoVO>> pageCourseSelection(
-            @RequestParam(required = false, defaultValue = "1") int pageNum,
-            @RequestParam(required = false, defaultValue = "10") int pageSize,
-            @RequestParam(required = false) Long semesterId,
-            @RequestParam(required = false) String taskName
-    )
+    public BaseResponse<Page<CourseSelectionInfoVO>> pageCourseSelection(@RequestBody CourseSelectionInfoQueryRequest request)
     {
-        Page<CourseSelectionInfoVO> result = courseSelectionInfoService
-                .pageCourseSelection(pageNum, pageSize, semesterId, taskName);
+        Page<CourseSelectionInfoVO> result = courseSelectionInfoService.pageCourseSelection(request);
         return ResultUtils.success(result);
     }
 

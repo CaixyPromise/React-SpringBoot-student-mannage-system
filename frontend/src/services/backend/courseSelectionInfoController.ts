@@ -136,69 +136,19 @@ export async function getCourseSelectionInfoVoByIdUsingGet1(
   });
 }
 
-/** listCourseSelectionInfoByPage POST /api/selection/list/page */
-export async function listCourseSelectionInfoByPageUsingPost1(
+/** pageCourseSelection POST /api/selection/page/selection-task-admin */
+export async function pageCourseSelectionUsingPost1(
   body: API.CourseSelectionInfoQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageCourseSelectionInfo_>('/api/selection/list/page', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** listCourseSelectionInfoVOByPage POST /api/selection/list/page/vo */
-export async function listCourseSelectionInfoVoByPageUsingPost1(
-  body: API.CourseSelectionInfoQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageCourseSelectionInfoVO_>('/api/selection/list/page/vo', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** listMyCourseSelectionInfoVOByPage POST /api/selection/my/list/page/vo */
-export async function listMyCourseSelectionInfoVoByPageUsingPost1(
-  body: API.CourseSelectionInfoQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageCourseSelectionInfoVO_>('/api/selection/my/list/page/vo', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** pageCourseSelection GET /api/selection/page/selection-task-admin */
-export async function pageCourseSelectionUsingGet1(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.pageCourseSelectionUsingGET1Params,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponsePageCourseSelectionInfoVO_>(
     '/api/selection/page/selection-task-admin',
     {
-      method: 'GET',
-      params: {
-        // pageNum has a default value: 1
-        pageNum: '1',
-        // pageSize has a default value: 10
-        pageSize: '10',
-
-        ...params,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      data: body,
       ...(options || {}),
     },
   );

@@ -1,15 +1,12 @@
 package com.caixy.adminSystem.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.caixy.adminSystem.common.ErrorCode;
-import com.caixy.adminSystem.constant.CommonConstant;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.exception.ThrowUtils;
 import com.caixy.adminSystem.mapper.*;
@@ -25,10 +22,8 @@ import com.caixy.adminSystem.model.vo.courseSelectionInfo.CourseSelectionInfoVO;
 import com.caixy.adminSystem.model.vo.teacherInfo.TeacherInfoVO;
 import com.caixy.adminSystem.service.*;
 import com.caixy.adminSystem.utils.JsonUtils;
-import com.caixy.adminSystem.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -36,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -100,50 +94,19 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
      * @return
      */
     @Override
-    public QueryWrapper<CourseSelectionInfo> getQueryWrapper(
-            CourseSelectionInfoQueryRequest courseSelectionInfoQueryRequest)
+    public LambdaQueryWrapper<CourseSelectionInfo> getQueryWrapper(
+            CourseSelectionInfoQueryRequest request)
     {
-        QueryWrapper<CourseSelectionInfo> queryWrapper = new QueryWrapper<>();
-        if (courseSelectionInfoQueryRequest == null)
-        {
-            return queryWrapper;
-        }
-        // todo 从对象中取值
-        Long id = courseSelectionInfoQueryRequest.getId();
-        Long notId = courseSelectionInfoQueryRequest.getNotId();
-        String title = courseSelectionInfoQueryRequest.getTitle();
-        String content = courseSelectionInfoQueryRequest.getContent();
-        String searchText = courseSelectionInfoQueryRequest.getSearchText();
-        String sortField = courseSelectionInfoQueryRequest.getSortField();
-        String sortOrder = courseSelectionInfoQueryRequest.getSortOrder();
-        List<String> tagList = courseSelectionInfoQueryRequest.getTags();
-        Long userId = courseSelectionInfoQueryRequest.getUserId();
-        // todo 补充需要的查询条件
-        // 从多字段中搜索
-        if (StringUtils.isNotBlank(searchText))
-        {
-            // 需要拼接查询条件
-            queryWrapper.and(qw -> qw.like("title", searchText).or().like("content", searchText));
-        }
-        // 模糊查询
-        queryWrapper.like(StringUtils.isNotBlank(title), "title", title);
-        queryWrapper.like(StringUtils.isNotBlank(content), "content", content);
-        // JSON 数组查询
-        if (CollUtil.isNotEmpty(tagList))
-        {
-            for (String tag : tagList)
-            {
-                queryWrapper.like("tags", "\"" + tag + "\"");
-            }
-        }
-        // 精确查询
-        queryWrapper.ne(ObjectUtils.isNotEmpty(notId), "id", notId);
-        queryWrapper.eq(ObjectUtils.isNotEmpty(id), "id", id);
-        queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
-        // 排序规则
-        queryWrapper.orderBy(SqlUtils.validSortField(sortField),
-                sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
-                sortField);
+        LambdaQueryWrapper<CourseSelectionInfo> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(request.getId() != null, CourseSelectionInfo::getId, request.getId());
+        queryWrapper.like(StringUtils.isNotBlank(request.getName()), CourseSelectionInfo::getTaskName, request.getName());
+        queryWrapper.eq(request.getSemesterName() != null, CourseSelectionInfo::getSemesterId, request.getSemesterName());
+
+        // 时间区间查询
+        queryWrapper.ge(request.getStartDate() != null, CourseSelectionInfo::getStartDate, request.getStartDate());
+        queryWrapper.le(request.getEndDate() != null, CourseSelectionInfo::getEndDate, request.getEndDate());
+
         return queryWrapper;
     }
 
@@ -373,26 +336,15 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
 
 
     @Override
-    public Page<CourseSelectionInfoVO> pageCourseSelection(int pageNum, int pageSize, Long semesterId, String taskName)
+    public Page<CourseSelectionInfoVO> pageCourseSelection(CourseSelectionInfoQueryRequest request)
     {
+        int pageNum = request.getCurrent();
+        int pageSize = request.getPageSize();
         // 构建分页对象
         Page<CourseSelectionInfo> page = new Page<>(pageNum, pageSize);
 
-        // 构建查询条件
-        LambdaQueryWrapper<CourseSelectionInfo> wrapper = Wrappers.lambdaQuery(CourseSelectionInfo.class)
-                                                                  .eq(CourseSelectionInfo::getIsDelete, 0)
-                                                                  .orderByDesc(CourseSelectionInfo::getCreateTime);
-        if (semesterId != null)
-        {
-            wrapper.eq(CourseSelectionInfo::getSemesterId, semesterId);
-        }
-        if (StringUtils.isNotBlank(taskName))
-        {
-            wrapper.like(CourseSelectionInfo::getTaskName, taskName);
-        }
-
         // 查询分页数据
-        IPage<CourseSelectionInfo> resultPage = courseSelectionInfoMapper.selectPage(page, wrapper);
+        IPage<CourseSelectionInfo> resultPage = courseSelectionInfoMapper.selectPage(page, getQueryWrapper(request));
 
         // 调用公共方法组装 VO
         List<CourseSelectionInfoVO> voList = assembleCourseSelectionInfoVOs(resultPage.getRecords());

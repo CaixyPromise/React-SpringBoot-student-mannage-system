@@ -100,21 +100,6 @@ export async function listSubjectsVoByPageUsingPost1(
   });
 }
 
-/** listMySubjectsVOByPage POST /api/subject/my/list/page/vo */
-export async function listMySubjectsVoByPageUsingPost1(
-  body: API.SubjectsQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageSubjectsVO_>('/api/subject/my/list/page/vo', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
 /** searchSubjectsVOByPage POST /api/subject/search/page/vo */
 export async function searchSubjectsVoByPageUsingPost1(
   body: API.SubjectsQueryRequest,

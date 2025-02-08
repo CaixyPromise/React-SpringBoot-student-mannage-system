@@ -1,5 +1,6 @@
 package com.caixy.adminSystem.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -45,9 +46,12 @@ public class SubjectsServiceImpl extends ServiceImpl<SubjectsMapper, Subjects>
     }
 
     @Override
-    public QueryWrapper<Subjects> getQueryWrapper(SubjectsQueryRequest SubjectsQueryRequest)
+    public LambdaQueryWrapper<Subjects> getQueryWrapper(SubjectsQueryRequest SubjectsQueryRequest)
     {
-        return null;
+        LambdaQueryWrapper<Subjects> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SubjectsQueryRequest.getId() != null, Subjects::getId, SubjectsQueryRequest.getId());
+        queryWrapper.like(SubjectsQueryRequest.getName() != null, Subjects::getName, SubjectsQueryRequest.getName());
+        return queryWrapper;
     }
 
     @Override

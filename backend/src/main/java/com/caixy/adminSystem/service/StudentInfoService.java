@@ -1,6 +1,6 @@
 package com.caixy.adminSystem.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.caixy.adminSystem.model.dto.studentInfo.StudentInfoAddRequest;
@@ -39,7 +39,7 @@ public interface StudentInfoService extends IService<StudentInfo>
      * @param postQueryRequest
      * @return
      */
-    QueryWrapper<StudentInfo> getQueryWrapper(StudentInfoQueryRequest postQueryRequest);
+    LambdaQueryWrapper<StudentInfo> getQueryWrapper(StudentInfoQueryRequest postQueryRequest);
 
     /**
      * 从 ES 查询
@@ -69,7 +69,6 @@ public interface StudentInfoService extends IService<StudentInfo>
      * 分页获取帖子封装
      *
      * @param postPage
-     * @param request
      * @return
      */
     Page<StudentInfoVO> getStudentInfoVOPage(Page<StudentInfo> postPage);

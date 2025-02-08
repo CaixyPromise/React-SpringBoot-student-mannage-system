@@ -95,7 +95,6 @@ const Index = () => {
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
-
           const {data, code} = await listStudentInfoByPageUsingPost1({
             ...params,
             sortField,

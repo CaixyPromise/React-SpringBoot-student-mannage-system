@@ -11,7 +11,6 @@ import com.caixy.adminSystem.exception.ThrowUtils;
 import com.caixy.adminSystem.mapper.CourseSelectionInfoMapper;
 import com.caixy.adminSystem.mapper.CourseSelectionSubjectMapper;
 import com.caixy.adminSystem.mapper.SubjectsMapper;
-import com.caixy.adminSystem.model.dto.subject.SubjectClassTime;
 import com.caixy.adminSystem.model.dto.teacherInfo.TeacherInfoAddRequest;
 import com.caixy.adminSystem.model.dto.teacherInfo.TeacherInfoQueryRequest;
 import com.caixy.adminSystem.model.entity.*;
@@ -169,6 +168,24 @@ public class TeacherInfoServiceImpl extends ServiceImpl<TeacherInfoMapper, Teach
         TeacherInfoQueryRequest queryRequest = new TeacherInfoQueryRequest();
         queryRequest.setId(id);
         return getTeacherVOWithCondition(queryRequest);
+    }
+
+    @Override
+    public LambdaQueryWrapper<TeacherInfo> getQueryWrapper(TeacherInfoQueryRequest request) {
+        LambdaQueryWrapper<TeacherInfo> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(request.getId() != null, TeacherInfo::getId, request.getId());
+        queryWrapper.eq(StringUtils.isNotBlank(request.getTeacherId()), TeacherInfo::getTeacherId, request.getTeacherId());
+        queryWrapper.like(StringUtils.isNotBlank(request.getTeacherName()), TeacherInfo::getTeacherName, request.getTeacherName());
+        queryWrapper.eq(request.getTeacherSex() != null, TeacherInfo::getTeacherSex, request.getTeacherSex());
+
+        // 处理 teacherDepart 相关查询
+        if (request.getTeacherDepart() != null) {
+            queryWrapper.eq(request.getTeacherDepart().getDepartId() != null, TeacherInfo::getTeacherDeptId, request.getTeacherDepart().getDepartId());
+            queryWrapper.eq(request.getTeacherDepart().getMajorId() != null, TeacherInfo::getTeacherMajorId, request.getTeacherDepart().getMajorId());
+        }
+
+        return queryWrapper;
     }
 
     /**

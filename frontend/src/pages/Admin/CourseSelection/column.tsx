@@ -1,6 +1,6 @@
 import {ProColumns} from "@ant-design/pro-table/es/typing";
 import dayjs from "dayjs";
-import {Badge, Button, message, Modal, Tag, Tooltip} from "antd";
+import {Badge, Button, message, Modal, Select, Tag, Tooltip} from "antd";
 import {
   activateTaskByIdUsingGet1,
   deleteCourseSelectionInfoUsingPost1,
@@ -8,6 +8,7 @@ import {
 } from "@/services/backend/courseSelectionInfoController";
 import React, {MutableRefObject} from "react";
 import {ActionType} from "@ant-design/pro-components";
+import SemesterSelect from "@/components/SemesterSelect";
 
 export const RenderDateStatus = (startDate: string, endDate: string) => {
   const now = dayjs();
@@ -94,43 +95,57 @@ export const SelectionCourseColumnConfig = (
   openDetailsModal: (taskId: API.CourseSelectionInfoVO | undefined) => void
 ): ProColumns<any>[] => [
   {
+    title: '选课任务id',
+    dataIndex: 'id',
+    key: 'id',
+    copyable: true,
+  },
+  {
     title: "选课任务名称",
     dataIndex: "taskName",
-    key: "taskName",
+    key: "name",
     render: (text: string) => <b>{text}</b>,
   },
   {
     title: "学期",
     dataIndex: "semesterName",
     key: "semesterName",
+    renderFormItem: (_, { ...rest}) => {
+      return <SemesterSelect {...rest} />;
+    },
   },
   {
     title: "选课时间",
-    key: "dateRange",
+    key: "pickTime",
     width: 450,
+    valueType: 'dateRange',
     render: (_: any, record: API.CourseSelectionInfoVO) => RenderDateStatus(record.startDate, record.endDate),
   },
   {
     title: "最小选课学分",
     dataIndex: "minCredit",
     key: "minCredit",
+    hideInSearch: true,
     render: (credit: number) => <Tag color="blue">{credit.toFixed(2)}</Tag>,
   },
   {
     title: "创建时间",
     dataIndex: "createTime",
     key: "createTime",
+    hideInSearch: true,
     render: (date: string) => dayjs(date).format("YYYY-MM-DD HH:mm"),
   },
   {
     title: "更新时间",
     dataIndex: "updateTime",
     key: "updateTime",
+    hideInSearch: true,
     render: (date: string) => dayjs(date).format("YYYY-MM-DD HH:mm"),
   },
   {
     title: "任务状态",
     key: "taskStatus",
+    hideInSearch: true,
     render: (_: any, record: API.CourseSelectionInfoVO) => {
       if (dayjs(record?.endDate) < dayjs()) {
         return <Tag color="default">已结束</Tag>;
@@ -145,6 +160,7 @@ export const SelectionCourseColumnConfig = (
     },
   },
   {
+    hideInSearch: true,
     title: "操作",
     key: "operation",
     render: (_: any, record: API.CourseSelectionInfoVO) => {

@@ -162,32 +162,6 @@ public class StudentController
 
 
 
-    /**
-     * 分页获取当前用户创建的资源列表
-     *
-     * @param postQueryRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/my/list/page/vo")
-    public BaseResponse<Page<StudentInfoVO>> listMyStudentInfoVOByPage(@RequestBody StudentInfoQueryRequest postQueryRequest,
-                                                                    HttpServletRequest request)
-    {
-        if (postQueryRequest == null)
-        {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        User loginUser = userService.getLoginUser(request);
-        postQueryRequest.setUserId(loginUser.getId());
-        long current = postQueryRequest.getCurrent();
-        long size = postQueryRequest.getPageSize();
-        // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<StudentInfo> postPage = studentInfoService.page(new Page<>(current, size),
-                studentInfoService.getQueryWrapper(postQueryRequest));
-        return ResultUtils.success(studentInfoService.getStudentInfoVOPage(postPage));
-    }
-
     // endregion
 
     /**

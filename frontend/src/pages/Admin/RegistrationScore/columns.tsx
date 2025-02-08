@@ -8,6 +8,7 @@ import {
 import {ProCoreActionType} from "@ant-design/pro-utils/es/typing";
 import {record} from "@umijs/utils/compiled/zod";
 import {updatePublicationUsingPost1} from "@/services/backend/registrationTaskLessonController";
+import SemesterSelect from "@/components/SemesterSelect";
 
 const toggleActiveStatus = async (id: number | undefined, isActive: 0 | 1, action: ProCoreActionType) => {
   if (id === undefined) {
@@ -70,6 +71,9 @@ export const RegistrationTableColumn: ProColumns[] = [
     title: '学期名称',
     dataIndex: 'semesterName',
     key: 'semesterName',
+    renderFormItem: (_, { ...rest}) => {
+      return <SemesterSelect {...rest} />;
+    },
     render: (_, record) => {
       return record?.semestersInfo?.name || "未设置"
     }
@@ -85,23 +89,25 @@ export const RegistrationTableColumn: ProColumns[] = [
     dataIndex: 'endDate',
     valueType: 'date',
     render: (_, record) => dayjs(record.endDate).format("YYYY-MM-DD HH:mm"),
-
   },
   {
     title: "创建时间",
     dataIndex: "createTime",
     key: "createTime",
+    hideInSearch: true,
     render: (_, record) => dayjs(record.createTime).format("YYYY-MM-DD HH:mm"),
   },
   {
     title: "更新时间",
     dataIndex: "updateTime",
     key: "updateTime",
+    hideInSearch: true,
     render: (_, record) => dayjs(record.updateTime).format("YYYY-MM-DD HH:mm"),
   },
   {
     title: '操作',
     valueType: 'option',
+    hideInSearch: true,
     render: (_, record, _ix, action) => {
       return (
         <Space size="middle">
@@ -202,7 +208,7 @@ export const ExpandRegistrationLessonColumn: ProColumns<API.RegistrationTaskLess
 ]
 
 
-export const ExpandStudentGradeInfoColumn: ProColumns<API.StudentsGradeForAdminVO>[] = [
+export const ExpandStudentGradeInfoColumn = (subjectInfo: API.SubjectsVO):ProColumns<API.StudentsGradeForAdminVO>[] => ([
   {
     title: '学号',
     dataIndex: 'studentId',
@@ -243,34 +249,33 @@ export const ExpandStudentGradeInfoColumn: ProColumns<API.StudentsGradeForAdminV
     dataIndex: 'maxGrade',
     key: 'maxGrade',
     render: (_, record) => {
-      return record?.gradeItem?.gradeMax
+      return subjectInfo?.gradeMax;
     }
   },
   {
-     title: '科目限定最低分',
+    title: '科目限定最低分',
     dataIndex: 'minGrade',
     key: 'minGrade',
-    render: (_, record) => {
-      return record?.gradeItem?.gradeMin
+    render: () => {
+      return subjectInfo?.gradeMin;
     }
   },
   {
     title: '科目优秀分数线',
     dataIndex: 'gradeExcellent',
     key: 'gradeExcellent',
-    render: (_, record) => {
-      return record?.gradeItem?.gradeExcellent
+    render: () => {
+      return subjectInfo?.gradeExcellent;
     }
   },
   {
     title: '科目不及格分数线',
     dataIndex: 'gradeFail',
     key: 'gradeFail',
-    render: (_, record) => {
-      return record?.gradeItem?.gradeFail
+    render: () => {
+      return subjectInfo?.gradeFail;
     }
   },
-
   {
     title: '平时分总成绩',
     dataIndex: 'score',
@@ -319,4 +324,18 @@ export const ExpandStudentGradeInfoColumn: ProColumns<API.StudentsGradeForAdminV
       return <span>{record?.gradeItem?.totalGrade}</span>;
     }
   },
-]
+  {
+    title: "科目学分绩点",
+    dataIndex: 'scoreCredit',
+    key: 'scoreCredit',
+    render: (_, record) => {
+      if (!record?.gradeItem) {
+        return "未设置"
+      }
+      const totalGrade = record?.gradeItem?.totalGrade ?? 0;
+      const gradeMax = subjectInfo?.gradeMax ?? 0;
+      const result = (totalGrade / gradeMax) * 5;
+      return <span>{result.toFixed(2)}</span>;
+    }
+  }
+])

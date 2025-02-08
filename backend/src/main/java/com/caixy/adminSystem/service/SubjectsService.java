@@ -1,6 +1,6 @@
 package com.caixy.adminSystem.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.caixy.adminSystem.model.dto.subject.SubjectsQueryRequest;
 import com.caixy.adminSystem.model.entity.Subjects;
@@ -34,7 +34,7 @@ public interface SubjectsService extends IService<Subjects> {
      * @param SubjectsQueryRequest
      * @return
      */
-    QueryWrapper<Subjects> getQueryWrapper(SubjectsQueryRequest SubjectsQueryRequest);
+    LambdaQueryWrapper<Subjects> getQueryWrapper(SubjectsQueryRequest SubjectsQueryRequest);
 
     /**
      * 从 ES 查询

@@ -1,6 +1,6 @@
 package com.caixy.adminSystem.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.caixy.adminSystem.model.dto.courseSelectionInfo.CourseSelectionInfoQueryRequest;
@@ -35,7 +35,7 @@ public interface CourseSelectionInfoService extends IService<CourseSelectionInfo
      * @param courseSelectionInfoQueryRequest
      * @return
      */
-    QueryWrapper<CourseSelectionInfo> getQueryWrapper(CourseSelectionInfoQueryRequest courseSelectionInfoQueryRequest);
+    LambdaQueryWrapper<CourseSelectionInfo> getQueryWrapper(CourseSelectionInfoQueryRequest courseSelectionInfoQueryRequest);
 
     /**
      * 获取选课信息表封装
@@ -57,10 +57,7 @@ public interface CourseSelectionInfoService extends IService<CourseSelectionInfo
 
     Long createCourseSelection(CreateCourseSelectionRequest request, Long currentUserId);
 
-    Page<CourseSelectionInfoVO> pageCourseSelection(
-            int pageNum,
-            int pageSize,
-            Long semesterId, String taskName);
+    Page<CourseSelectionInfoVO> pageCourseSelection(CourseSelectionInfoQueryRequest request);
 
     Boolean putTaskHoldById(Long taskId);
 

@@ -1,5 +1,6 @@
 package com.caixy.adminSystem.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.caixy.adminSystem.model.dto.teacherInfo.TeacherInfoAddRequest;
@@ -31,6 +32,8 @@ public interface TeacherInfoService extends IService<TeacherInfo> {
     TeacherInfoVO getTeacherVOWithCondition(TeacherInfoQueryRequest queryRequest);
 
     TeacherInfoVO getTeacherVOById(Long id);
+
+    LambdaQueryWrapper<TeacherInfo> getQueryWrapper(TeacherInfoQueryRequest request);
 
     Page<TeacherInfoVO> getTeacherInfoVOPage(Page<TeacherInfo> teacherInfoPage);
 

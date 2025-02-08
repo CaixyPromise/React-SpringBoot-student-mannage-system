@@ -6,12 +6,13 @@ import {PlusOutlined} from '@ant-design/icons';
 import ExpandedSubjectInfo from './components/ExpandedSubjectInfo';
 import {CourseSelectionProvider} from './contexts/CourseSelectionContext';
 import {
-  pageCourseSelectionUsingGet1,
+   pageCourseSelectionUsingPost1,
 } from "@/services/backend/courseSelectionInfoController";
 import AddSelectionCourseClassModal from "@/pages/Admin/CourseSelection/components/AddSelectionCourseClassModal";
 import {SelectionCourseColumnConfig} from "@/pages/Admin/CourseSelection/column";
 import AddSelectionCourseTaskModal from "@/pages/Admin/CourseSelection/components/AddSelectionCourseTaskModal";
 import ExpandStudentSelectionInfo from "@/pages/Admin/CourseSelection/components/ExpandStudentSelectionInfo";
+import dayjs from "dayjs";
 
 const CourseSelectionTaskList: React.FC = () => {
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
@@ -68,9 +69,14 @@ const CourseSelectionTaskList: React.FC = () => {
             </Button>,
           ]}
           request={async (params, sort, filter) => {
-            const response = await pageCourseSelectionUsingGet1({
+            const { pickTime, ...rest } = params;
+            const response = await pageCourseSelectionUsingPost1({
               ...params,
+              startDate: pickTime?.[0] ? dayjs(pickTime[0]).format("YYYY-MM-DDTHH:mm:ss") : undefined,
+              endDate: pickTime?.[1] ? dayjs(pickTime[1]).format("YYYY-MM-DDTHH:mm:ss") : undefined,
             })
+            console.log("params: ", params)
+
             const {code, data} = response;
             if (code === 0 && data) {
               // 将数据记录转为 id 映射对象

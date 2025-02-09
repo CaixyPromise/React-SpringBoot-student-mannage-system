@@ -1,4 +1,4 @@
-import {Button, Col, message, Row, Table} from "antd";
+import {Button, Col, Empty, message, Row, Table} from "antd";
 import React, { useEffect, useState } from "react";
 import { getStudentGradesVoByTaskSubjectUsingGet1 } from "@/services/backend/scoreController";
 import { ExpandStudentGradeInfoColumn } from "@/pages/Admin/RegistrationScore/columns";
@@ -94,22 +94,31 @@ const ExpandStudentGradeInfo: React.FC<{
             title={() => (
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <h3>学生成绩-{subjectInfo?.name}</h3>
-                <Button type="default" icon={<DownloadOutlined />} onClick={exportToExcel}>
-                  导出成绩到 Excel
-                </Button>
+                {
+                  studentGrades?.length !== 0 && (
+                  <Button
+                    type="default"
+                    icon={<DownloadOutlined />}
+                    onClick={exportToExcel}
+                  >
+                    导出成绩到 Excel
+                  </Button>)
+                }
               </div>
             )}
             dataSource={studentGrades}
             columns={ExpandStudentGradeInfoColumn(subjectInfo)}
-            rowKey="stuId" // 添加唯一的 key 字段
+            rowKey="stuId"
           />
         </Col>
       </Row>
-      <Row gutter={16}>
-        <Col span={24}>
-          <Visualization gradeItems={studentGrades} subjectInfo={subjectInfo} />
-        </Col>
-      </Row>
+      {
+        studentGrades?.length !== 0 && (<Row gutter={16}>
+          <Col span={24}>
+            <Visualization gradeItems={studentGrades} subjectInfo={subjectInfo} />
+          </Col>
+        </Row>)
+      }
     </div>
   );
 };

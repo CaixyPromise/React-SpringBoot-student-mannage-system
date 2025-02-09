@@ -64,11 +64,6 @@ public class StudentGrades extends BaseEntity
     private Long courseGroupId;
 
     /**
-     * 是否是选修课
-     */
-    private Integer isElectives;
-
-    /**
      * 创建人id
      */
     private Long creatorId;

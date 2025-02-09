@@ -31,7 +31,7 @@ public interface StudentGradesService extends IService<StudentGrades> {
      * @param userId
      * @param studentInfoList
      */
-    void validStudentGrades(StudentGradesAddRequest request, boolean isElectives, Long userId, List<StudentInfo> studentInfoList);
+    void validStudentGrades(StudentGradesAddRequest request, Long userId, List<StudentInfo> studentInfoList);
 
     Boolean addElectiveCourseGrade(StudentGradesAddRequest request, Long userId);
 

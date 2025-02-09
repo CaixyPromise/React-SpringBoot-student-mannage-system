@@ -15,7 +15,6 @@
             <result property="usualPercentage" column="usualPercentage" jdbcType="TINYINT"/>
             <result property="finalPercentage" column="finalPercentage" jdbcType="TINYINT"/>
             <result property="courseGroupId" column="courseGroupId" jdbcType="BIGINT"/>
-            <result property="isElectives" column="isElectives" jdbcType="TINYINT"/>
             <result property="creatorId" column="creatorId" jdbcType="BIGINT"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
@@ -26,7 +25,7 @@
         id,stuId,subjectId,
         semesterId,totalGrade,usualGrade,
         finalGrade,usualPercentage,finalPercentage,
-        courseGroupId,isElectives,creatorId,
+        courseGroupId,creatorId,
         createTime,updateTime,isDelete
     </sql>
     

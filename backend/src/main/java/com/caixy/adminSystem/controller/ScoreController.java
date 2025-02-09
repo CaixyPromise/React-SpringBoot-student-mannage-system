@@ -113,8 +113,6 @@ public class ScoreController
         StudentGrades post = new StudentGrades();
         BeanUtils.copyProperties(postUpdateRequest, post);
 
-        // 参数校验
-//        studentGradesService.validStudentGrades(post, false);
         long id = postUpdateRequest.getId();
         // 判断是否存在
         StudentGrades oldStudentGrades = studentGradesService.getById(id);
@@ -204,81 +202,4 @@ public class ScoreController
         Page<StudentGrades> postPage = studentGradesService.page(new Page<>(current, size), studentGradesService.getQueryWrapper(postQueryRequest));
         return ResultUtils.success(studentGradesService.getStudentGradesVOPage(postPage, request));
     }
-
-    /**
-     * 分页获取当前用户创建的资源列表
-     *
-     * @param postQueryRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/my/list/page/vo")
-    public BaseResponse<Page<StudentGradesVO>> listMyStudentGradesVOByPage(@RequestBody StudentGradesQueryRequest postQueryRequest, HttpServletRequest request)
-    {
-        if (postQueryRequest == null)
-        {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        User loginUser = userService.getLoginUser(request);
-        postQueryRequest.setUserId(loginUser.getId());
-        long current = postQueryRequest.getCurrent();
-        long size = postQueryRequest.getPageSize();
-        // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<StudentGrades> postPage = studentGradesService.page(new Page<>(current, size), studentGradesService.getQueryWrapper(postQueryRequest));
-        return ResultUtils.success(studentGradesService.getStudentGradesVOPage(postPage, request));
-    }
-
-    // endregion
-
-    /**
-     * 分页搜索（从 ES 查询，封装类）
-     *
-     * @param postQueryRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/search/page/vo")
-    public BaseResponse<Page<StudentGradesVO>> searchStudentGradesVOByPage(@RequestBody StudentGradesQueryRequest postQueryRequest, HttpServletRequest request)
-    {
-        long size = postQueryRequest.getPageSize();
-        // 限制爬虫
-        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<StudentGrades> postPage = studentGradesService.searchFromEs(postQueryRequest);
-        return ResultUtils.success(studentGradesService.getStudentGradesVOPage(postPage, request));
-    }
-
-    /**
-     * 编辑（用户）
-     *
-     * @param postEditRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/edit")
-    public BaseResponse<Boolean> editStudentGrades(@RequestBody StudentGradesEditRequest postEditRequest, HttpServletRequest request)
-    {
-        if (postEditRequest == null || postEditRequest.getId() <= 0)
-        {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        StudentGrades post = new StudentGrades();
-        BeanUtils.copyProperties(postEditRequest, post);
-
-        // 参数校验
-//        studentGradesService.validStudentGrades(post, false);
-        User loginUser = userService.getLoginUser(request);
-        long id = postEditRequest.getId();
-        // 判断是否存在
-        StudentGrades oldStudentGrades = studentGradesService.getById(id);
-        ThrowUtils.throwIf(oldStudentGrades == null, ErrorCode.NOT_FOUND_ERROR);
-        // 仅本人或管理员可编辑
-        if (!oldStudentGrades.getCreatorId().equals(loginUser.getId()) && !userService.isAdmin(loginUser))
-        {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        boolean result = studentGradesService.updateById(post);
-        return ResultUtils.success(result);
-    }
-
 }

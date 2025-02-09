@@ -115,7 +115,7 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
 
 
     @Override
-    public void validStudentGrades(StudentGradesAddRequest request, boolean isElectives, Long userId, List<StudentInfo> studentInfoList)
+    public void validStudentGrades(StudentGradesAddRequest request, Long userId, List<StudentInfo> studentInfoList)
     {
         Long semesterId = request.getSemesterId();
         Optional.ofNullable(semestersService.getById(semesterId)).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "学期不存在"));
@@ -131,10 +131,7 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "学生信息为空");
         }
         // 选课任务校验
-        if (isElectives)
-        {
-            checkElectiveCourseInfo(studentInfoList, userId, subjectId, courseGroupId, registrationTaskId, studentGradeInfos);
-        }
+        checkElectiveCourseInfo(studentInfoList, userId, subjectId, courseGroupId, registrationTaskId, studentGradeInfos);
     }
 
     /**
@@ -159,7 +156,7 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
         {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "学生不存在");
         }
-        validStudentGrades(request, true, userId, studentInfos);
+        validStudentGrades(request, userId, studentInfos);
         Map<String, Long> stuIdMap = studentInfos.stream().collect(Collectors.toMap(StudentInfo::getStuId, StudentInfo::getId));
         boolean saved = saveBatch(studentGradeInfos.stream().map(item -> {
             StudentGrades studentGrades = new StudentGrades();
@@ -173,7 +170,6 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
             studentGrades.setSemesterId(request.getSemesterId());
             studentGrades.setCourseGroupId(request.getCourseGroupId());
             studentGrades.setStuId(stuID);
-            studentGrades.setIsElectives(1);
             studentGrades.setCreatorId(userId);
             return studentGrades;
         }).collect(Collectors.toList()));

@@ -78,9 +78,9 @@ export const stuDepartInfoOption = (students: API.StudentInfoVO[]): EChartsOptio
   const classCount: Record<string, number> = {};
 
   students.forEach((student) => {
-    departmentCount[student.stuDepart] = (departmentCount[student.stuDepart] || 0) + 1;
-    majorCount[student.stuMajor] = (majorCount[student.stuMajor] || 0) + 1;
-    classCount[student.stuClass] = (classCount[student.stuClass] || 0) + 1;
+    departmentCount[student?.stuDepart] = (departmentCount[student?.stuDepart] || 0) + 1;
+    majorCount[student?.stuMajor] = (majorCount[student?.stuMajor] || 0) + 1;
+    classCount[student?.stuClass] = (classCount[student?.stuClass] || 0) + 1;
   });
 
   /** 获取前 N 个最多的项目 */
@@ -195,7 +195,6 @@ export const studentGenderOption = (students: API.StudentInfoVO[]) => {
     ]
   }
 }
-
 export const enrollByDayOption = (students: API.StudentCourseSelection[]): EChartsOption => {
   /** 计算选课时间数据 */
   const today = dayjs().format("YYYY-MM-DD"); // 获取当前日期
@@ -208,6 +207,7 @@ export const enrollByDayOption = (students: API.StudentCourseSelection[]): EChar
   });
 
   const allDates = Object.keys(enrollCountByDay).sort(); // 获取所有日期并排序
+  const enrollData = allDates.map((d) => enrollCountByDay[d]);
   const lastRecordedDate = allDates.length > 0 ? allDates[allDates.length - 1] : today; // 获取数据最后一天
 
   return {
@@ -215,9 +215,37 @@ export const enrollByDayOption = (students: API.StudentCourseSelection[]): EChar
     tooltip: { trigger: "axis" },
     xAxis: { type: "category", data: allDates, axisLabel: { rotate: 30, interval: 0 } },
     yAxis: { type: "value" },
-    series: [{ name: "选课人数", type: "bar", data: allDates.map((d) => enrollCountByDay[d]), itemStyle: { color: "#73c0de" } }]
+    series: [
+      {
+        name: "选课人数（柱状图）",
+        type: "bar",
+        data: enrollData,
+        itemStyle: { color: "#73c0de" },
+      },
+      {
+        name: "选课趋势（折线图）",
+        type: "line",
+        data: enrollData,
+        smooth: true, // 平滑曲线
+        lineStyle: { color: "#ff7f50" }, // 折线颜色
+        itemStyle: { color: "#ff7f50" }, // 数据点颜色
+        label: { show: true, position: "top" }, // 显示数据点值
+        markPoint: {
+          data: [
+            {
+              type: "max",
+              name: "最大值",
+              symbol: "pin",
+              symbolSize: 50,
+              itemStyle: { color: "red" }, // 高亮最大值
+            },
+          ],
+        },
+      },
+    ],
   };
 };
+
 
 export const enrollByHourOption = (students: API.StudentCourseSelection[]): EChartsOption => {
   /** 计算选课时间数据 */

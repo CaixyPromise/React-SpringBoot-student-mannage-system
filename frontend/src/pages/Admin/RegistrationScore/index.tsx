@@ -49,7 +49,7 @@ const RegistrationScore: React.FC = () => {
         expandable={{
           expandedRowKeys,
           onExpandedRowsChange: (keys) => setExpandedRowKeys(keys),
-          expandedRowRender: (record) => (
+          expandedRowRender: (record: API.RegistrationTaskVO) => (
             <>
               <ExpandRegistrationLesson id={record?.id} />
             </>

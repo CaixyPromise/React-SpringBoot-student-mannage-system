@@ -1,6 +1,5 @@
 export default [
   {path: '/user', layout: false, routes: [{path: '/user/login', component: './User/Login'}]},
-  {icon: 'PieChartOutlined', path: '/analysis', name: '成绩分析', component: './Admin/Analysis'},
   {
     icon: 'user',
     path: '/user-center',

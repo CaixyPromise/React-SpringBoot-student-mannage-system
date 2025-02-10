@@ -3,8 +3,6 @@ import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message } from 'antd';
 import { EditOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 
-// TODO: 替换成你真实的接口请求方法
-// import { querySemesters, addSemester, updateSemester, deleteSemester, setActiveSemester } from '@/services/semesters';
 
 import CreateOrEditModal from "@/pages/Admin/Semester/components/CreateOrEditModal";
 import SetActiveModal from "@/pages/Admin/Semester/components/SetActiveModal";

@@ -1,4 +1,4 @@
-import {Button, Dropdown, Empty, Menu, message, Modal, Select, Space, Table, theme, Tooltip} from "antd";
+import {Button, Dropdown, Empty, Menu, MenuProps, message, Modal, Select, Space, Table, theme, Tooltip} from "antd";
 import {DownloadOutlined, FunctionOutlined, MehOutlined, ReloadOutlined, SmileOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
 import {
@@ -140,13 +140,24 @@ const ExpandStudentSelectionInfo: React.FC<ExpandedSubjectInfoProps> = ({visible
     );
   };
 
-  const dropdownMenu = (
-    <Menu>
-      <Menu.Item icon={<SmileOutlined/>} key="all" onClick={() => exportToExcel("all")}>导出全部</Menu.Item>
-      <Menu.Item icon={<MehOutlined/>} key="unqualified"
-                 onClick={() => exportToExcel("unqualified")}>导出未达标</Menu.Item>
-    </Menu>
-  );
+// 定义菜单项
+  const items: MenuProps["items"] = [
+    {
+      key: "all",
+      icon: <SmileOutlined />,
+      label: "导出全部",
+    },
+    {
+      key: "unqualified",
+      icon: <MehOutlined />,
+      label: "导出未达标",
+    },
+  ];
+
+// 处理菜单点击事件
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    exportToExcel(e.key);
+  };
 
   function handleRandomAssign() {
     let taskCount = 0;
@@ -235,15 +246,15 @@ const ExpandStudentSelectionInfo: React.FC<ExpandedSubjectInfoProps> = ({visible
             value={filterType}
             onChange={setFilterType}
             options={[
-              {value: "all", label: "全部学生"},
+              {value: "all", label: "全部学生信息"},
               {value: "unqualified", label: "未达标学生"}
             ]}
           />
           <Button type="primary" icon={<ReloadOutlined/>} onClick={fetchStudents} loading={loading}>
             刷新数据
           </Button>
-          <Dropdown overlay={dropdownMenu}>
-            <Button icon={<DownloadOutlined/>}>导出 Excel</Button>
+          <Dropdown menu={{ items, onClick: handleMenuClick }}>
+            <Button icon={<DownloadOutlined />}>导出 Excel</Button>
           </Dropdown>
           {
             courseSelectionItem?.endDate && dayjs(courseSelectionItem.endDate).isBefore(dayjs()) && (

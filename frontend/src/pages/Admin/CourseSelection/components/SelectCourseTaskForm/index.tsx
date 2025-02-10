@@ -128,21 +128,12 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
     >([]);
     const [subjectMap, setSubjectMap] = useState<Record<number, API.SubjectsVO>>({});
 
-    const colorSemester = useMemo(() => {
-      return {
-        1: "green",
-        0: "#ff0000",
-      };
-    }, []);
-
-
     const querySubject = async () => {
       try {
         const {code, data} = await getAllSubjectsVoUsingGet1();
         if (code === 0) {
           const newSubjectMap: Record<number, API.SubjectsVO> = {};
           const option = data
-            .filter((subj) => subj.courseType === 1)
             .map((subject) => {
               newSubjectMap[subject.id ?? 0] = subject;
               return {
@@ -360,7 +351,7 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
                       >
                         <Row gutter={16}>
                           {/* 课程 */}
-                          <Col span={6}>
+                          <Col span={12}>
                             <Form.Item
                               {...field}
                               label="课程"
@@ -376,7 +367,7 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
                           </Col>
 
                           {/* 课程老师 */}
-                          <Col span={6}>
+                          <Col span={12}>
                             <Form.Item
                               label="课程老师"
                               name={[field.name, 'classTeacher']}
@@ -385,9 +376,10 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
                               <TeacherSelect />
                             </Form.Item>
                           </Col>
-
+                        </Row>
+                        <Row gutter={16}>
                           {/* 最大人数 */}
-                          <Col span={6}>
+                          <Col span={12}>
                             <Form.Item
                               {...field}
                               label="最大人数"
@@ -402,17 +394,17 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
                             </Form.Item>
                           </Col>
 
-                          {/* 上课教室 */}
-                          <Col span={6}>
+                          {/* 上课地点 */}
+                          <Col span={12}>
                             <Form.Item
-                              label="上课教室"
+                              label="上课地点"
                               name={[field.name, 'classRoom']}
                               rules={[
-                                { required: true, message: '请填写上课教室' },
-                                { max: 20, message: '教室长度不能超过20个字符' },
+                                { required: true, message: '请填写上课地点' },
+                                { max: 20, message: '上课地点长度不能超过20个字符' },
                               ]}
                             >
-                              <Input placeholder="请填写上课教室" />
+                              <Input placeholder="请填写上课地点" />
                             </Form.Item>
                           </Col>
                         </Row>
@@ -436,7 +428,7 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
                                         >
                                           <Select
                                             placeholder="选择星期"
-                                            style={{ width: 120 }}
+                                            style={{ width: 270 }}
                                             options={weeks_option}
                                           />
                                         </Form.Item>
@@ -444,11 +436,11 @@ const SelectCourseTaskForm = forwardRef<SelectCourseTaskFormRef, SelectCourseTas
                                         <Form.Item
                                           {...restField}
                                           name={[name, 'period']}
-                                          rules={[{ required: true, message: '请选择课时' }]}
+                                          rules={[{ required: true, message: '选择上课课时' }]}
                                         >
                                           <Select
-                                            placeholder="选择课时"
-                                            style={{ width: 150 }}
+                                            placeholder="选择上课课时"
+                                            style={{ width: 270 }}
                                             options={period_option}
                                           />
                                         </Form.Item>

@@ -32,21 +32,6 @@ export async function deleteStudentGradesUsingPost1(
   });
 }
 
-/** editStudentGrades POST /api/score/edit */
-export async function editStudentGradesUsingPost1(
-  body: API.StudentGradesEditRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponseBoolean_>('/api/score/edit', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
 /** getStudentGrades GET /api/score/get/grades/me */
 export async function getStudentGradesUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -130,36 +115,6 @@ export async function listStudentGradesVoByPageUsingPost1(
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponsePageStudentGradesVO_>('/api/score/list/page/vo', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** listMyStudentGradesVOByPage POST /api/score/my/list/page/vo */
-export async function listMyStudentGradesVoByPageUsingPost1(
-  body: API.StudentGradesQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageStudentGradesVO_>('/api/score/my/list/page/vo', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** searchStudentGradesVOByPage POST /api/score/search/page/vo */
-export async function searchStudentGradesVoByPageUsingPost1(
-  body: API.StudentGradesQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageStudentGradesVO_>('/api/score/search/page/vo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

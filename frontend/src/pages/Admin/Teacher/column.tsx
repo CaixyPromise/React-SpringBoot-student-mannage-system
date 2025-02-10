@@ -3,6 +3,7 @@ import StudentSex from "@/pages/Admin/Student/components/StudentSex";
 import React from "react";
 import {Button, message, Space} from "antd";
 import {deleteTeacherInfoUsingPost1} from "@/services/backend/teacherInfoController";
+import DepartmentSelect from "@/components/DepartmentSelect";
 
 const handleDelete = async (actionRef: React.RefObject<ActionType>, record: API.TeacherInfoVO) => {
   if (record.id === undefined) {
@@ -42,6 +43,11 @@ export const TeacherColumn = (
   {
     title: '教师性别',
     dataIndex: 'teacherSex',
+    valueEnum: {
+      0: {text: '未知'},
+      1: {text: '男'},
+      2: {text: '女'},
+    },
     render: (_, record) => (
       <StudentSex useSex={record.teacherSex}/>
     )
@@ -49,14 +55,28 @@ export const TeacherColumn = (
   {
     title: '所属学院',
     dataIndex: 'teacherDepart',
+    formItemProps: {
+      label: '院系信息',
+      name: 'teacherDepart'
+    },
+    renderFormItem: (_, {...rest}) => {
+      return (
+        <DepartmentSelect
+          ignoreLevels={["classId"]}
+          {...rest}
+        />
+      );
+    },
   },
   {
     title: '教师专业',
     dataIndex: 'teacherMajor',
+    hideInSearch: true,
   },
   {
     title: '操作',
     width: 200,
+    hideInSearch: true,
     render: (_, record) => {
       return (
         <Space size="middle" direction="horizontal" wrap={true}>
@@ -72,7 +92,7 @@ export const TeacherColumn = (
           <Button
             type="link"
             danger
-            onClick={()=>{
+            onClick={() => {
               handleDelete(actionRef, record)
             }}
           >

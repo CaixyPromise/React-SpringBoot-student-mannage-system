@@ -47,7 +47,7 @@ export const setPublicationScoreState = async (id: number[] | undefined, state: 
 }
 
 
-export const RegistrationTableColumn: ProColumns[] = [
+export const RegistrationTableColumn: ProColumns<API.RegistrationTaskVO>[] = [
   {
     title: '任务Id',
     dataIndex: 'id',

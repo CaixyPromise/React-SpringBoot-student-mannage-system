@@ -70,11 +70,20 @@ const TeacherSelect = ({value, onChange}:{
       value={value}
       onChange={onChange}
     >
-      {optionData.map((item: API.TeacherInfoVO) => (
-        <Option key={item.id} value={item.id}>
-          {item.teacherName} - {item.teacherId}
-        </Option>
-      ))}
+      {optionData
+        .sort((a: API.TeacherInfoVO, b: API.TeacherInfoVO) => {
+          // 先按 teacherDeptId 排序
+          const deptDiff = (a.teacherDeptId ?? 0) - (b.teacherDeptId ?? 0);
+          if (deptDiff !== 0) return deptDiff; // 如果部门不同，直接返回部门排序结果
+
+          // 如果部门相同，再按 teacherMajorId 排序
+          return (a.teacherMajorId ?? 0) - (b.teacherMajorId ?? 0);
+        })
+        .map((item: API.TeacherInfoVO) => (
+          <Option key={item.id} value={item.id}>
+            {item?.teacherName} - {item?.teacherDepart} - {item?.teacherMajor} - {item?.teacherId}
+          </Option>
+        ))}
     </Select>
   );
 };

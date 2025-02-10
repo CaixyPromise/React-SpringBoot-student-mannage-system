@@ -54,40 +54,34 @@ const UserAdminPage: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
+      copyable: true,
     },
     {
-      title: '账号',
+      title: '工号/学号',
       dataIndex: 'userAccount',
       valueType: 'text',
     },
     {
-      title: '用户名',
+      title: '用户姓名',
       dataIndex: 'userName',
       valueType: 'text',
     },
+
     {
-      title: '头像',
-      dataIndex: 'userAvatar',
-      valueType: 'image',
-      fieldProps: {
-        width: 64,
-      },
-      hideInSearch: true,
-    },
-    {
-      title: '简介',
-      dataIndex: 'userProfile',
-      valueType: 'textarea',
-    },
-    {
-      title: '权限',
+      title: '身份',
       dataIndex: 'userRole',
       valueEnum: {
-        user: {
-          text: '用户',
+        teacher: {
+          text: '教师',
+          color: 'blue'
+        },
+        student: {
+          text: '学生',
+          color: 'green'
         },
         admin: {
           text: '管理员',
+          color: 'red'
         },
       },
     },
@@ -134,9 +128,7 @@ const UserAdminPage: React.FC = () => {
         headerTitle={'查询表格'}
         actionRef={actionRef}
         rowKey="key"
-        search={{
-          labelWidth: 120,
-        }}
+
         toolBarRender={() => [
           <Button
             type="primary"
@@ -151,7 +143,7 @@ const UserAdminPage: React.FC = () => {
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
-
+          console.log("params: ", params)
           const { data, code } = await listUserByPageUsingPost1({
             ...params,
             sortField,

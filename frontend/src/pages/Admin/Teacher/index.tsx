@@ -12,13 +12,16 @@ export default function Teacher() {
   const actionRef = useRef<ActionType>();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const fetchTeacherPageData = async ({params, pageSize, filter,}: PageRequest) => {
+  const fetchTeacherPageData = async (params: {
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+  }) => {
     setLoading(true);
+    console.log("parmas: ", params)
     try {
       const {data, code} = await listTeacherInfoByPageUsingPost1({
-        pageSize,
         ...params,
-        ...filter,
       })
       return {
         success: code === 0,

@@ -1347,7 +1347,6 @@ declare namespace API {
     finalPercentage?: number;
     id?: number;
     isDelete?: number;
-    isElectives?: number;
     semesterId?: number;
     stuId?: number;
     subjectId?: number;
@@ -1363,13 +1362,6 @@ declare namespace API {
     studentGradeInfos?: StudentGradeInfo[];
     subjectId?: number;
     taskId?: number;
-  };
-
-  type StudentGradesEditRequest = {
-    content?: string;
-    id?: number;
-    tags?: string[];
-    title?: string;
   };
 
   type StudentGradesQueryRequest = {
@@ -1660,13 +1652,11 @@ declare namespace API {
   type UserQueryRequest = {
     current?: number;
     id?: number;
-    mpOpenId?: string;
     pageSize?: number;
     sortField?: string;
     sortOrder?: string;
-    unionId?: string;
+    userAccount?: string;
     userName?: string;
-    userProfile?: string;
     userRole?: string;
   };
 

@@ -269,7 +269,7 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         Page<StudentInfoVO> postVOPage = new Page<>(postPage.getCurrent(), postPage.getSize());
         List<StudentInfoVO> studentInfoVOS = this.getStudentInfoVOList(postPage.getRecords());
         postVOPage.setRecords(studentInfoVOS);
-        postVOPage.setTotal(studentInfoVOS.size());
+        postVOPage.setTotal(postPage.getTotal());
         return postVOPage;
     }
 

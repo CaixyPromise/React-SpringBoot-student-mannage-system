@@ -20,7 +20,7 @@ public class SubjectsAddRequest implements Serializable
     /**
      * 科目最高分
      */
-    private Long gradeMax;
+    private Integer gradeMax;
     /**
      * 课程类型
      */
@@ -28,22 +28,27 @@ public class SubjectsAddRequest implements Serializable
     /**
      * 科目最低分
      */
-    private Long gradeMin;
+    private Integer gradeMin;
 
     /**
      * 优秀分数线
      */
-    private Long gradeExcellent;
+    private Integer gradeExcellent;
 
     /**
      * 不及格分数线
      */
-    private Long gradeFail;
+    private Integer gradeFail;
 
     /**
      * 课程学时
      */
     private Integer creditHours;
+
+    /**
+    * 学分
+    */
+    private Double gradeCredit;
 
     private static final long serialVersionUID = 1L;
 }

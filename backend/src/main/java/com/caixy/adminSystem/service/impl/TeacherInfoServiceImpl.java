@@ -86,13 +86,13 @@ public class TeacherInfoServiceImpl extends ServiceImpl<TeacherInfoMapper, Teach
             String teacherId = teacherInfo.getTeacherId();
             if (StringUtils.isBlank(teacherId) || teacherId.length() < 8)
             {
-                throw new BusinessException(ErrorCode.PARAMS_ERROR, "学号不合法");
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "工号不合法");
             }
             LambdaQueryWrapper<TeacherInfo> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(TeacherInfo::getTeacherId, teacherId);
             if (this.count(queryWrapper) > 0)
             {
-                throw new BusinessException(ErrorCode.PARAMS_ERROR, "学号已存在");
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "工号已存在");
             }
         }
     }
@@ -199,7 +199,7 @@ public class TeacherInfoServiceImpl extends ServiceImpl<TeacherInfoMapper, Teach
         Page<TeacherInfoVO> postVOPage = new Page<>(teacherInfoPage.getCurrent(), teacherInfoPage.getSize());
         List<TeacherInfoVO> studentInfoVOS = this.getTeacherInfoVOList(teacherInfoPage.getRecords());
         postVOPage.setRecords(studentInfoVOS);
-        postVOPage.setTotal(studentInfoVOS.size());
+        postVOPage.setTotal(teacherInfoPage.getTotal());
         return postVOPage;
     }
 

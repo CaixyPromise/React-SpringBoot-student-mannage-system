@@ -15,7 +15,7 @@ const Settings: ProLayoutProps & {
   "fixedHeader": false,
   "fixSiderbar": true,
   colorWeak: false,
-  title: '高校新生质量分析系统',
+  title: '课业星⭐',
   pwa: true,
   iconfontUrl: '',
   token: {

@@ -65,7 +65,7 @@ const Login: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" style={{ height: '100%' }} src="/logo.svg" />}
-          title="高校新生质量分析系统"
+          title="课业星⭐"
           subTitle={'数字赋能时代发展 高校数字化管理'}
           initialValues={{
             autoLogin: true,

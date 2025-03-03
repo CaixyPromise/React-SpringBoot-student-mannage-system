@@ -44,7 +44,7 @@ const HomePage = () => {
       setCurrentTime(moment().format('HH:mm:ss'));
     }, 1000);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, []);
 
 

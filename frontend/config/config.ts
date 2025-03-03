@@ -73,7 +73,7 @@ export default defineConfig({
    * @name layout 插件
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: '高校新生质量分析系统',
+  title: '课业星⭐',
   layout: {
     locale: true,
     ...defaultSettings,

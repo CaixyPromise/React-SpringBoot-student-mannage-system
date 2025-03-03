@@ -77,6 +77,7 @@ export default [
     access: 'canAdmin',
     component: './Admin/RegistrationScore'
   },
-  {path: '/', redirect: '/analysis'},
+  {path: '/index', component: './Welcome', name: '主页'},
+  {path: '/', redirect: '/index'},
   {path: '*', layout: false, component: './404'},
 ];

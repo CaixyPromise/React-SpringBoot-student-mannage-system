@@ -109,8 +109,6 @@ const Index = () => {
           };
         }}
       />
-
-
       <CreateInfoModal
         createModalVisible={createModalVisible}
         setCreateModalVisible={setCreateModalVisible}

@@ -140,7 +140,6 @@ public class StudentCourseSelectionServiceImpl extends ServiceImpl<StudentCourse
      *
      * @author CAIXYPROMISE
      * @version 1.0
-     * @version 2025/1/11 3:38
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

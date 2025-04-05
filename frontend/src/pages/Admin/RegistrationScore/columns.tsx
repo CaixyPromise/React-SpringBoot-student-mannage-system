@@ -6,7 +6,6 @@ import {
   deleteRegistrationTaskUsingPost1
 } from "@/services/backend/registrationTaskController";
 import {ProCoreActionType} from "@ant-design/pro-utils/es/typing";
-import {record} from "@umijs/utils/compiled/zod";
 import {updatePublicationUsingPost1} from "@/services/backend/registrationTaskLessonController";
 import SemesterSelect from "@/components/SemesterSelect";
 

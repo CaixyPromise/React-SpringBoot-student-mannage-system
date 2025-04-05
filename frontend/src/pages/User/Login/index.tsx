@@ -38,7 +38,8 @@ const Login: React.FC = () => {
         currentUser: res.data,
       });
       const urlParams = new URL(window.location.href).searchParams;
-      history.push(urlParams.get('redirect') || '/');
+      // history.push(urlParams.get('redirect') || '/');
+      history.push('/');
       return;
     } catch (error: any) {
       const defaultLoginFailureMessage = `登录失败，${error.message}`;

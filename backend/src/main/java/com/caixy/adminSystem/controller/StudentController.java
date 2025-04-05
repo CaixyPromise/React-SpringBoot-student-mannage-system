@@ -73,7 +73,7 @@ public class StudentController
      */
     @PostMapping("/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> deleteStudentInfo(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request)
+    public BaseResponse<Boolean> deleteStudentInfo(@RequestBody DeleteRequest deleteRequest)
     {
         if (deleteRequest == null || deleteRequest.getId() <= 0)
         {

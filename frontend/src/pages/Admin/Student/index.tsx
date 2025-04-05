@@ -35,13 +35,13 @@ const Index = () => {
    * @since 2024/5/1 下午6:33
    * @version 1.0
    */
-  const handleDelete = async (record: { id: any; }) => {
+  const handleDelete = async (record: { studentId: number; }) => {
     try {
       const {data, code} = await deleteStudentInfoUsingPost1({
-        id: record.id,
+        id: record?.studentId,
       })
       if (code === 0 && data) {
-        message.success('删除成功，即将刷新')
+        message.success('删除成功')
         actionRef.current?.reloadAndRest?.()
       }
     } catch (e) {

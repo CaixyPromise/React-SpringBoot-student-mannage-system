@@ -222,7 +222,13 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
                 Wrappers.<StudentInfo>lambdaQuery()
                         .in(StudentInfo::getStuClassId, classIds));
         if (totalClassCount > totalMaxSelectionCount) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "班级总人数超过所有科目的最大选课人数: " + totalMaxSelectionCount);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, String.format(
+                        "所有选课科目的限选人数(%d)必须要超过班级总人数(%d)," +
+                        "否则会有%d名学生选不到课程, 请重新设置每个课程的限选人数",
+                    totalClassCount,
+                    totalMaxSelectionCount,
+                    totalClassCount - totalMaxSelectionCount
+            ));
         }
 
         // 5. 验证最小学分要求是否符合已选科目的学分范围

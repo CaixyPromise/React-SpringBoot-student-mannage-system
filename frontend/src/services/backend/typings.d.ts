@@ -1512,6 +1512,7 @@ declare namespace API {
   type SubjectsAddRequest = {
     courseType?: number;
     creditHours?: number;
+    gradeCredit?: number;
     gradeExcellent?: number;
     gradeFail?: number;
     gradeMax?: number;

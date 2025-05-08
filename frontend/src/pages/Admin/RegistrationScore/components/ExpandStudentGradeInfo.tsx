@@ -8,7 +8,8 @@ import {DownloadOutlined} from "@ant-design/icons"; // 导出 Excel
 const ExpandStudentGradeInfo: React.FC<{
   courseTaskId: number;
   subjectInfo: API.SubjectsVO;
-}> = ({ courseTaskId, subjectInfo }) => {
+  taskId: number;
+}> = ({ courseTaskId, subjectInfo, taskId }) => {
   const [studentGrades, setStudentGrades] = useState<API.StudentsGradeForAdminVO[]>([]);
 
   const queryStudentGrade = async () => {
@@ -16,6 +17,7 @@ const ExpandStudentGradeInfo: React.FC<{
       const { code, data } = await getStudentGradesVoByTaskSubjectUsingGet1({
         subjectId: subjectInfo?.id as number,
         courseTaskId,
+        taskId,
       });
       if (code === 0) {
         setStudentGrades(data);

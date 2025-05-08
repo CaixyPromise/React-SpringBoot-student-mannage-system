@@ -14,6 +14,8 @@
             <result property="finalGrade" column="finalGrade" jdbcType="INTEGER"/>
             <result property="usualPercentage" column="usualPercentage" jdbcType="TINYINT"/>
             <result property="finalPercentage" column="finalPercentage" jdbcType="TINYINT"/>
+        <result property="taskId" column="taskId" jdbcType="BIGINT"/>
+
             <result property="courseGroupId" column="courseGroupId" jdbcType="BIGINT"/>
             <result property="creatorId" column="creatorId" jdbcType="BIGINT"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
@@ -25,7 +27,7 @@
         id,stuId,subjectId,
         semesterId,totalGrade,usualGrade,
         finalGrade,usualPercentage,finalPercentage,
-        courseGroupId,creatorId,
+        courseGroupId,creatorId,taskId,
         createTime,updateTime,isDelete
     </sql>
     
@@ -41,7 +43,7 @@
         INNER JOIN
                 subjects s ON sg.subjectId = s.id
         WHERE
-            sg.stuId = #{userId}  -- 根据学生ID过滤
+            sg.stuId = #{userId}
         AND
             sg.courseGroupId IN (
                 SELECT

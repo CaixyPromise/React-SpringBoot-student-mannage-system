@@ -639,15 +639,12 @@ public class CourseSelectionInfoServiceImpl extends ServiceImpl<CourseSelectionI
         else {semesterMap = new HashMap<>();}
 
         // 组装 VO 列表
-        return courseSelectionInfos.stream().map(csi ->
-        {
+        return courseSelectionInfos.stream().map(csi -> {
             CourseSelectionInfoVO vo = new CourseSelectionInfoVO();
             BeanUtils.copyProperties(csi, vo);
-
             // 补充学期信息
             Semesters semester = semesterMap.get(csi.getSemesterId());
             vo.setSemesterName(semester != null ? semester.getName() : null);
-
             return vo;
         }).collect(Collectors.toList());
     }

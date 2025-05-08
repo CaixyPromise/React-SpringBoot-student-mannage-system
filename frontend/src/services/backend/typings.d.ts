@@ -684,6 +684,8 @@ declare namespace API {
     courseTaskId: number;
     /** subjectId */
     subjectId: number;
+    /** taskId */
+    taskId: number;
   };
 
   type getStudentInfoVOByIdUsingGET1Params = {
@@ -1350,6 +1352,7 @@ declare namespace API {
     semesterId?: number;
     stuId?: number;
     subjectId?: number;
+    taskId?: number;
     totalGrade?: number;
     updateTime?: string;
     usualGrade?: number;

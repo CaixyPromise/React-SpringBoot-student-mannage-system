@@ -38,8 +38,8 @@ const Login: React.FC = () => {
         currentUser: res.data,
       });
       const urlParams = new URL(window.location.href).searchParams;
-      // history.push(urlParams.get('redirect') || '/');
-      history.push('/');
+      history.push(urlParams.get('redirect') || '/');
+      // history.push('/');
       return;
     } catch (error: any) {
       const defaultLoginFailureMessage = `登录失败，${error.message}`;
@@ -119,14 +119,14 @@ const Login: React.FC = () => {
             </>
           )}
 
-          <div
-            style={{
-              marginBottom: 24,
-              textAlign: 'right',
-            }}
-          >
-            <a>新用户注册</a>
-          </div>
+          {/*<div*/}
+          {/*  style={{*/}
+          {/*    marginBottom: 24,*/}
+          {/*    textAlign: 'right',*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  <a>新用户注册</a>*/}
+          {/*</div>*/}
         </LoginForm>
       </div>
       <Footer />

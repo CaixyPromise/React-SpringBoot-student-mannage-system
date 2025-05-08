@@ -59,6 +59,11 @@ public class StudentGrades extends BaseEntity
     private Integer finalPercentage;
 
     /**
+    * 任务id
+    */
+    private Long taskId;
+
+    /**
      * 课程组id
      */
     private Long courseGroupId;

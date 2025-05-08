@@ -187,6 +187,9 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
             return Collections.emptyList();
         }
         List<StudentInfo> studentInfoList = this.listByIds(studentIds);
+        LambdaQueryWrapper<StudentInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(StudentInfo::getId, studentIds);
+//        queryWrapper.ignore
         return this.getStudentInfoVOList(studentInfoList);
     }
 

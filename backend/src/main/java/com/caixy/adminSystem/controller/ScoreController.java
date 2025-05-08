@@ -11,7 +11,6 @@ import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.exception.ThrowUtils;
 
 import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesAddRequest;
-import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesEditRequest;
 import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesQueryRequest;
 import com.caixy.adminSystem.model.dto.StudentGrades.StudentGradesUpdateRequest;
 import com.caixy.adminSystem.model.entity.StudentGrades;
@@ -161,11 +160,14 @@ public class ScoreController
         return ResultUtils.success(studentGradesVOByStuId);
     }
 
-    @GetMapping("/get/stu/grade/{courseTaskId}/{subjectId}")
+    @GetMapping("/get/stu/grade/{taskId}/{courseTaskId}/{subjectId}")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<List<StudentsGradeForAdminVO>> getStudentGradesVOByTaskSubject(@PathVariable("courseTaskId") Long courseTaskId, @PathVariable("subjectId") Long subjectId)
+    public BaseResponse<List<StudentsGradeForAdminVO>> getStudentGradesVOByTaskSubject(
+            @PathVariable("taskId") Long taskId,
+            @PathVariable("courseTaskId") Long courseTaskId,
+            @PathVariable("subjectId") Long subjectId)
     {
-        return ResultUtils.success(studentGradesService.getStudentGradesByCourseTaskIdAndSubjectId(courseTaskId, subjectId));
+        return ResultUtils.success(studentGradesService.getStudentGradesByCourseTaskIdAndSubjectId(taskId, courseTaskId, subjectId));
     }
 
 

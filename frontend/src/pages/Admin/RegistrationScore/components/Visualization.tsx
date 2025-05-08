@@ -1,8 +1,7 @@
 import React, {useMemo} from "react";
 import {Row, Col, Card, Statistic} from "antd";
 import EChartsReact from "echarts-for-react";
-import * as echarts from "echarts"; // ECharts 需要用到数据工具
-import "echarts/dist/extension/dataTool"; // 额外加载数据处理工具
+import { prepareBoxplotData } from 'echarts/dist/extension/dataTool';
 
 const getStatistics = (grades: API.StudentsGradeForAdminVO[], subjectInfo: API.SubjectsVO) => {
   let excellentCount = 0;
@@ -238,7 +237,7 @@ const Visualization: React.FC<{
     }
 
     // 3. 使用 ECharts 内置方法计算箱线图数据
-    const boxData = echarts.dataTool.prepareBoxplotData([scores]);
+    const boxData = prepareBoxplotData([scores]);
 
     return {
       title: { text: "成绩分布箱线图", left: "center" },

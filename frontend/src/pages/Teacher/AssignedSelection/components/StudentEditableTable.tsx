@@ -1,7 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {EditableProTable, ProColumns} from '@ant-design/pro-components';
 import {InputNumber, message, Select, Tooltip, Button, Empty, Descriptions} from "antd";
-import {InfoOutlined} from "@ant-design/icons";
+import {InfoOutlined, UserOutlined} from "@ant-design/icons";
 import {getStudentsByCourseSelectionAndSubjectUsingGet1} from "@/services/backend/studentController";
 import dayjs from "dayjs";
 import {addStudentElectiveGradesUsingPost1} from "@/services/backend/scoreController";
@@ -50,26 +50,51 @@ const StudentEditableTable: React.FC<{
 
   // 初始化可编辑行keys
   useEffect(() => {
-    setEditableKeys(studentInfoVOList?.map(item => item?.id));
+    setEditableKeys(studentInfoVOList?.map(item => item?.stuId));
   }, [studentInfoVOList]);
+
+  const needRegistration = useMemo(()=> {
+    const now = dayjs();
+
+    return registrationTaskInfo?.hasTask &&
+      !registrationTaskInfo?.isFinished &&
+      registrationTaskInfo?.startDate &&
+      registrationTaskInfo?.endDate &&
+      dayjs(registrationTaskInfo.startDate).isBefore(now) &&
+      dayjs(registrationTaskInfo.endDate).isAfter(now);
+  }, [registrationTaskInfo])
 
   useEffect(() => {
     const baseColumns = [
       // {title: 'ID', dataIndex: 'id', editable: false},
       {title: '学号', dataIndex: 'stuId', editable: false},
       {title: '姓名', dataIndex: 'stuName', editable: false},
-      {title: '性别', dataIndex: 'stuSex', editable: false},
+      {title: '性别', dataIndex: 'stuSex',
+        render: (_, record) => {
+          const {stuSex: useSex} = record;
+          if (useSex === undefined || useSex === null) {
+            return null;
+          }
+
+          const sexString = String(useSex).trim();
+
+          const isMale = sexString === "1";
+          const color = isMale ? "blue" : "pink";
+          const label = isMale ? "男" : "女";
+
+          return (
+            <span aria-label={label} style={{ color }}>
+              <UserOutlined color={color}/> <a>{label}</a>
+            </span>
+          );
+        },
+        editable: false},
       {title: '学院', dataIndex: 'stuDepart', editable: false},
       {title: '专业', dataIndex: 'stuMajor', editable: false},
       {title: '班级', dataIndex: 'stuClass', editable: false},
     ];
-    const now = dayjs();
 
-    if (registrationTaskInfo?.hasTask &&
-      registrationTaskInfo?.startDate &&
-      registrationTaskInfo?.endDate &&
-      dayjs(registrationTaskInfo.startDate).isBefore(now) &&
-      dayjs(registrationTaskInfo.endDate).isAfter(now)) {
+    if (needRegistration) {
       baseColumns.push(
         {
           title: (
@@ -129,7 +154,9 @@ const StudentEditableTable: React.FC<{
     }
 
     setColumns(baseColumns);
-  }, [registeredScore, usualPercentage, maxScore]);
+  }, [needRegistration, registeredScore, usualPercentage, maxScore]);
+
+
 
   const handleScoreSubmitToServer = async (values: StudentTableInfo[]) => {
     const submitData = {
@@ -201,120 +228,135 @@ const StudentEditableTable: React.FC<{
 
   return (
     <>
-      <div style={{margin: 0, padding: 0, width: '100%'}}>
-        <div>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            {
-              registrationTaskInfo?.hasTask && (
-                <Descriptions bordered>
-                  <Descriptions.Item
-                    span={3}
-                    label="登分任务名称"
-                  >
-                    {registrationTaskInfo?.name}
+      <div
+        style={{
+          margin: 0,
+          padding: 0,
+          width: '100%',
+          // 包裹整个卡片内容的父容器，使用 flex 布局垂直居中
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          // 如果卡片有固定高度，可以设置 height 属性
+          height: '100%'
+        }}
+      >
+        <div style={{ width: '100%' }}>
+          {/* 如果存在登分任务，则渲染 Descriptions 区域 */}
+          {registrationTaskInfo?.hasTask && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: "10px" }}>
+              <Descriptions bordered style={{ width: '100%' }}>
+                <Descriptions.Item span={3} label="登分任务名称">
+                  {registrationTaskInfo?.name}
+                </Descriptions.Item>
+                <Descriptions.Item span={2} label="登分开始时间">
+                  {dayjs(registrationTaskInfo?.startDate).format('YYYY-MM-DD HH:mm')}
+                </Descriptions.Item>
+                <Descriptions.Item span={2} label="登分截止时间">
+                  {dayjs(registrationTaskInfo?.endDate).format('YYYY-MM-DD HH:mm')}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label="登分状态"
+                  style={{
+                    color: registrationTaskInfo?.isFinished === 1 ? 'green' : 'red'
+                  }}
+                >
+                  {registrationTaskInfo?.isFinished === 1 ? '已登分' : '未登分'}
+                </Descriptions.Item>
+                {registrationTaskInfo?.finishedTime && (
+                  <Descriptions.Item span={3} label="登分时间">
+                    {dayjs(registrationTaskInfo?.finishedTime).format('YYYY-MM-DD HH:mm')}
                   </Descriptions.Item>
-                  <Descriptions.Item
-                    span={2}
-                    label="登分开始时间"
-                  >
-                    {dayjs(registrationTaskInfo?.startDate).format('YYYY-MM-DD HH:mm')}
-                  </Descriptions.Item>
-                  <Descriptions.Item
-                    span={2}
-                    label="登分截止时间"
-                  >
-                    {dayjs(registrationTaskInfo?.endDate).format('YYYY-MM-DD HH:mm')}
-                  </Descriptions.Item>
-                  <Descriptions.Item
-                    label="登分状态"
-                    style={{
-                      color: registrationTaskInfo?.isFinished === 1 ? 'green' : 'red',
-                    }}>
-                    {registrationTaskInfo?.isFinished === 1 ? '已登分' : '未登分'}
-                  </Descriptions.Item>
-                  {
-                    registrationTaskInfo?.finishedTime &&
-                    <Descriptions.Item
-                      span={3}
-                      label="登分时间"
-                    >
-                      {dayjs(registrationTaskInfo?.finishedTime).format('YYYY-MM-DD HH:mm')}
-                    </Descriptions.Item>}
-                </Descriptions>
-              )
-            }
-          </div>
-        </div>
-        <EditableProTable
-          ref={tableRef}
-          style={{margin: 0, padding: 0, width: '100%'}}
-          bordered
-          rowKey="id"
-          headerTitle="学生信息"
-          columns={columns}
-          value={studentInfoVOList}
-          recordCreatorProps={false}
-          editable={{
-            type: 'multiple',
-            editableKeys: editableKeys,
-            actionRender: () => [],
-            onValuesChange: (changedRecord, allRecords) => {
-              setStudentInfoVOList(allRecords);
-            },
-            onChange: setEditableKeys,
-          }}
-          search={false}
-          toolBarRender={false}
-          pagination={false}
-          locale={{
-            emptyText: (
-              <div style={{textAlign: 'center', padding: '20px 0'}}>
-                <Empty
-                  imageStyle={{width: 100, height: 100}}
-                  style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}
-                  description="暂无学生信息"
-                />
-              </div>
-            ),
-          }}
-          rowClassName={(record, index) => errorRows.has(index) ? 'ant-table-row-error' : ''}
-        />
-        <div style={{textAlign: 'center', marginTop: 32}}>
-          {!isConfirmed ? (
-            <Button type="primary" onClick={() => {
-              // 第一次点击确认：禁用编辑
-              setIsConfirmed(true);
-              setEditableKeys([]); // 禁用所有行的编辑
-            }}>
-              确认
-            </Button>
-          ) : (
-            <>
-              <Button type="primary" onClick={() => {
-                // 第二次点击提交：收集数据并调用提交函数
-                const submissionData = studentInfoVOList.map(item => ({
-                  ...item,
-                  usualScore: item.usualScore || null,
-                  finalScore: item.finalScore || null,
-                  usualPercentage: usualPercentage,
-                  finalPercentage: 100 - usualPercentage,
-                  totalScore: (item.usualScore || 0) * (usualPercentage / 100)
-                    + (item.finalScore || 0) * ((100 - usualPercentage) / 100),
-                }));
-                handleScoreSubmit(submissionData);
-              }}>
-                提交
-              </Button>
-              <Button type='dashed' danger style={{marginLeft: 8}} onClick={() => {
-                // 取消按钮：恢复编辑状态
-                setIsConfirmed(false);
-                setEditableKeys(studentInfoVOList?.map(item => item?.id));
-              }}>
-                取消
-              </Button>
-            </>
+                )}
+              </Descriptions>
+            </div>
           )}
         </div>
+        <div style={{ width: '100%', marginTop: 16 }}>
+          <EditableProTable
+            ref={tableRef}
+            style={{ width: '100%' }}
+            bordered
+            rowKey="stuId"
+            headerTitle="学生信息"
+            columns={columns}
+            value={studentInfoVOList}
+            recordCreatorProps={false}
+            editable={{
+              type: 'multiple',
+              editableKeys: editableKeys,
+              actionRender: () => [],
+              onValuesChange: (changedRecord, allRecords) => {
+                setStudentInfoVOList(allRecords);
+              },
+              onChange: setEditableKeys,
+            }}
+            search={false}
+            toolBarRender={false}
+            pagination={false}
+            locale={{
+              emptyText: (
+                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                  <Empty
+                    imageStyle={{ width: 100, height: 100 }}
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+                    description="暂无学生信息"
+                  />
+                </div>
+              ),
+            }}
+            rowClassName={(_, index) => (errorRows.has(index) ? 'ant-table-row-error' : '')}
+          />
+        </div>
+        {
+          needRegistration && <>
+            <div style={{ textAlign: 'center', marginTop: 32 }}>
+              {!isConfirmed ? (
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setIsConfirmed(true);
+                    setEditableKeys([]); // 禁用编辑
+                  }}
+                >
+                  确认
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      const submissionData = studentInfoVOList.map(item => ({
+                        ...item,
+                        usualScore: item.usualScore || null,
+                        finalScore: item.finalScore || null,
+                        usualPercentage: usualPercentage,
+                        finalPercentage: 100 - usualPercentage,
+                        totalScore:
+                          (item.usualScore || 0) * (usualPercentage / 100) +
+                          (item.finalScore || 0) * ((100 - usualPercentage) / 100)
+                      }));
+                      handleScoreSubmit(submissionData);
+                    }}
+                  >
+                    提交
+                  </Button>
+                  <Button
+                    type="dashed"
+                    danger
+                    style={{ marginLeft: 8 }}
+                    onClick={() => {
+                      setIsConfirmed(false);
+                      setEditableKeys(studentInfoVOList.map(item => String(item.stuId)));
+                    }}
+                  >
+                    取消
+                  </Button>
+                </>
+              )}
+            </div>
+          </>
+        }
       </div>
     </>
   );

@@ -47,15 +47,15 @@ export async function getStudentGradesUsingGet1(
   });
 }
 
-/** getStudentGradesVOByTaskSubject GET /api/score/get/stu/grade/${param0}/${param1} */
+/** getStudentGradesVOByTaskSubject GET /api/score/get/stu/grade/${param2}/${param0}/${param1} */
 export async function getStudentGradesVoByTaskSubjectUsingGet1(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getStudentGradesVOByTaskSubjectUsingGET1Params,
   options?: { [key: string]: any },
 ) {
-  const { courseTaskId: param0, subjectId: param1, ...queryParams } = params;
+  const { courseTaskId: param0, subjectId: param1, taskId: param2, ...queryParams } = params;
   return request<API.BaseResponseListStudentsGradeForAdminVO_>(
-    `/api/score/get/stu/grade/${param0}/${param1}`,
+    `/api/score/get/stu/grade/${param2}/${param0}/${param1}`,
     {
       method: 'GET',
       params: { ...queryParams },

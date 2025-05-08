@@ -57,7 +57,7 @@ public class StudentGradesAddRequest implements Serializable
          * 成绩
          */
         @NotNull(message = "成绩不能为空")
-        private Long totalGrade;
+        private Integer totalGrade;
 
         /**
          * 平时成绩

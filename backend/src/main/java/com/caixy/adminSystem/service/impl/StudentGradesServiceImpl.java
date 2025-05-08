@@ -170,7 +170,9 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
             studentGrades.setSemesterId(request.getSemesterId());
             studentGrades.setCourseGroupId(request.getCourseGroupId());
             studentGrades.setStuId(stuID);
+            studentGrades.setTaskId(request.getTaskId());
             studentGrades.setCreatorId(userId);
+//            studentGrades.setTotalGrade(item.getTotalGrade());
             return studentGrades;
         }).collect(Collectors.toList()));
         if (saved)
@@ -186,17 +188,20 @@ public class StudentGradesServiceImpl extends ServiceImpl<StudentGradesMapper, S
 
     /**
      * 根据课程任务和科目id获取学生成绩信息
+     * alter table student_grades
+     *     add taskId bigint null comment '登分任务Id' after finalPercentage;
      *
      * @author CAIXYPROMISE
      * @version 1.0
      * @version 2025/1/27 1:19
      */
     @Override
-    public List<StudentsGradeForAdminVO> getStudentGradesByCourseTaskIdAndSubjectId(Long courseTaskId, Long subjectId)
+    public List<StudentsGradeForAdminVO> getStudentGradesByCourseTaskIdAndSubjectId(Long taskId, Long courseTaskId, Long subjectId)
     {
         LambdaQueryWrapper<StudentGrades> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(StudentGrades::getCourseGroupId, courseTaskId);
         queryWrapper.eq(StudentGrades::getSubjectId, subjectId);
+        queryWrapper.eq(StudentGrades::getTaskId, taskId);
         List<StudentGrades> studentGradesList = list(queryWrapper);
         Subjects subjectInfo = subjectsService.getById(subjectId);
         if (studentGradesList.isEmpty() || subjectInfo == null)

@@ -63,5 +63,6 @@ public class HasRegistrationTaskVO implements Serializable
     * 学期id
     */
     private Long semesterId;
+    
     private static final long serialVersionUID = 1L;
 }

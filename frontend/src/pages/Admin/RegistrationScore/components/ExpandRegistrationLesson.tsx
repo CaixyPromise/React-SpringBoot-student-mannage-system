@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {message} from "antd";
 import {listRegistrationTaskLessonVoByPageUsingGet1} from "@/services/backend/registrationTaskLessonController";
 import {ProTable} from "@ant-design/pro-components";
@@ -49,7 +49,7 @@ const ExpandRegistrationLesson: React.FC<{
           onExpandedRowsChange: (keys) => setExpandedRowKeys(keys),
           expandedRowRender: (record) => (
             <>
-              <ExpandStudentGradeInfo courseTaskId={record?.courseSelectionInfo?.id} subjectInfo={record?.subjectsInfo} />
+              <ExpandStudentGradeInfo taskId={id} courseTaskId={record?.courseSelectionInfo?.id} subjectInfo={record?.subjectsInfo} />
             </>
           ),
         }}

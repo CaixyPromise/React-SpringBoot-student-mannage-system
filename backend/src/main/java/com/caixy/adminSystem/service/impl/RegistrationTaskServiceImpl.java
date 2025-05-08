@@ -7,6 +7,7 @@ import com.caixy.adminSystem.common.ErrorCode;
 import com.caixy.adminSystem.exception.BusinessException;
 import com.caixy.adminSystem.exception.ThrowUtils;
 import com.caixy.adminSystem.mapper.CourseSelectionInfoMapper;
+import com.caixy.adminSystem.mapper.RegistrationTaskLessonMapper;
 import com.caixy.adminSystem.mapper.RegistrationTaskMapper;
 import com.caixy.adminSystem.model.dto.registrationTask.RegistrationTaskAddRequest;
 import com.caixy.adminSystem.model.dto.registrationTask.RegistrationTaskQueryRequest;
@@ -14,6 +15,7 @@ import com.caixy.adminSystem.model.entity.*;
 
 import com.caixy.adminSystem.model.vo.registrationTask.RegistrationTaskVO;
 
+import com.caixy.adminSystem.model.vo.registrationTaskLesson.HasRegistrationTaskVO;
 import com.caixy.adminSystem.model.vo.semesters.SemestersVO;
 import com.caixy.adminSystem.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -47,11 +49,15 @@ public class RegistrationTaskServiceImpl extends ServiceImpl<RegistrationTaskMap
     private RegistrationTaskLessonService registrationTaskLessonService;
     @Resource
     private SemestersService semestersService;
+    @Resource
+    private RegistrationTaskLessonMapper registrationTaskLessonMapper;
+
 
     private Date localDateTimeToDate(LocalDateTime localDateTime)
     {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean addRegistrationTask(RegistrationTaskAddRequest request, Long creatorId)
@@ -84,6 +90,17 @@ public class RegistrationTaskServiceImpl extends ServiceImpl<RegistrationTaskMap
             courseSelectionSubjects.size() != subjectIds.size())
         {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "课程任务科目不存在");
+        }
+        // 检查，如果同课程组里的科目已经登分过了，则该科目也不能登分。
+        List<HasRegistrationTaskVO> hasRegistrationTaskVOS = registrationTaskLessonMapper.
+                selectHasRegistrationTaskBySubjectAndCourseTaskIds(courseTaskId, subjectIds);
+        if (hasRegistrationTaskVOS != null && !hasRegistrationTaskVOS.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,
+                    "该课程组里的科目已经登分或正在登分了，不能重复登分。重复包含科目涉及的登分任务名称： " +
+                            hasRegistrationTaskVOS.stream()
+                                    .map(HasRegistrationTaskVO::getName)
+                                    .collect(Collectors.toList())
+                    );
         }
 
         RegistrationTask registrationTask = new RegistrationTask();

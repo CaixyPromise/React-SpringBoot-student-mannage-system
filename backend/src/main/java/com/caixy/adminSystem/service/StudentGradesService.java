@@ -35,7 +35,7 @@ public interface StudentGradesService extends IService<StudentGrades> {
 
     Boolean addElectiveCourseGrade(StudentGradesAddRequest request, Long userId);
 
-    List<StudentsGradeForAdminVO> getStudentGradesByCourseTaskIdAndSubjectId(Long courseTaskId, Long subjectId);
+    List<StudentsGradeForAdminVO> getStudentGradesByCourseTaskIdAndSubjectId(Long taskId, Long courseTaskId, Long subjectId);
 
     /**
      * 获取查询条件
